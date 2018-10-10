@@ -4,6 +4,7 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 // import toggleFileActive from "../../actions/files/toggleFileActive";
 import setActiveFile from "../../actions/activeFilesIds/setActiveFile";
 import unsetActiveFile from "../../actions/activeFilesIds/unsetActiveFile";
+import downloadFile from "../../actions/files/downloadFile";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
@@ -37,9 +38,15 @@ class FileItem extends Component {
   };
 
   handleContextMenuClick = e => {
-    console.log(e);
-    console.log(this.file.id);
+   e.preventDefault();
+  
+   this.props.downloadFile(this.file.id);
   };
+
+   download(id)
+   {
+    console.log("download me "+id);
+   }
   render() {
     let driveIcon = null;
     switch (this.file.drive) {
@@ -83,7 +90,8 @@ class FileItem extends Component {
           </ContextMenuTrigger>
           <ContextMenu id={this.file.id}>
             <MenuItem
-              data={{ foo: "bar" }}
+              data={{ foo:"bar"
+              }}
               onClick={this.handleContextMenuClick}
             >
               Download
@@ -112,13 +120,10 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       setActiveFile,
-      unsetActiveFile
+      unsetActiveFile,
+      downloadFile
     },
     dispatch
   );
 }
-
-export default connect(
-  null,
-  mapDispatchToProps
-)(FileItem);
+export default connect(null,mapDispatchToProps)(FileItem);

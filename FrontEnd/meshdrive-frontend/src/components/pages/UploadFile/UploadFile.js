@@ -25,6 +25,7 @@ class UploadFile extends Component {
     this.setState({ files: acceptedFiles });
     acceptedFiles.forEach(file => {
       console.log(file);
+      
       //   const reader = new FileReader();
       //   reader.onload = () => {
       //     const fileAsBinaryString = reader.result;
