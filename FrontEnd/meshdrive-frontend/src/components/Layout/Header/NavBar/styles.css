@@ -1,0 +1,9 @@
+.search input[type="text"] {
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+.search button {
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  padding-right: 15px;
+}

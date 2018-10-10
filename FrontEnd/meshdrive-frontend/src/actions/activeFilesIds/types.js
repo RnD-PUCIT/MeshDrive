@@ -1,0 +1,2 @@
+export const SET_ACTIVE_FILE = "SET_ACTIVE_FILES";
+export const UNSET_ACTIVE_FILE = "UNSET_ACTIVE_FILE";

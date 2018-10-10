@@ -1,0 +1,29 @@
+.file-item {
+  font-size: 0.9rem;
+  min-width: 130px;
+  width: 23.5%;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid #e6e8eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.file-item.active {
+}
+.file-item:hover {
+  border-color: #a9cbff;
+}
+.file-item--drive-icon {
+  color: #ddd;
+}
+
+.file-item--icon img {
+  width: 32px;
+}
+.file-item--title {
+  font-weight: 600;
+}
+.file-item--size {
+  font-size: 0.8rem;
+}
