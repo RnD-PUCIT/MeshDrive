@@ -52,12 +52,12 @@ class NavBar extends React.Component {
             </NavItem>
             <NavItem>
               <NavLink href="#">
-                <FAIcon icon="bell" />
+                <FAIcon icon="bell" classes={["fa"]} />
               </NavLink>
             </NavItem>
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>
-                <FAIcon icon="user" />
+                <FAIcon icon="user" classes={["fa"]} />
               </DropdownToggle>
               <DropdownMenu right>
                 <DropdownItem>Option 1</DropdownItem>

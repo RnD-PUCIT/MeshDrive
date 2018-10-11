@@ -1,15 +1,11 @@
 import React from "react";
 
 export default props => {
-  return (
-    <span
-      className={
-        "icon fa-" +
-        props.icon +
-        (props.fab ? " fab" : " fas") +
-        " " +
-        props.className
-      }
-    />
-  );
+  let htmlClasses = "icon fa-" + props.icon;
+  if (Array.isArray(props.classes)) {
+    htmlClasses += " " + props.classes.join(" ");
+  }
+  console.log(htmlClasses);
+
+  return <span className={htmlClasses} />;
 };

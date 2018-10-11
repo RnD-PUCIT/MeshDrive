@@ -18,7 +18,12 @@ class FileItem extends Component {
     };
     this.file = this.props.file;
   }
-  toggleActive = () => {
+  toggleActive = e => {
+    e.preventDefault();
+    if (e.target.tagName.toLowerCase() === "a") {
+      this.downloadFile();
+      return;
+    }
     this.setState(
       prevState => {
         return {
@@ -38,15 +43,14 @@ class FileItem extends Component {
   };
 
   handleContextMenuClick = e => {
-   e.preventDefault();
-  
-   this.props.downloadFile(this.file.id);
+    e.preventDefault();
   };
 
-   download(id)
-   {
-    console.log("download me "+id);
-   }
+  downloadFile = () => {
+    console.log("Download clicked");
+    this.props.downloadFile(this.file.id);
+    console.log(this.file.id);
+  };
   render() {
     let driveIcon = null;
     switch (this.file.drive) {
@@ -78,9 +82,9 @@ class FileItem extends Component {
               </div>
               <div className="d-flex flex-column p-1 file-item--info">
                 <div className="file-item--title">{this.file.name}</div>
-                <div className="file-item--size text-muted">
+                <div className="file-item--download">
                   {/* {this.props.size} */}
-                  12 Kb
+                  <a href="#">Download</a>
                 </div>
               </div>
               <div className="file-item--drive-icon align-self-start ml-auto mt-1 mr-2 m-1">
@@ -90,7 +94,8 @@ class FileItem extends Component {
           </ContextMenuTrigger>
           <ContextMenu id={this.file.id}>
             <MenuItem
-              data={{ foo:"bar"
+              data={{
+                foo: "bar"
               }}
               onClick={this.handleContextMenuClick}
             >
@@ -126,4 +131,7 @@ function mapDispatchToProps(dispatch) {
     dispatch
   );
 }
-export default connect(null,mapDispatchToProps)(FileItem);
+export default connect(
+  null,
+  mapDispatchToProps
+)(FileItem);

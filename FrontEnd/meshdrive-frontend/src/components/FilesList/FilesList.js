@@ -13,7 +13,7 @@ class FilesList extends Component {
     console.log(this.props.activeFileIds);
     const mapFilesList = this.props.files.map(file => {
       const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;
-      return <FileItem file={file} isFileActive={isFileActive} />;
+      return <FileItem key={file.id} file={file} isFileActive={isFileActive} />;
     });
 
     return (

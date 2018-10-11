@@ -1,6 +1,7 @@
 import { FETCH_FILES } from "./types";
-
+import axios from "axios";
 export const setFiles = files => {
+  console.log(files);
   const drives = ["googledrive", "onedrive", "dropbox"];
   files.forEach((file, i) => {
     file.drive = drives[i % 3];
