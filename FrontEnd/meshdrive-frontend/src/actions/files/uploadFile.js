@@ -12,10 +12,11 @@ export const addFile = fileWithInfo => {
 export default function uploadFile(fileWithInfo) {
   return dispatch => {
   {
-    const formData = new FormData()
-    for (var f in fileWithInfo.files)
+    const formData = new FormData();
+    var allFIles = fileWithInfo.files;
+    for (var singleFile in allFIles)
     {
-      formData.append('files[]', f, f.name);
+      formData.append('files[]', singleFile ,singleFile.name);
     }  
     axios.post('https://mysterious-plains-65246.herokuapp.com/uploadFile',formData,{     
       headers: {
