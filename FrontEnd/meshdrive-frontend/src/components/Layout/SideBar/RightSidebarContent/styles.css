@@ -1,5 +1,7 @@
 .sidebar-right {
   width: 192px;
-  border: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  border-radius: 25px;
   padding: 20px;
 }
