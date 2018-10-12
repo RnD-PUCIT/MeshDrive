@@ -24,9 +24,7 @@ class Home extends Component {
           <SideBar right>
             {activeFiles.length == 0
               ? "No file selected"
-              : activeFiles.length == 1
-                ? `Single file selected: ${lastActiveFile.id}`
-                : `Multiple files selected: ${activeFileIds}`}
+              : `Total Selected Files: ${activeFiles.length}`}
           </SideBar>
         </div>
       </React.Fragment>

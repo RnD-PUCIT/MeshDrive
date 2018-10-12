@@ -41,7 +41,7 @@ class FilesList extends Component {
   }
 
   render() {
-    const emptyMessage = <p> Empty Dashboard </p>;
+    const emptyMessage = <p> Loading... </p>;
     const fileItems = this.sortFileItems(this.props.files);
 
     // seperate folders
