@@ -8,6 +8,8 @@ import downloadFile from "../../actions/files/downloadFile";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
+import { googleMimeTypes } from "../../constants/mimeTypes";
+
 import "./styles.css";
 class FileItem extends Component {
   constructor(props) {
@@ -52,10 +54,16 @@ class FileItem extends Component {
     console.log(this.file.id);
   };
   render() {
+    console.log(this.file);
+
     let driveIcon = null;
+    let mimeType = null;
     switch (this.file.drive) {
       case "googledrive":
         driveIcon = <FAIcon icon="google" fab />;
+        mimeType = googleMimeTypes.find(
+          mimeType => mimeType.str === this.file.mimeType
+        );
         break;
       case "dropbox":
         driveIcon = <FAIcon icon="dropbox" fab />;
@@ -64,6 +72,7 @@ class FileItem extends Component {
         driveIcon = <FAIcon icon="cloud" />;
         break;
     }
+    console.log(mimeType);
     return (
       <React.Fragment>
         <div
@@ -78,7 +87,8 @@ class FileItem extends Component {
           <ContextMenuTrigger id={this.file.id}>
             <div className="d-flex flex-nowrap flex-wrap align-items-center">
               <div className="file-item--icon  p-2">
-                <img src={require("./folder-icon.png")} alt="" />
+                {/* <img src={require("./folder-icon.png")} alt="" /> */}
+                {mimeType && mimeType.icon}
               </div>
               <div className="d-flex flex-column p-1 file-item--info">
                 <div className="file-item--title">{this.file.name}</div>
