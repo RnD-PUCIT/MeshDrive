@@ -33,6 +33,6 @@ export function getMimeTypeIcon(mimeType) {
 }
 
 export const fileItemIcons = {
-  folder: <img src={require("../images/folder-icon.png")} alt="" />,
+  folder: <img src={require("../images/icon-folder.png")} alt="" />,
   unknown: <FAIcon icon="question-circle" classes={["fas"]} />
 };
