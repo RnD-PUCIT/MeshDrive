@@ -3,6 +3,9 @@ body,
 #root {
   height: 100%;
 }
+nav {
+  min-height: 62px;
+}
 .nav-item .fas {
   font-size: 1.8rem;
 }
