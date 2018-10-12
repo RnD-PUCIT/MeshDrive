@@ -18,8 +18,9 @@ export default function downloadFile(id) {
         responseType: 'blob', // important
       }).then((response) => {
 
+        console.log(response);
         
-      /*  const blob = new Blob([response.data], {type: response.data.type});
+        const blob = new Blob([response.data], {type: response.data.type});
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -28,13 +29,13 @@ export default function downloadFile(id) {
         if (contentDisposition) {
             const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
             if (fileNameMatch.length)
-                fileName = fileNameMatch[0];
+                fileName = fileNameMatch;
         }
         link.setAttribute('download', fileName);
         document.body.appendChild(link);
         link.click();
         link.remove();
-        window.URL.revokeObjectURL(url);*/
+        window.URL.revokeObjectURL(url);
         //___________________________________________________________________________________
         
        /* const url = window.URL.createObjectURL(new Blob([response.data]));
