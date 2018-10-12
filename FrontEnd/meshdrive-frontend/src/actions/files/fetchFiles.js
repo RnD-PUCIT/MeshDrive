@@ -18,7 +18,10 @@ export default function fetchFiles() {
   return dispatch => {
     fetch("https://mysterious-plains-65246.herokuapp.com/ListDriveFiles")
       .then(res => res.json())
-      .then(files => dispatch(setFiles(files)))
+      .then(files => {
+        // sort files
+        dispatch(setFiles(files));
+      })
       .catch(error => console.log(error));
   };
 }
