@@ -22,8 +22,7 @@ class FileItem extends Component {
   }
   toggleActive = e => {
     e.preventDefault();
-    if (e.target.tagName.toLowerCase() === "a") {
-      this.downloadFile();
+    if (e.target.tagName.toLowerCase() === "nav") {
       return;
     }
     this.setState(
@@ -44,18 +43,13 @@ class FileItem extends Component {
     );
   };
 
-  handleContextMenuClick = e => {
-    e.preventDefault();
-  };
-
-  downloadFile = () => {
-    console.log("Download clicked");
-    this.props.downloadFile(this.file.id);
-    console.log(this.file.id);
+  handleContextMenuClick = menu => {
+    switch (menu) {
+      case "download":
+        return this.props.downloadFile(this.file.id);
+    }
   };
   render() {
-    console.log(this.file);
-
     let driveIcon = null;
     switch (this.file.drive) {
       case "googledrive":
@@ -100,20 +94,20 @@ class FileItem extends Component {
               data={{
                 foo: "bar"
               }}
-              onClick={this.handleContextMenuClick}
+              onClick={() => this.handleContextMenuClick("download")}
             >
               Download
             </MenuItem>
             <MenuItem
               data={{ foo: "bar" }}
-              onClick={this.handleContextMenuClick}
+              onClick={() => this.handleContextMenuClick("delete")}
             >
               Delete
             </MenuItem>
             <MenuItem divider />
             <MenuItem
               data={{ foo: "bar" }}
-              onClick={this.handleContextMenuClick}
+              onClick={() => this.handleContextMenuClick("details")}
             >
               Details
             </MenuItem>
