@@ -25,7 +25,7 @@ class UploadFile extends Component {
     this.setState({ files: acceptedFiles });
     acceptedFiles.forEach(file => {
       console.log(file);
-      
+
       //   const reader = new FileReader();
       //   reader.onload = () => {
       //     const fileAsBinaryString = reader.result;
@@ -60,7 +60,7 @@ class UploadFile extends Component {
   render() {
     return (
       <React.Fragment>
-        <div id="page" className="d-flex flex-row w-100">
+        <div id="page" className="d-flex flex-row w-100 page-uploadfile">
           <div className="flex-grow-1 d-flex flex-column pl-4 pr-4">
             <h1>Upload File</h1>
 

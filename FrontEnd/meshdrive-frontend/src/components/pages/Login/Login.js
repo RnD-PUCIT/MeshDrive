@@ -5,7 +5,7 @@ class Login extends Component {
   render() {
     return (
       <React.Fragment>
-        <div id="page" className="d-flex flex-row w-100">
+        <div id="page" className="d-flex flex-row w-100 page-login">
           <div className="flex-grow-1 d-flex flex-column pl-4 pr-4">
             <h1>Login</h1>
             This is login page

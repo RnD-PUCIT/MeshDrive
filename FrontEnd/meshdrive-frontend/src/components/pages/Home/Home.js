@@ -14,7 +14,7 @@ class Home extends Component {
     const activeFileIds = activeFiles.map(file => file.id);
     return (
       <React.Fragment>
-        <div id="page" className="d-flex flex-row w-100">
+        <div id="page" className="d-flex flex-row w-100 page-home">
           <div className="flex-grow-1 d-flex flex-column pl-4 pr-4">
             <h1>Home</h1>
 
