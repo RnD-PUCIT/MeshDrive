@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import pathToClassName from "../../../utils/pathToClassName";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import SideBar from "../../Layout/SideBar/SideBar";
 import uuid from "uuid";
@@ -7,6 +8,10 @@ import { connect } from "react-redux";
 import Dropzone from "react-dropzone";
 import "./styles.css";
 class UploadFile extends Component {
+  componentDidMount() {
+    const bodyClassName = pathToClassName(this.props.match.path);
+    if (bodyClassName) document.body.classList.add(bodyClassName);
+  }
   state = {
     onDragEnter: false,
     files: [],
@@ -60,7 +65,7 @@ class UploadFile extends Component {
   render() {
     return (
       <React.Fragment>
-        <div id="page" className="d-flex flex-row w-100 page-uploadfile">
+        <div id="page" className="d-flex flex-row w-100">
           <div className="flex-grow-1 d-flex flex-column pl-4 pr-4">
             <h1>Upload File</h1>
 

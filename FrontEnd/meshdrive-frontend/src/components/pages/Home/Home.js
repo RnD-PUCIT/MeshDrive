@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import pathToClassName from "../../../utils/pathToClassName";
 import SideBar from "../../Layout/SideBar/SideBar";
 import { connect } from "react-redux";
 // import fetchFiles from "../../../actions/files/fetchFiles";
@@ -6,6 +7,10 @@ import PropTypes from "prop-types";
 import FilesList from "../../FilesList/FilesList";
 
 class Home extends Component {
+  componentDidMount() {
+    const bodyClassName = pathToClassName(this.props.match.path);
+    if (bodyClassName) document.body.classList.add(bodyClassName);
+  }
   render() {
     const activeFiles = this.props.files.filter(file => {
       return this.props.activeFileIds.indexOf(file.id) !== -1;
@@ -14,7 +19,7 @@ class Home extends Component {
     const activeFileIds = activeFiles.map(file => file.id);
     return (
       <React.Fragment>
-        <div id="page" className="d-flex flex-row w-100 page-home">
+        <div id="page" className="d-flex flex-row w-100">
           <div className="flex-grow-1 d-flex flex-column pl-4 pr-4">
             <h1>Home</h1>
 

@@ -1,9 +1,14 @@
 import React, { Component } from "react";
+import pathToClassName from "../../../utils/pathToClassName";
 import "./style.css";
 // import SideBar from "../../Layout/SideBar/SideBar";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 
 class Login extends Component {
+  componentDidMount() {
+    const bodyClassName = pathToClassName(this.props.match.path);
+    if (bodyClassName) document.body.classList.add(bodyClassName);
+  }
   render() {
     return (
       <React.Fragment>
