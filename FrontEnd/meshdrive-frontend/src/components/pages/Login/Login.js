@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import pathToClassName from "../../../utils/pathToCssId";
+import pathToCssId from "../../../utils/pathToCssId";
 import "./styles.css";
 // import SideBar from "../../Layout/SideBar/SideBar";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 
 class Login extends Component {
   componentDidMount() {
-    const bodyId = pathToClassName(this.props.match.path);
+    const bodyId = pathToCssId(this.props.match.path);
     document.body.id = "";
     if (bodyId) document.body.id = bodyId;
   }

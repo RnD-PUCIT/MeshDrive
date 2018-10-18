@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import pathToCssId from "../../../utils/pathToCssId";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import SideBar from "../../Layout/SideBar/SideBar";
 import uuid from "uuid";
@@ -7,6 +8,11 @@ import { connect } from "react-redux";
 import Dropzone from "react-dropzone";
 import "./styles.css";
 class UploadFile extends Component {
+  componentDidMount() {
+    const bodyId = pathToCssId(this.props.match.path);
+    document.body.id = "";
+    if (bodyId) document.body.id = bodyId;
+  }
   state = {
     onDragEnter: false,
     files: [],
@@ -25,7 +31,7 @@ class UploadFile extends Component {
     this.setState({ files: acceptedFiles });
     acceptedFiles.forEach(file => {
       console.log(file);
-      
+
       //   const reader = new FileReader();
       //   reader.onload = () => {
       //     const fileAsBinaryString = reader.result;
