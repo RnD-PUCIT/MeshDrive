@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import pathToClassName from "../../../utils/pathToClassName";
+import pathToCssId from "../../../utils/pathToCssId";
 import SideBar from "../../Layout/SideBar/SideBar";
 import { connect } from "react-redux";
 // import fetchFiles from "../../../actions/files/fetchFiles";
@@ -8,8 +8,9 @@ import FilesList from "../../FilesList/FilesList";
 
 class Home extends Component {
   componentDidMount() {
-    const bodyClassName = pathToClassName(this.props.match.path);
-    if (bodyClassName) document.body.classList.add(bodyClassName);
+    const bodyId = pathToCssId(this.props.match.path);
+    document.body.id = "";
+    if (bodyId) document.body.id = bodyId;
   }
   render() {
     const activeFiles = this.props.files.filter(file => {

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import pathToClassName from "../../../utils/pathToClassName";
+import pathToCssId from "../../../utils/pathToCssId";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import SideBar from "../../Layout/SideBar/SideBar";
 import uuid from "uuid";
@@ -9,8 +9,9 @@ import Dropzone from "react-dropzone";
 import "./styles.css";
 class UploadFile extends Component {
   componentDidMount() {
-    const bodyClassName = pathToClassName(this.props.match.path);
-    if (bodyClassName) document.body.classList.add(bodyClassName);
+    const bodyId = pathToCssId(this.props.match.path);
+    document.body.id = "";
+    if (bodyId) document.body.id = bodyId;
   }
   state = {
     onDragEnter: false,

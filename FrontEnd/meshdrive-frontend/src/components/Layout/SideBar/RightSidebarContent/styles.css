@@ -1,9 +1,8 @@
 .sidebar-right {
   width: 192px;
 }
-.page-home .sidebar-right,
-.page-upload .sidebar-right {
-  width: 192px;
+
+.sidebar-right {
   border-top: 1px solid #ddd;
   border-left: 1px solid #ddd;
   border-radius: 25px;
