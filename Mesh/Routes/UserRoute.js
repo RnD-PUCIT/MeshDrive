@@ -191,6 +191,31 @@ router.put("/edit/:id",function(req,res){
 })
 router.get("/sendVerification:id",function(req,res){
 
+    // var id = req.params.id;
+    // var user = User.findById(id).then((user)=>{
+
+    //     if(user.verified==='false')
+    //     {
+    //         var receipent = user.email;
+    //         var statusObj =new Object();
+    //         statusObj["verified"]="/confirmation/"+id;   
+            
+    //         // email sending 
+
+
+
+
+    //         // acknoledgement for user 
+    //         User.findByIdAndUpdate(id,statusObj).then(()=>{
+    //             res.status(Constants.RESPONSE_SUCCESS).json({
+    //                 success:true,
+    //                 message:"Email link sent!"   
+    //                 });
+    //         })
+            
+          
+    //     }
+    // });
     
 })
 
