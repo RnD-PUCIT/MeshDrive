@@ -7,9 +7,9 @@ const Constants=require('./Extras/Constants');
 
 const CREDENTIALS_PATH="./credentials.json";
 
-mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
+// mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
 
-mongoose.Promise=global.Promise;
+// mongoose.Promise=global.Promise;
 
 // app.use((req,res)=>{
 // 	res.header('Access-Control-Allow-Origin','*');
