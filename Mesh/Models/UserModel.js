@@ -8,11 +8,6 @@ const UserSchema = new Schema({
         required:true
         
     },
-    verified:{
-        type:String,
-        default:false
-
-    },
     email:{
         type:String,
         required:true
@@ -20,6 +15,10 @@ const UserSchema = new Schema({
     password:{
         type:"String",
         required:true
+    },
+    verified:{
+        type:String,
+        default:false
     },
     drives :{
         GoogleDrive:{
