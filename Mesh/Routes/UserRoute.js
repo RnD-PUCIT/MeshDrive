@@ -9,7 +9,6 @@ const nodemailer = require('nodemailer');
 //to get all users
 router.get("/",function(req,res){
 
-
     console.log("hello");
     var result = new Object();
 
@@ -57,7 +56,6 @@ router.get("/:id",(req,res)=>{
 });
 //for login : working fine
 router.post("/login",function(req,res){
-
     var result= new Object();
     var email=req.body.email;
     var pass=req.body.password;
@@ -190,34 +188,48 @@ router.put("/edit/:id",function(req,res){
 
 })
 
-router.get("/confirmation:id",function(req,res){
+router.get("/confirmation/:id",function(req,res){
 
 // pending 
+var id = req.params.id;
 
+var user = User.findById(id).then((user)=>{
+    if(user.verified==="/users/confirmation/"+id)
+    {
+        var receipent = user.email;
+        var statusObj =new Object();
+        statusObj["verified"]="true";
+
+        User.findByIdAndUpdate(id,statusObj).then(()=>{
+            res.status(Constants.RESPONSE_SUCCESS).json({
+                success:true,
+                message:"Email verified!"   
+                });
+        })      
+    }
+});
 
 });
-router.get("/sendVerification:id",function(req,res){
-
-  
+router.get("/sendVerification/:id",function(req,res){
     var id = req.params.id;
     var user = User.findById(id).then((user)=>{
         if(user.verified==='false')
         {
             var receipent = user.email;
             var statusObj =new Object();
-            statusObj["verified"]="/confirmation/"+id;   
+            statusObj["verified"]="/users/confirmation/"+id;   
             
     // preparing link 
-    var baseURL= 'http://localhost:8000/users';
-    var link = '/confirmation/'+id;
-            // email sending 
+    var baseURL= 'http://localhost:8000';
+    var link = '/users/confirmation/'+id;
+    // email sending 
     var mailOptions = new Object();
     mailOptions={
         to : receipent,
         subject : "Please confirm your Email account",
         html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+baseURL+link+">Click here to verify</a>" 
     }
-    console.log(mailOptions);
+   // console.log(mailOptions);
     var smtpTransport = nodemailer.createTransport({
         service: "Gmail",
         auth: {
@@ -228,26 +240,31 @@ router.get("/sendVerification:id",function(req,res){
     smtpTransport.sendMail(mailOptions, function(error, response){
         if(error)
         {
-               console.log(error);
+            // mail not sent
+            console.log(error);
             res.status(Constants.RESPONSE_FAIL).json({success:false,
             message:"Please try again"});
 
         }
         else
-        {
-               
+        {         
+            //mail sent  
             // acknoledgement for user 
             User.findByIdAndUpdate(id,statusObj).then(()=>{
                 res.status(Constants.RESPONSE_SUCCESS).json({
                     success:true,
                     message:"Email link sent!"   
                     });
-            })
-            
+            })         
         }
-   });
-            
-          
+   });  
+        }
+        else if(user.verified!='true')
+        {
+            res.status(Constants.RESPONSE_SUCCESS).json({
+                success:true,
+                message:"Verification link already sent on your mail. Please verify from there"   
+                });
         }
     });
     
