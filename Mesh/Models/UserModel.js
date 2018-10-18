@@ -8,6 +8,11 @@ const UserSchema = new Schema({
         required:true
         
     },
+    verified:{
+        type:String,
+        default:false
+
+    },
     email:{
         type:String,
         required:true
