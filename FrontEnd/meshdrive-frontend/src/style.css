@@ -9,6 +9,12 @@ nav {
 .nav-item .fas {
   font-size: 1.8rem;
 }
+.sidebar-left .btn.active,
+.btn-gradient {
+  color: #fff !important;
+  background: linear-gradient(to right, #02b3e4, #02ccba);
+  border: none;
+}
 
 .react-contextmenu {
   z-index: 999;

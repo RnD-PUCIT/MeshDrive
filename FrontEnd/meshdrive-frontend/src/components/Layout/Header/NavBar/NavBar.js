@@ -45,7 +45,7 @@ class NavBar extends React.Component {
                 <InputGroup>
                   <Input />
                   <InputGroupAddon addonType="append">
-                    <Button>Search</Button>
+                    <Button className="btn-gradient">Search</Button>
                   </InputGroupAddon>
                 </InputGroup>
               </Form>
