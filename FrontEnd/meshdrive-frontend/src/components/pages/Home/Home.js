@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import pathToCssId from "../../../utils/pathToCssId";
 import SideBar from "../../Layout/SideBar/SideBar";
 import { connect } from "react-redux";
 // import fetchFiles from "../../../actions/files/fetchFiles";
@@ -7,11 +6,6 @@ import PropTypes from "prop-types";
 import FilesList from "../../FilesList/FilesList";
 
 class Home extends Component {
-  componentDidMount() {
-    const bodyId = pathToCssId(this.props.match.path);
-    document.body.id = "";
-    if (bodyId) document.body.id = bodyId;
-  }
   render() {
     const activeFiles = this.props.files.filter(file => {
       return this.props.activeFileIds.indexOf(file.id) !== -1;
@@ -30,9 +24,7 @@ class Home extends Component {
           <SideBar right>
             {activeFiles.length == 0
               ? "No file selected"
-              : activeFiles.length == 1
-                ? `Single file selected: ${lastActiveFile.id}`
-                : `Multiple files selected: ${activeFileIds}`}
+              : `Total Selected Files: ${activeFiles.length}`}
           </SideBar>
         </div>
       </React.Fragment>

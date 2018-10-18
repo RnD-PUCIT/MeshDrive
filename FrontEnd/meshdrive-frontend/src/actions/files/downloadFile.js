@@ -16,8 +16,7 @@ export default function downloadFile(id) {
       responseType: "blob" // important
     }).then(response => {
       console.log(response);
-
-      /*  const blob = new Blob([response.data], {type: response.data.type});
+        const blob = new Blob([response.data], {type: response.data.type});
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -26,29 +25,15 @@ export default function downloadFile(id) {
         if (contentDisposition) {
             const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
             if (fileNameMatch.length)
-                fileName = fileNameMatch[0];
+                fileName = fileNameMatch;
         }
         link.setAttribute('download', fileName);
         document.body.appendChild(link);
         link.click();
         link.remove();
-        window.URL.revokeObjectURL(url);*/
-      //___________________________________________________________________________________
-
-      /* const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download',"Bilal.pdf");
-        document.body.appendChild(link);
-        link.click();
-          link.parentElement.removeChild(link)*/
+        window.URL.revokeObjectURL(url);
+    
     });
-    /*fetch("https://mysterious-plains-65246.herokuapp.com/downloadFile/"+id)
-      .then(
-
-
-      )
-      .then(d_file => dispatch(downloadFile()))
-      .catch(error => console.log(error));*/
+  
   };
 }

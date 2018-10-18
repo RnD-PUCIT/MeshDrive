@@ -8,7 +8,7 @@ import downloadFile from "../../actions/files/downloadFile";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
-import { googleMimeTypes } from "../../constants/mimeTypes";
+import { getMimeTypeIcon } from "../../constants/mimeTypes";
 
 import "./styles.css";
 class FileItem extends Component {
@@ -22,8 +22,7 @@ class FileItem extends Component {
   }
   toggleActive = e => {
     e.preventDefault();
-    if (e.target.tagName.toLowerCase() === "a") {
-      this.downloadFile();
+    if (e.target.tagName.toLowerCase() === "nav") {
       return;
     }
     this.setState(
@@ -44,35 +43,27 @@ class FileItem extends Component {
     );
   };
 
-  handleContextMenuClick = e => {
-    e.preventDefault();
-  };
-
-  downloadFile = () => {
-    console.log("Download clicked");
-    this.props.downloadFile(this.file.id);
-    console.log(this.file.id);
+  handleContextMenuClick = menu => {
+    switch (menu) {
+      case "download":
+        return this.props.downloadFile(this.file.id);
+    }
   };
   render() {
-    console.log(this.file);
-
     let driveIcon = null;
-    let mimeType = null;
     switch (this.file.drive) {
       case "googledrive":
-        driveIcon = <FAIcon icon="google" fab />;
-        mimeType = googleMimeTypes.find(
-          mimeType => mimeType.str === this.file.mimeType
-        );
+        driveIcon = <FAIcon icon="google" classes={["fab"]} />;
         break;
       case "dropbox":
-        driveIcon = <FAIcon icon="dropbox" fab />;
+        driveIcon = <FAIcon icon="dropbox" classes={["fab"]} />;
         break;
       case "onedrive":
-        driveIcon = <FAIcon icon="cloud" />;
+        driveIcon = <FAIcon icon="cloud" classes={["fa"]} />;
         break;
     }
-    console.log(mimeType);
+
+    const fileItemIcon = getMimeTypeIcon(this.file.mimeType);
     return (
       <React.Fragment>
         <div
@@ -87,15 +78,11 @@ class FileItem extends Component {
           <ContextMenuTrigger id={this.file.id}>
             <div className="d-flex flex-nowrap flex-wrap align-items-center">
               <div className="file-item--icon  p-2">
-                {/* <img src={require("./folder-icon.png")} alt="" /> */}
-                {mimeType && mimeType.icon}
+                {fileItemIcon && fileItemIcon}
               </div>
               <div className="d-flex flex-column p-1 file-item--info">
                 <div className="file-item--title">{this.file.name}</div>
-                <div className="file-item--download">
-                  {/* {this.props.size} */}
-                  <a href="#">Download</a>
-                </div>
+                <div className="file-item--download">{this.props.size}</div>
               </div>
               <div className="file-item--drive-icon align-self-start ml-auto mt-1 mr-2 m-1">
                 {driveIcon}
@@ -107,20 +94,20 @@ class FileItem extends Component {
               data={{
                 foo: "bar"
               }}
-              onClick={this.handleContextMenuClick}
+              onClick={() => this.handleContextMenuClick("download")}
             >
               Download
             </MenuItem>
             <MenuItem
               data={{ foo: "bar" }}
-              onClick={this.handleContextMenuClick}
+              onClick={() => this.handleContextMenuClick("delete")}
             >
               Delete
             </MenuItem>
             <MenuItem divider />
             <MenuItem
               data={{ foo: "bar" }}
-              onClick={this.handleContextMenuClick}
+              onClick={() => this.handleContextMenuClick("details")}
             >
               Details
             </MenuItem>

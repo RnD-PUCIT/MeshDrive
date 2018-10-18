@@ -7,6 +7,7 @@
   border: 1px solid #e6e8eb;
   border-radius: 4px;
   overflow: hidden;
+  min-height: 50px;
 }
 
 .file-item.active {
@@ -23,6 +24,13 @@
 }
 .file-item--title {
   font-weight: 600;
+  word-break: break-all;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
 }
 .file-item--size {
   font-size: 0.8rem;

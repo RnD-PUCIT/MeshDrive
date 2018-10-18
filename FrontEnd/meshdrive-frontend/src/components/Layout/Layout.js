@@ -2,7 +2,6 @@ import React from "react";
 import Header from "./Header/Header";
 import SideBar from "./SideBar/SideBar";
 import MainContent from "./MainContent/MainContent";
-import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import Footer from "./Footer/Footer";
 
 const Layout = props => {
@@ -11,13 +10,7 @@ const Layout = props => {
       <div id="main" className="d-flex flex-column flex-fill">
         <Header />
         <div className="d-flex flex-row flex-fill">
-          <Router>
-            <Switch>
-              {["/", "/uploadfile"].map((path, index) => (
-                <Route path={path} exact component={SideBar} key={index} />
-              ))}
-            </Switch>
-          </Router>
+          <SideBar />
           <MainContent>
             <div className="d-flex flex-column flex-grow w-100">
               {props.children}

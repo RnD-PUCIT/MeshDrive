@@ -1,4 +1,5 @@
 import { FETCH_FILES } from "./types";
+import uuid from "uuid";
 import axios from "axios";
 export const setFiles = files => {
   console.log(files);
@@ -15,10 +16,24 @@ export const setFiles = files => {
 };
 
 export default function fetchFiles() {
+  // let dummyFiles = [];
+  // for (let i = 0; i < 100; i++) {
+  //   const file = {
+  //     id: uuid,
+  //     name: `File ${i}`
+  //   };
+  //   dummyFiles = [...dummyFiles, file];
+  // }
+
   return dispatch => {
-    fetch("https://mysterious-plains-65246.herokuapp.com/listDriveFiles")
+    fetch("https://mysterious-plains-65246.herokuapp.com/ListDriveFiles")
       .then(res => res.json())
-      .then(files => dispatch(setFiles(files)))
+      .then(files => {
+        // sort files
+        dispatch(setFiles(files));
+      })
       .catch(error => console.log(error));
+
+    // return dispatch(setFiles(dummyFiles));
   };
 }
