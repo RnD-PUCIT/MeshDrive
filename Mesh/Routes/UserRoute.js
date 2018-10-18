@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../Models/UserModel');
 const Constants=require('../Extras/Constants');
+const nodemailer = require('nodemailer');
 
 
 
@@ -188,33 +189,67 @@ router.put("/edit/:id",function(req,res){
 
 
 })
+
+router.get("/confirmation:id",function(req,res){
+
+// pending 
+
+
+});
 router.get("/sendVerification:id",function(req,res){
 
-    // var id = req.params.id;
-    // var user = User.findById(id).then((user)=>{
-
-    //     if(user.verified==='false')
-    //     {
-    //         var receipent = user.email;
-    //         var statusObj =new Object();
-    //         statusObj["verified"]="/confirmation/"+id;   
+  
+    var id = req.params.id;
+    var user = User.findById(id).then((user)=>{
+        if(user.verified==='false')
+        {
+            var receipent = user.email;
+            var statusObj =new Object();
+            statusObj["verified"]="/confirmation/"+id;   
             
-    //         // email sending 
+    // preparing link 
+    var baseURL= 'http://localhost:8000/users';
+    var link = '/confirmation/'+id;
+            // email sending 
+    var mailOptions = new Object();
+    mailOptions={
+        to : receipent,
+        subject : "Please confirm your Email account",
+        html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+baseURL+link+">Click here to verify</a>" 
+    }
+    console.log(mailOptions);
+    var smtpTransport = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: "drivemesh36@gmail.com",
+            pass: "MeshDrive123?"
+        }
+    });
+    smtpTransport.sendMail(mailOptions, function(error, response){
+        if(error)
+        {
+               console.log(error);
+            res.status(Constants.RESPONSE_FAIL).json({success:false,
+            message:"Please try again"});
 
-
-
-
-    //         // acknoledgement for user 
-    //         User.findByIdAndUpdate(id,statusObj).then(()=>{
-    //             res.status(Constants.RESPONSE_SUCCESS).json({
-    //                 success:true,
-    //                 message:"Email link sent!"   
-    //                 });
-    //         })
+        }
+        else
+        {
+               
+            // acknoledgement for user 
+            User.findByIdAndUpdate(id,statusObj).then(()=>{
+                res.status(Constants.RESPONSE_SUCCESS).json({
+                    success:true,
+                    message:"Email link sent!"   
+                    });
+            })
+            
+        }
+   });
             
           
-    //     }
-    // });
+        }
+    });
     
 })
 
