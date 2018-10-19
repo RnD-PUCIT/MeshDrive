@@ -4,6 +4,7 @@ import "./styles.css";
 import validator from "validator";
 // import SideBar from "../../Layout/SideBar/SideBar";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import { Link } from "react-router-dom";
 
 class Login extends Component {
   componentDidMount() {
@@ -105,9 +106,9 @@ class Login extends Component {
             <div className="login-signup-form-text p-5">
               <h2>Don't Have an account?</h2>
               <p>Signup now </p>
-              <a href="#" className="btn btn-outline-light">
+              <Link to="/signup" className="btn btn-outline-light">
                 Sign Up
-              </a>
+              </Link>
             </div>
           </div>
         </div>

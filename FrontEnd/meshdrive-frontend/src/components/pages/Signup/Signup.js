@@ -4,7 +4,7 @@ import "../Login/styles.css";
 import validator from "validator";
 // import SideBar from "../../Layout/SideBar/SideBar";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
-
+import { Link } from "react-router-dom";
 class Signup extends Component {
   componentDidMount() {
     const bodyId = pathToCssId(this.props.match.path);
@@ -65,9 +65,9 @@ class Signup extends Component {
             <div className="login-signup-form-text p-5">
               <h2>Have an account?</h2>
               <p>Login now </p>
-              <a href="#" className="btn btn-outline-light">
+              <Link to="/login" className="btn btn-outline-light">
                 Login
-              </a>
+              </Link>
             </div>
             <div className="form-wrapper p-5">
               <h1 className="text-primary mb-4">Sign Up</h1>
