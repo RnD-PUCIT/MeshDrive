@@ -1,4 +1,4 @@
-const  URL="localhost:8000";
+const  URL="http://localhost:8000";
 const RESPONSE_FAIL=500;
 const RESPONSE_SUCCESS=200;
 const RESPONSE_EMPTY= 201;

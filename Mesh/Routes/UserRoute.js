@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../Models/UserModel');
 const Constants=require('../Extras/Constants');
 const nodemailer = require('nodemailer');
+const promise=require("promises");
 
 
 
@@ -62,9 +63,15 @@ router.post("/login",function(req,res){
     var criteria = {email:email,password:pass};
     User.findOne(criteria)
     .then((user)=>{
-
         if(user)
         {
+            if(user.verified=="false")
+            {
+                result.error="Account not verified";
+                result.user=user;
+                res.status(Constants.RESPONSE_FAIL).json(result);
+            }
+
             result.user=user;
             result.success=true;
             result.request={
@@ -101,15 +108,26 @@ router.post("/",function(req,res){
 
         User.create(u).then((user)=>{
            
+            console.log("sending email");
+            //sending the verification link
+            sendVerificationLink(user.email,user.id)
+            .then((a)=>{
+                
             result.user = user;
             result.success=true;
+            result.message=a.message;
             result.request={
                 url:Constants.URL+"/users/"+user["_id"],
                 method:"GET"
             }
-         
-            res.status(Constants.RESPONSE_SUCCESS).json(result);
-            console.log(user);
+                res.status(Constants.RESPONSE_SUCCESS).json(result);
+                console.log("User Registration");
+            
+            })
+            .catch((err)=>{
+                result.error=err;
+                res.status(Constants.RESPONSE_FAIL).json(result);
+            });
         }).catch((err)=>{
          
            
@@ -194,7 +212,7 @@ router.get("/confirmation/:id",function(req,res){
 var id = req.params.id;
 
 var user = User.findById(id).then((user)=>{
-    if(user.verified==="/users/confirmation/"+id)
+    if(user.verified==="/users/confirmation/"+id || user.verified==="false")
     {
         var receipent = user.email;
         var statusObj =new Object();
@@ -203,33 +221,35 @@ var user = User.findById(id).then((user)=>{
         User.findByIdAndUpdate(id,statusObj).then(()=>{
             res.status(Constants.RESPONSE_SUCCESS).json({
                 success:true,
-                message:"Email verified!"   
+                message:"Email verified! You can now login using your email"   
                 });
         })      
     }
 });
 
 });
-router.get("/sendVerification/:id",function(req,res){
-    var id = req.params.id;
-    var user = User.findById(id).then((user)=>{
-        if(user.verified==='false')
-        {
-            var receipent = user.email;
-            var statusObj =new Object();
-            statusObj["verified"]="/users/confirmation/"+id;   
-            
-    // preparing link 
-    var baseURL= 'http://localhost:8000';
+
+
+
+
+function sendVerificationLink(recipentEmail,id)
+{
+
+    
+  return new Promise((resolve,reject)=>{
+      
+    var baseURL= Constants.URL;
     var link = '/users/confirmation/'+id;
     // email sending 
     var mailOptions = new Object();
     mailOptions={
-        to : receipent,
-        subject : "Please confirm your Email account",
-        html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+baseURL+link+">Click here to verify</a>" 
+        to : recipentEmail,
+        subject : "Please confirm your Email account for MESH DRIVE",
+        html : "<h1>Hello</h1>,<br> Please Click on the link to verify your email.<br><a href="+baseURL+link+">Click here to verify</a>" 
     }
-   // console.log(mailOptions);
+    var statusObj =new Object();
+        statusObj["verified"]="/users/confirmation/"+id;   
+            
     var smtpTransport = nodemailer.createTransport({
         service: "Gmail",
         auth: {
@@ -237,38 +257,85 @@ router.get("/sendVerification/:id",function(req,res){
             pass: "MeshDrive123?"
         }
     });
-    smtpTransport.sendMail(mailOptions, function(error, response){
-        if(error)
-        {
-            // mail not sent
-            console.log(error);
-            res.status(Constants.RESPONSE_FAIL).json({success:false,
-            message:"Please try again"});
+    smtpTransport.sendMail(mailOptions)
+    .then((response)=>{
+        var result =new Object();
+        result.message="Verification Link sent to email";
+                 console.log(result);
+                 resolve(result);    
+    }).catch((error)=>{
+        console.log(error);
+        reject(error);
+    })
+        
+                    
 
-        }
-        else
-        {         
-            //mail sent  
-            // acknoledgement for user 
-            User.findByIdAndUpdate(id,statusObj).then(()=>{
-                res.status(Constants.RESPONSE_SUCCESS).json({
-                    success:true,
-                    message:"Email link sent!"   
-                    });
-            })         
-        }
-   });  
-        }
-        else if(user.verified!='true')
-        {
-            res.status(Constants.RESPONSE_SUCCESS).json({
-                success:true,
-                message:"Verification link already sent on your mail. Please verify from there"   
-                });
-        }
-    });
+    })
+}
+
+
+
+
+
+// router.get("/sendVerification/:id",function(req,res){
+//     var id = req.params.id;
+//     var user = User.findById(id).then((user)=>{
+//         if(user.verified==='false')
+//         {
+//             var receipent = user.email;
+//             var statusObj =new Object();
+//             statusObj["verified"]="/users/confirmation/"+id;   
+            
+//     // preparing link 
+//     var baseURL= Constants.URL;
+//     var link = '/users/confirmation/'+id;
+//     // email sending 
+//     var mailOptions = new Object();
+//     mailOptions={
+//         to : receipent,
+//         subject : "Please confirm your Email account",
+//         html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+baseURL+link+">Click here to verify</a>" 
+//     }
+//    // console.log(mailOptions);
+//     var smtpTransport = nodemailer.createTransport({
+//         service: "Gmail",
+//         auth: {
+//             user: "drivemesh36@gmail.com",
+//             pass: "MeshDrive123?"
+//         }
+//     });
+//     smtpTransport.sendMail(mailOptions, function(error, response){
+//         if(error)
+//         {
+//             // mail not sent
+//             console.log(error);
+//             res.status(Constants.RESPONSE_FAIL).json({success:false,
+//             message:"Please try again"});
+
+//         }
+//         else
+//         {         
+//             //mail sent  
+//             // acknoledgement for user 
+//             User.findByIdAndUpdate(id,statusObj).then(()=>{
+//                 res.status(Constants.RESPONSE_SUCCESS).json({
+//                     success:true,
+//                     message:"Email link sent!"   
+//                     });
+//             })         
+//         }
+//    });  
+//         }
+//         else if(user.verified!='true')
+//         {
+//             res.status(Constants.RESPONSE_SUCCESS).json({
+//                 success:true,
+//                 message:"Verification link already sent on your mail. Please verify from there"   
+//                 });
+//         }
+//     });
     
-})
+// })
 
 
 module.exports=router;
