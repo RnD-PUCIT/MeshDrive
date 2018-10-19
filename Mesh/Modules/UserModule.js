@@ -8,7 +8,7 @@ var exports=module.exports={};
 
 mongoose.connect(url,{ useNewUrlParser: true });
 
-exports.readTokens =function(email)
+exports.readGoogleDriveTokens =function(email)
 {
 	return new Promise(function(success,failure)
 	{
@@ -33,9 +33,7 @@ exports.readTokens =function(email)
 	});
 }
 
-
-
-exports.saveToken =function(email,token)
+exports.saveGoogleDriveTokens =function(email,token)
 {
 	return new Promise(function(success,failure){	
         
@@ -46,17 +44,60 @@ exports.saveToken =function(email,token)
         then((result)=>{
           console.log(result)
             success(result);
+        })
+        .catch((err)=>{
+            console.log(err);
+            failure(err.message);
+        });	
+	});
+}
+
+
+exports.readUserTokens =function(email)
+{
+	return new Promise(function(success,failure)
+	{
+		var criteria = {"email":email};
+		User.findOne(criteria).then((user)=>{
+           
+            if(user.token==false)
+            {
+                console.log("failed!");
+                failure("Token Empty"); 
+            }
+            else
+            {
+             
+                success(user.drives.GoogleDrive.token); 
+            }
+		}).catch((err)=>{
+
+            failure("Cannot read token");
+        })
+		
+	});
+}
+
+
+exports.saveUserTokens =function(email,token)
+{
+	return new Promise(function(success,failure){	
+        
+        var criteria = {"email":email};
+        var updation = {"token":token}
+
+        User.updateOne(criteria,{$set:updation}).
+        then((result)=>{
+          console.log(result)
+            success(result);
         }).
         catch((err)=>{
         console.log(err);
         failure(err.message);
-        });
-        
-      
-
-		
+        });	
 	});
 }
+
 function isEmpty(obj) {
     for(var prop in obj) {
         if(obj.hasOwnProperty(prop))

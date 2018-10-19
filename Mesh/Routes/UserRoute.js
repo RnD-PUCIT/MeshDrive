@@ -4,8 +4,9 @@ const User = require('../Models/UserModel');
 const Constants=require('../Extras/Constants');
 const nodemailer = require('nodemailer');
 const promise=require("promises");
-
-
+const bcrypt = require('bcrypt');
+const jwt=require('jsonwebtoken');
+const uuid = require('uuid/v4');
 
 //to get all users
 router.get("/",function(req,res){
@@ -60,29 +61,40 @@ router.post("/login",function(req,res){
     var result= new Object();
     var email=req.body.email;
     var pass=req.body.password;
-    var criteria = {email:email,password:pass};
+    console.log(email," : ",pass);
+    var criteria = {email:email};
     User.findOne(criteria)
     .then((user)=>{
         if(user)
         {
-            if(user.verified=="false")
-            {
-                result.error="Account not verified";
-                result.user=user;
-                res.status(Constants.RESPONSE_FAIL).json(result);
-            }
-
-            result.user=user;
-            result.success=true;
-            result.request={
-                url:Constants.URL+"/users/"+user["_id"],
-                method:"GET"
-            }
-            res.status(Constants.RESPONSE_SUCCESS).json(result);
-        }else{
-
+            bcrypt.compare(pass,user.password,(err,test)=>{
+                if(err){
+                    return res.status(Constants.RESPONSE_EMPTY).json({error:"Authentication Failed"});
+                }
+                if(test){
+                    console.log(result);
+                    const token=jwt.sign({
+                        email:user.email,
+                        userId:user._id
+                    },"secret",{
+                        expiresIn:"2hr"
+                    });
+                    result.token=token;
+                    result.message="Authentication Successfull";
+                    result.request={
+                        url:Constants.URL+"/users/"+user["_id"],
+                        method:"GET"
+                    }
+                    res.status(Constants.RESPONSE_SUCCESS).json(result);
+                }else{
+                    return res.status(Constants.RESPONSE_EMPTY).json({error:"Authentication Failed"});
+                }
+            });
+        }
+        else
+        {
             result.user=null;
-            result.error="No User Found";
+            result.error="User Not Found";
             res.status(Constants.RESPONSE_EMPTY).json(result);
         }
 
@@ -98,45 +110,52 @@ router.post("/login",function(req,res){
 
 //to save user : WORKING FINE
 router.post("/",function(req,res){
-
-       var u = {
-            name:req.body.name,
-            password: req.body.password,
-            email:req.body.email
-    }
     var result= new Object();
-
-        User.create(u).then((user)=>{
-           
-            console.log("sending email");
-            //sending the verification link
-            sendVerificationLink(user.email,user.id)
-            .then((a)=>{
-                
-            result.user = user;
-            result.success=true;
-            result.message=a.message;
-            result.request={
-                url:Constants.URL+"/users/"+user["_id"],
-                method:"GET"
+    bcrypt.hash(req.body.password,10,(err,hash)=>{
+        if(err)
+        {
+            result.error="Invalid Password Entered";
+            return res.status(Constants.RESPONSE_EMPTY).json(result);
+        }
+        else
+        {
+            var u = {
+                name:req.body.name,
+                password: hash,
+                email:req.body.email
             }
-                res.status(Constants.RESPONSE_SUCCESS).json(result);
-                console.log("User Registration");
             
-            })
-            .catch((err)=>{
-                result.error=err;
+            User.create(u).then((user)=>{
+                
+                console.log("sending email");
+                //sending the verification link
+                sendVerificationLink(user.email,user.id)
+                .then((a)=>{
+                
+                result.user = user;
+                result.success=true;
+                result.message=a.message;
+                result.request={
+                    url:Constants.URL+"/users/"+user["_id"],
+                    method:"GET"
+                }
+                    res.status(Constants.RESPONSE_SUCCESS).json(result);
+                    console.log("User Registration");
+                
+                })
+                .catch((err)=>{
+                    result.error=err;
+                    res.status(Constants.RESPONSE_FAIL).json(result);
+                });
+            }).catch((err)=>{
+                
+                
+                result.success=false;
+                result.error=err.message;
                 res.status(Constants.RESPONSE_FAIL).json(result);
-            });
-        }).catch((err)=>{
-         
-           
-            result.success=false;
-            result.error=err.message;
-            res.status(Constants.RESPONSE_FAIL).json(result);
-        })
-            
-     
+            })
+        }
+    });
 })  
 
 //to delete 

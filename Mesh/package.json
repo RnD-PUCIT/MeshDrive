@@ -21,6 +21,7 @@
       "resolved": "https://registry.npmjs.org/asap/-/asap-2.0.6.tgz",
       "version": "2.0.6"
     },
+    "bcrypt": "^3.0.2",
     "body-parser": {
       "dependencies": {
         "iconv-lite": {
@@ -192,6 +193,7 @@
       "resolved": "https://registry.npmjs.org/ipaddr.js/-/ipaddr.js-1.8.0.tgz",
       "version": "1.8.0"
     },
+    "jsonwebtoken": "^8.3.0",
     "media-typer": {
       "integrity": "sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=",
       "resolved": "https://registry.npmjs.org/media-typer/-/media-typer-0.3.0.tgz",
@@ -468,6 +470,7 @@
       "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.1.tgz",
       "version": "1.0.1"
     },
+    "uuid": "^3.3.2",
     "vary": {
       "integrity": "sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=",
       "resolved": "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz",

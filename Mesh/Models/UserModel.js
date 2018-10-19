@@ -20,6 +20,14 @@ const UserSchema = new Schema({
         type:String,
         default:false
     },
+    token:{
+        type:String,
+        default:""
+    },
+    secret:{
+        type:String,
+        default:""
+    },
     drives :{
         GoogleDrive:{
             token:{
