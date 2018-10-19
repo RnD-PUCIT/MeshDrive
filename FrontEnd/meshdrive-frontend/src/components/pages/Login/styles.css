@@ -1,7 +1,9 @@
-body#login {
+body#login,
+body#signup {
   background-image: url(../../../images/light-blue-blur-background.jpg);
   background-size: cover;
 }
+body#login nav,
 body#login nav {
   background: #ffffff91 !important;
 }
