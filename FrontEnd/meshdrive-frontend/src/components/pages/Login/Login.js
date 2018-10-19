@@ -103,8 +103,8 @@ class Login extends Component {
               </Form>
             </div>
             <div className="login-signup-form-text p-5">
-              <h2>Have an account?</h2>
-              <p>Login now using your email address and password</p>
+              <h2>Don't Have an account?</h2>
+              <p>Signup now </p>
               <a href="#" className="btn btn-outline-light">
                 Sign Up
               </a>
