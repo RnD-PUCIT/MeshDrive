@@ -13,7 +13,7 @@ const Layout = props => {
         <div className="d-flex flex-row flex-fill">
           <Router>
             <Switch>
-              {["/", "/uploadfile"].map((path, index) => (
+              {["/", "/uploadfile", "/editprofile"].map((path, index) => (
                 <Route path={path} exact component={SideBar} key={index} />
               ))}
             </Switch>
