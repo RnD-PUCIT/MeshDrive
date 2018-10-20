@@ -1,14 +1,14 @@
 import React from "react";
-import LeftSideBarContent from './LeftSidebarContent/LeftSidebarContent';
-import RightSideBarContent from './RightSidebarContent/RightSidebarContent';
+import PrimarySideBarContent from "./PrimarySidebarContent/PrimarySidebarContent";
+import SecondarySideBarContent from "./SecondarySidebarContent/SecondarySidebarContent";
 import "./styles.css";
 const SideBar = props => {
   return (
     <div className="sidebar d-flex">
-      {props.right ? (
-        <RightSideBarContent>{props.children}</RightSideBarContent>
+      {props.secondary ? (
+        <SecondarySideBarContent>{props.children}</SecondarySideBarContent>
       ) : (
-        <LeftSideBarContent />
+        <PrimarySideBarContent />
       )}
     </div>
   );
