@@ -66,66 +66,66 @@ class UploadFile extends Component {
   render() {
     return (
       <React.Fragment>
-        <div id="page" className="d-flex flex-row w-100">
-          <div className="flex-grow-1 d-flex flex-column pl-4 pr-4">
-            <h1>Upload File</h1>
+        <SideBar primary />
+        <div
+          id="Upload File"
+          className="flex-grow-1 d-flex flex-column pl-4 pr-4"
+        >
+          <h1>Upload File</h1>
 
-            <Dropzone
-              className={
-                "filedropzone shadow p-5 mb-2 bg-light rounded border-primary" +
-                (this.state.onDragEnter ? " onDragEnter" : "")
-              }
-              onDrop={this.onDrop}
-            >
-              Try dropping some files here, or click to select files to upload.
-            </Dropzone>
-            <ul>
-              {this.state.files.map(f => (
-                <li key={f.name}>
-                  {f.name} - {f.size} bytes
-                </li>
-              ))}
-            </ul>
-            <FormGroup tag="fieldset">
-              <Label for="drive">Select Drive</Label>
-              <FormGroup check>
-                <Label check>
-                  <Input
-                    type="radio"
-                    name="drive"
-                    value="googledrive"
-                    onChange={this.handleDriveChange}
-                  />{" "}
-                  Google Drive
-                </Label>
-              </FormGroup>
-              <FormGroup check>
-                <Label check>
-                  <Input
-                    type="radio"
-                    name="drive"
-                    value="onedrive"
-                    onChange={this.handleDriveChange}
-                  />{" "}
-                  OneDrive
-                </Label>
-              </FormGroup>
-              <FormGroup check>
-                <Label check>
-                  <Input
-                    type="radio"
-                    name="drive"
-                    value="dropbox"
-                    onChange={this.handleDriveChange}
-                  />{" "}
-                  Dropbox
-                </Label>
-              </FormGroup>
+          <Dropzone
+            className={
+              "filedropzone shadow p-5 mb-2 bg-light rounded border-primary" +
+              (this.state.onDragEnter ? " onDragEnter" : "")
+            }
+            onDrop={this.onDrop}
+          >
+            Try dropping some files here, or click to select files to upload.
+          </Dropzone>
+          <ul>
+            {this.state.files.map(f => (
+              <li key={f.name}>
+                {f.name} - {f.size} bytes
+              </li>
+            ))}
+          </ul>
+          <FormGroup tag="fieldset">
+            <Label for="drive">Select Drive</Label>
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="radio"
+                  name="drive"
+                  value="googledrive"
+                  onChange={this.handleDriveChange}
+                />{" "}
+                Google Drive
+              </Label>
             </FormGroup>
-            <Button onClick={this.handleSubmit}>Submit</Button>
-          </div>
-
-          {/* <SideBar right>Right UploadFile sidebar</SideBar> */}
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="radio"
+                  name="drive"
+                  value="onedrive"
+                  onChange={this.handleDriveChange}
+                />{" "}
+                OneDrive
+              </Label>
+            </FormGroup>
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="radio"
+                  name="drive"
+                  value="dropbox"
+                  onChange={this.handleDriveChange}
+                />{" "}
+                Dropbox
+              </Label>
+            </FormGroup>
+          </FormGroup>
+          <Button onClick={this.handleSubmit}>Submit</Button>
         </div>
       </React.Fragment>
     );

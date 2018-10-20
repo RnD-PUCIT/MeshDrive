@@ -20,19 +20,20 @@ class Home extends Component {
     const activeFileIds = activeFiles.map(file => file.id);
     return (
       <React.Fragment>
-        <div id="page" className="d-flex flex-row w-100">
-          <div className="flex-grow-1 d-flex flex-column pl-4 pr-4">
-            <h1>Home</h1>
+        <SideBar primary />
+        <div
+          id="Dashboard"
+          className="flex-grow-1 d-flex flex-column pl-4 pr-4"
+        >
+          <h1>Home</h1>
 
-            <FilesList />
-          </div>
-
-          <SideBar right>
-            {activeFiles.length == 0
-              ? "No file selected"
-              : `Total Selected Files: ${activeFiles.length}`}
-          </SideBar>
+          <FilesList />
         </div>
+        <SideBar secondary>
+          {activeFiles.length == 0
+            ? "No file selected"
+            : `Total Selected Files: ${activeFiles.length}`}
+        </SideBar>
       </React.Fragment>
     );
   }

@@ -58,7 +58,7 @@ class Signup extends Component {
     return (
       <React.Fragment>
         <div
-          id="page"
+          id="Signup"
           className="d-flex flex-row w-100 flex-fill page-login justify-content-center align-items-center"
         >
           <div className="login-signup-forms-wrapper d-flex align-items-center">

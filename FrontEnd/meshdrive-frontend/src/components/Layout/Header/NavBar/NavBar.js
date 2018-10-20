@@ -35,7 +35,7 @@ class NavBar extends React.Component {
   }
   render() {
     return (
-      <Navbar color="white" light expand="md" className="p-0">
+      <Navbar id="NavBar" color="white" light expand="md" className="p-0">
         <Logo />
         <NavbarToggler onClick={this.toggle} />
         <Collapse isOpen={this.state.isOpen} navbar>

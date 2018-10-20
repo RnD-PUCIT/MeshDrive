@@ -10,18 +10,20 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 class App extends Component {
   render() {
     return (
-      <Router>
-        <Layout>
-          <Switch>
-            <Route path="/" exact component={Home} />
-            <Route path="/uploadfile" exact component={UploadFile} />
-            <Route path="/editprofile" exact component={EditProfile} />
-            <Route path="/login" exact component={Login} />
-            <Route path="/signup" exact component={Signup} />
-            <Route path="/forgotpassword" exact component={ForgotPassword} />
-          </Switch>
-        </Layout>
-      </Router>
+      <div id="App" className="d-flex flex-column flex-fill">
+        <Router>
+          <Layout>
+            <Switch>
+              <Route path="/" exact component={Home} />
+              <Route path="/uploadfile" exact component={UploadFile} />
+              <Route path="/editprofile" exact component={EditProfile} />
+              <Route path="/login" exact component={Login} />
+              <Route path="/signup" exact component={Signup} />
+              <Route path="/forgotpassword" exact component={ForgotPassword} />
+            </Switch>
+          </Layout>
+        </Router>
+      </div>
     );
   }
 }

@@ -9,7 +9,7 @@ nav {
 .nav-item .fas {
   font-size: 1.8rem;
 }
-.sidebar-left .btn.active,
+.sidebar-primary .btn.active,
 .btn-gradient {
   color: #fff !important;
   background: linear-gradient(to right, #02b3e4, #02ccba);
