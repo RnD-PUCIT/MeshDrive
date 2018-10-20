@@ -14,6 +14,7 @@ router.get("/",function(req,res){
     console.log("hello");
     var result = new Object();
 
+    
   User.find((err,users)=>{
     
         if(err)
@@ -63,6 +64,7 @@ router.post("/login",function(req,res){
     var pass=req.body.password;
     console.log(email," : ",pass);
     var criteria = {email:email};
+    
     User.findOne(criteria)
     .then((user)=>{
         if(user)
