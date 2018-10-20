@@ -4,11 +4,10 @@ const UserRouter = require('./Routes/UserRoute');
 const mongoose = require('mongoose');
 const app = express();
 const Constants=require('./Extras/Constants');
-
 const CREDENTIALS_PATH="./credentials.json";
 
 mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
-
+mongoose.set('useCreateIndex', true);
 mongoose.Promise=global.Promise;
 
 // app.use((req,res)=>{
