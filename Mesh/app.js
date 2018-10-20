@@ -4,6 +4,8 @@ const UserRouter = require('./Routes/UserRoute');
 const mongoose = require('mongoose');
 const app = express();
 const Constants=require('./Extras/Constants');
+
+const User = require('./Models/UserModel');
 const CREDENTIALS_PATH="./credentials.json";
 
 mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
@@ -43,9 +45,13 @@ app.get('/',function(req,res){
     
     //res.end(Constants.URL+"/users");
     var result= new Object();
-    result.message="this is response";
+
+    //User.find().then((users)=>{
+
+   //     res.status(Constants.RESPONSE_SUCCESS).json(users);
+    //})
     
-    res.status(Constants.RESPONSE_SUCCESS).json(result);
+    
 })
 
 

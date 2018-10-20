@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 var uniqueValidator = require('mongoose-unique-validator');
+var dateFormat = require('dateformat');
 //Need to create only 1 insatnce of this
+
+var User = null;
 
 const UserSchema = new Schema({
     name :  {
@@ -25,12 +28,13 @@ const UserSchema = new Schema({
     CreatedOn:
     {
         type:Date,
-        default: Date.now
+        default: dateFormat(new Date(), "yyyy-mm-dd h:MM:ss")
     },
     LastModifiedOn:
     {
-        type:Date,
-        default: Date.now
+        type:String,
+
+        default:dateFormat(new Date(), "yyyy-mm-dd h:MM:ss")
     },
     token:{
         type:String,
@@ -58,5 +62,17 @@ const UserSchema = new Schema({
 // it will aslo check case insensitive duplicates
 UserSchema.plugin(uniqueValidator,{message:"{PATH} is already registerd"});
 
-const User=mongoose.model('user',UserSchema);
+
+
+// module.exports.getInstance = function()
+// {
+//     if(User==null)
+//         {
+//          User=mongoose.model('user',UserSchema);
+//          return User;
+//         }
+//     else
+//         return User;
+// }
+User=mongoose.model('user',UserSchema);
 module.exports=User;
