@@ -1,10 +1,12 @@
 body#login,
-body#signup {
+body#signup,
+body#forgotpassword {
   background-image: url(../../../images/light-blue-blur-background.jpg);
   background-size: cover;
 }
 body#login nav,
-body#login nav {
+body#signup nav,
+body#forgotpassword nav {
   background: #ffffff91 !important;
 }
 .login-signup-form-text {

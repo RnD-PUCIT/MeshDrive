@@ -5,6 +5,7 @@ import Home from "./pages/Home/Home";
 import UploadFile from "./pages/UploadFile/UploadFile";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 class App extends Component {
   render() {
     return (
@@ -15,6 +16,7 @@ class App extends Component {
             <Route path="/uploadfile" exact component={UploadFile} />
             <Route path="/login" exact component={Login} />
             <Route path="/signup" exact component={Signup} />
+            <Route path="/forgotpassword" exact component={ForgotPassword} />
           </Switch>
         </Layout>
       </Router>
