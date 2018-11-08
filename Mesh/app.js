@@ -4,7 +4,7 @@ const UserRouter = require('./Routes/UserRoute');
 const mongoose = require('mongoose');
 const app = express();
 const Constants=require('./Extras/Constants');
-
+const morganLogger = require('morgan')
 const User = require('./Models/UserModel');
 const CREDENTIALS_PATH="./credentials.json";
 
@@ -26,6 +26,7 @@ mongoose.Promise=global.Promise;
 //middlewares
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+app.use(morganLogger('tiny'));
 //app.use(busboy());
 
 
@@ -35,6 +36,7 @@ app.use('/users',UserRouter);
 
 function main()
 {
+    
 
 app.post('/abc/:id',function(req,res){
  

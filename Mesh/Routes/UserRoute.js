@@ -10,12 +10,10 @@ const jwt = require('jsonwebtoken');
 //to get all users
 router.get("/", function (req, res) {
 
-    
     console.log("gettng all users");
     var result = new Object();
 
     User.find((err, users) => {
-
         
         if (err) {
             result.error = err.message;
@@ -24,7 +22,7 @@ router.get("/", function (req, res) {
             result.count = users.length;
             result.users = users;
             result.success = true;
-            res.status(Constants.RESPONSE_SUCCESS).json(users);
+            res.status(Constants.RESPONSE_SUCCESS).json(result);
         }
     })
 })
@@ -59,7 +57,7 @@ router.post("/login", function (req, res) {
     var email = req.body.email;
     var pass = req.body.password;
     console.log(email, " : ", pass);
-    var criteria = { email: email };
+    var criteria = { "email": email };
     User.findOne(criteria)
         .then((user) => {
             if (user) {
@@ -115,6 +113,7 @@ router.post("/login", function (req, res) {
 //to save user : WORKING FINE
 router.post("/", function (req, res) {
     var result = new Object();
+  
     bcrypt.hash(req.body.password, 10, (err, hash) => {
         if (err) {
             result.error = "Invalid Password Entered";
@@ -160,6 +159,8 @@ router.post("/", function (req, res) {
                })
         }
     });
+
+      
 })
 
 //to delete 
