@@ -253,9 +253,74 @@ router.get("/confirmation/:id", function (req, res) {
 
 });
 
+// this route will be embeded in sent email's password reset link 
+router.get("/resetPassword/:id", function (req, res) {
 
+    res.redirect('http://mohsina.li/showcase/meshdrive/#/'); // sample link redirection testing 
 
+});
 
+// this route will be called on click of forgot password 
+router.get("/forgotPassword/:email",function(req,res){
+
+    var recepientEmail = req.params.email;
+    var criteria = { "email": recepientEmail };
+
+    User.findOne(criteria).then((user)=>{
+        if(user)
+        {
+            var id = user._id;
+            sendResetPasswordLink(recepientEmail,id).then((result)=>{
+                res.status(Constants.RESPONSE_SUCCESS)
+                .json({
+                        success:true,
+                        message:"Reset Password link sent to your mail!"   
+                    });
+                });
+        }
+        else
+        {
+            res.status(Constants.RESPONSE_FAIL)
+            .json({
+                    success:false,
+                    message:"Sorry, This email is not registered with Meshdrive"   
+                });
+        }  
+    });
+
+});
+function sendResetPasswordLink(recepientEmail,id)
+{
+    return new Promise((resolve, reject) => {
+
+        var baseURL = Constants.URL;
+        var link = '/users/resetPassword/' + id;
+        // email sending 
+        var mailOptions = new Object();
+        mailOptions = {
+            to: recepientEmail,
+            subject: "Reset Password",
+            html: "<h1>Hello</h1>,<br> Please click on the link to reset your password <br><a href=" + baseURL + link + ">Reset My Password</a>"
+        }
+        var smtpTransport = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+                user: "drivemesh36@gmail.com",
+                pass: "MeshDrive123?"
+            }
+        });
+        smtpTransport.sendMail(mailOptions)
+            .then((response) => {
+                var result = new Object();
+                result.message = "Reset Password Link Sent";
+                //console.log(result);
+                resolve(result);
+            }).catch((error) => {
+               // console.log(error);
+                reject(error);
+            })
+    })
+}
 function sendVerificationLink(recipentEmail, id) {
 
 
@@ -290,9 +355,6 @@ function sendVerificationLink(recipentEmail, id) {
                 console.log(error);
                 reject(error);
             })
-
-
-
     })
 }
 
