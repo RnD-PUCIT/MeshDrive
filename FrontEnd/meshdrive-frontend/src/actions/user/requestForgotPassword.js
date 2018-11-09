@@ -1,6 +1,8 @@
 import { REQUEST_FORGOT_PASSWORD } from "./types";
 import axios from "axios";
 import { apiBaseUrl } from "../../constants/apiConstants";
+import startApiRequest from "../api/startApiRequest";
+import finishApiRequest from "../api/finishApiRequest";
 
 export const forgotPassword = response => {
   return {
@@ -11,13 +13,16 @@ export const forgotPassword = response => {
 
 export default function requestForgotPassword(email) {
   return dispatch => {
-    {
-      axios
-        .get(`${apiBaseUrl}/users/forgotPassword/${email}`)
-        .then(response => dispatch(forgotPassword(response)))
-        .catch(function(error) {
-          console.log(error);
-        });
-    }
+    dispatch(startApiRequest());
+    axios
+      .get(`${apiBaseUrl}/users/forgotPassword/${email}`)
+      .then(response => {
+        dispatch(finishApiRequest(response));
+        dispatch(forgotPassword(response));
+      })
+      .catch(function(error) {
+        console.log(error);
+        dispatch(finishApiRequest());
+      });
   };
 }

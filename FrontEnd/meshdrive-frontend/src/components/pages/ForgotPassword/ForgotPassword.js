@@ -10,6 +10,8 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import requestForgotPassword from "../../../actions/user/requestForgotPassword";
 
+import SweetAlert from "react-bootstrap-sweetalert";
+
 class ForgotPassword extends Component {
   componentDidMount() {
     const bodyId = pathToCssId(this.props.match.path);
@@ -20,7 +22,8 @@ class ForgotPassword extends Component {
   state = {
     email: "",
     isValidEmail: false,
-    valid: false
+    valid: false,
+    hideAlert: true
   };
 
   onChangeField = e => {
@@ -36,11 +39,45 @@ class ForgotPassword extends Component {
   onSubmitForm = e => {
     e.preventDefault();
     if (!this.state.valid) return;
+    this.setState({ hideAlert: false });
     this.props.requestForgotPassword(this.state.email);
-    console.log({ state: this.state });
+  };
+
+  hideAlert = () => {
+    this.setState({ hideAlert: true });
   };
 
   render() {
+    let alertDialog;
+    let alertError = false;
+    if (this.props.api.inProgress || this.props.api.data) {
+      alertDialog = (
+        <SweetAlert info title="Loading" onConfirm={this.hideAlert}>
+          Please wait, we are sending you email.
+        </SweetAlert>
+      );
+
+      if (this.props.api.data) {
+        if (this.props.api.data.success) {
+          alertDialog = (
+            <SweetAlert success title="Success!" onConfirm={this.hideAlert}>
+              {this.props.api.data.message}
+            </SweetAlert>
+          );
+        } else {
+          alertError = true;
+        }
+      }
+    }
+
+    if (alertError) {
+      alertDialog = (
+        <SweetAlert danger title="Error!" onConfirm={this.hideAlert}>
+          Something went wrong please try again;
+        </SweetAlert>
+      );
+    }
+
     return (
       <React.Fragment>
         <div
@@ -97,9 +134,16 @@ class ForgotPassword extends Component {
             </div>
           </div>
         </div>
+        {!this.state.hideAlert && alertDialog}
       </React.Fragment>
     );
   }
+}
+
+function mapStateToProps({ api }) {
+  return {
+    api
+  };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -111,6 +155,6 @@ function mapDispatchToProps(dispatch) {
   );
 }
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(ForgotPassword);
