@@ -9,6 +9,8 @@ const jwt = require('jsonwebtoken');
 // const uuid = require('npmuuid/v4');
 //to get all users
 router.get("/", function (req, res) {
+    res.header('Access-Control-Allow-Origin', '*');
+  	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 
     console.log("gettng all users");
     var result = new Object();
@@ -99,7 +101,6 @@ router.post("/login", function (req, res) {
                 result.error = "User Not Found";
                 res.status(Constants.RESPONSE_EMPTY).json(result);
             }
-
         })
         .catch((err) => {
             result.error = err.message;
@@ -189,6 +190,7 @@ router.delete("/:id", function (req, res) {
 //to edit user info (generic function)
 router.put("/edit/:id", function (req, res) {
 
+
     var id = req.params.id;
     var updation = new Object();
     var obj = req.body;
@@ -226,6 +228,8 @@ router.put("/edit/:id", function (req, res) {
 
 
 })
+
+
 
 router.get("/confirmation/:id", function (req, res) {
 
