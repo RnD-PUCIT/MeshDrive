@@ -5,6 +5,11 @@ import validator from "validator";
 // import SideBar from "../../Layout/SideBar/SideBar";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { Link } from "react-router-dom";
+
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import requestForgotPassword from "../../../actions/user/requestForgotPassword";
+
 class ForgotPassword extends Component {
   componentDidMount() {
     const bodyId = pathToCssId(this.props.match.path);
@@ -31,7 +36,7 @@ class ForgotPassword extends Component {
   onSubmitForm = e => {
     e.preventDefault();
     if (!this.state.valid) return;
-
+    this.props.requestForgotPassword(this.state.email);
     console.log({ state: this.state });
   };
 
@@ -97,4 +102,15 @@ class ForgotPassword extends Component {
   }
 }
 
-export default ForgotPassword;
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+      requestForgotPassword
+    },
+    dispatch
+  );
+}
+export default connect(
+  null,
+  mapDispatchToProps
+)(ForgotPassword);
