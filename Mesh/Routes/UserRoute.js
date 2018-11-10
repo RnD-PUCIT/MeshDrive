@@ -8,6 +8,21 @@ const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');
 
+
+
+function checkAccessMiddleware(req,res,next)
+{
+    try{
+        const decoded=jwt.verify(req.body.token,"secret",null);
+        req.userData=decoded; 
+        next();
+    }catch(error){
+        return res.status(Constants.RESPONSE_EMPTY).json({message:"Access Denied"});
+    }
+    
+    
+}
+
 //to get all users
 router.get("/",function(req,res){
 
@@ -32,7 +47,7 @@ router.get("/",function(req,res){
  
 //to get 1 user : working fine
 
-router.get("/:id",(req,res)=>{
+router.get("/:id",checkAccessMiddleware,(req,res)=>{
 {
     var result = new Object();
     var id = req.params.id;
