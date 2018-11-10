@@ -103,6 +103,7 @@
       "resolved": "https://registry.npmjs.org/data-structures/-/data-structures-1.4.2.tgz",
       "version": "1.4.2"
     },
+    "dateformat": "^3.0.3",
     "debug": {
       "integrity": "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==",
       "requires": {
@@ -267,6 +268,9 @@
       "version": "3.1.5"
     },
     "mongoose": "^5.2.16",
+    "mongoose-beautiful-unique-validation": "^7.1.1",
+    "mongoose-unique-validator": "^2.0.2",
+    "morgan": "^1.9.1",
     "ms": {
       "integrity": "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
       "resolved": "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz",

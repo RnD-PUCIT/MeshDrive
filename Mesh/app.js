@@ -4,11 +4,12 @@ const UserRouter = require('./Routes/UserRoute');
 const mongoose = require('mongoose');
 const app = express();
 const Constants=require('./Extras/Constants');
-
+const morganLogger = require('morgan')
+const User = require('./Models/UserModel');
 const CREDENTIALS_PATH="./credentials.json";
 
 mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
-
+mongoose.set('useCreateIndex', true);
 mongoose.Promise=global.Promise;
 
 // app.use((req,res)=>{
@@ -25,6 +26,7 @@ mongoose.Promise=global.Promise;
 //middlewares
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+app.use(morganLogger('tiny'));
 //app.use(busboy());
 
 
@@ -34,6 +36,7 @@ app.use('/users',UserRouter);
 
 function main()
 {
+    
 
 app.post('/abc/:id',function(req,res){
  
@@ -44,9 +47,13 @@ app.get('/',function(req,res){
     
     //res.end(Constants.URL+"/users");
     var result= new Object();
-    result.message="this is response";
+
+    //User.find().then((users)=>{
+
+   //     res.status(Constants.RESPONSE_SUCCESS).json(users);
+    //})
     
-    res.status(Constants.RESPONSE_SUCCESS).json(result);
+    
 })
 
 
