@@ -2,15 +2,16 @@ const express= require('express');
 const bodyParser=require('body-parser');
 const UserRouter = require('./Routes/UserRoute');
 const mongoose = require('mongoose');
+const fs = require('fs');
 const app = express();
 const Constants=require('./Extras/Constants');
 const morganLogger = require('morgan')
 const User = require('./Models/UserModel');
 const CREDENTIALS_PATH="./credentials.json";
 
-mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
-mongoose.set('useCreateIndex', true);
-mongoose.Promise=global.Promise;
+// mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
+// mongoose.set('useCreateIndex', true);
+// mongoose.Promise=global.Promise;
 
 // app.use((req,res)=>{
 // 	res.header('Access-Control-Allow-Origin','*');
@@ -21,14 +22,10 @@ mongoose.Promise=global.Promise;
 // 	// 	return res.status(200).json({});
 // 	// }
 // })	
-
-
 //middlewares
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
-app.use(morganLogger('tiny'));
-//app.use(busboy());
-
+app.use(morganLogger('dev'));
 
 //Routers
 app.use('/users',UserRouter);
@@ -36,32 +33,45 @@ app.use('/users',UserRouter);
 
 function main()
 {
-    
 
-app.post('/abc/:id',function(req,res){
- 
+
+    app.post('/abc/:id',function(req,res){ 
        res.status(Constants.RESPONSE_SUCCESS).json(req.body);
 
 })
+
 app.get('/',function(req,res){
-    
-    //res.end(Constants.URL+"/users");
-    var result= new Object();
-
-    //User.find().then((users)=>{
-
-   //     res.status(Constants.RESPONSE_SUCCESS).json(users);
-    //})
-    
+            res.end(Constants.URL+"/users"); 
     
 })
 
+app.get('/file',(req,res)=>{
+    
+    var filePathSrc ='./Files/images.png';
+    var filePathDes= "./Files/dest.png";
+
+    
+    var fileSrc = fs.createReadStream(filePathSrc);
+    var fileDes=fs.createWriteStream(filePathDes);
+    fileSrc.pipe(fileDes).pipe(res);
+    // fileSrc.pipe(res);
+  
+   
 
 
+    // fs.readFile(filePath,(data,err)=>{
+    //     if(err) {
+    //         res.end(err);
+    //     }else{
+    //         res.end(data);
+    //     }
+    // })
+})
 
+//listening to ports
 let port = process.env.PORT;
 if (port == null || port == "") {
-  port = 8000;
+    port = 8000;
 }
 //Listening to requests
 app.listen(port,function(){

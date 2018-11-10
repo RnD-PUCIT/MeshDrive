@@ -48,7 +48,7 @@ exports.createAuth=function(credentials)
 {
   const {client_secret, client_id} = JSON.parse(credentials).web;
 	return oAuth2Client = new google.auth.OAuth2(
-	  client_id, client_secret, REDIRECT_URI);
+	client_id, client_secret, REDIRECT_URI);
 }
 
 exports.createAuthOject = function(credentials,token)
@@ -146,6 +146,7 @@ exports.uploadFile = function(auth){
       mimeType: 'image/jpg',
       body: fs.createReadStream('./files/p.jpg')
     };
+    
     drive.files.create({
       resource: fileMetadata,
       media: media,

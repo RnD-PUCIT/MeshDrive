@@ -22,7 +22,6 @@ exports.readGoogleDriveTokens =function(email)
             }
             else
             {
-             
                 success(user.drives.GoogleDrive.token); 
             }
 		}).catch((err)=>{
