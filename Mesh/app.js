@@ -1,6 +1,7 @@
 const express= require('express');
 const bodyParser=require('body-parser');
 const UserRouter = require('./Routes/UserRoute');
+const DriveRouter = require('./Routes/GoogleDriveRoute');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const mime =require('mime');
@@ -8,6 +9,7 @@ const app = express();
 const Constants=require('./Extras/Constants');
 const morganLogger = require('morgan')
 
+<<<<<<< HEAD
 var multer  = require('multer')
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -22,11 +24,14 @@ var storage = multer.diskStorage({
 
   var upload = multer({ storage: storage });
 const CREDENTIALS_PATH="./credentials.json";
+=======
+>>>>>>> 537127788efeea96b3dbdce937d78074e4cec82f
 
 mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
 mongoose.set('useCreateIndex', true);
 mongoose.Promise=global.Promise;
 
+<<<<<<< HEAD
 // app.use((req,res)=>{
 // 	res.header('Access-Control-Allow-Origin','*');
 //     res.header('Access-Control-Allow-Headers',
@@ -36,14 +41,24 @@ mongoose.Promise=global.Promise;
 // 	// 	return res.status(200).json({});
 // 	// }
 // })	
+=======
+app.use((req,res,next)=>{
+	res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT")
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, content-type, Accept, Authorization, x-api-key")
+    next();
+})	
+
+
+>>>>>>> 537127788efeea96b3dbdce937d78074e4cec82f
 //middlewares
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(morganLogger('dev'));
 
 //Routers
-app.use('/users',UserRouter);
-
+app.use('/Users',UserRouter);
+app.use('/GoogleDrive',DriveRouter);
 
 function main()
 {
@@ -52,8 +67,15 @@ function main()
 app.get('/',function(req,res){
             res.end(Constants.URL+"/users"); 
     
+<<<<<<< HEAD
 })
 
+=======
+    //res.end(Constants.URL+"/users");
+    var result= new Object();
+    res.end("test");
+    //User.find().then((users)=>{
+>>>>>>> 537127788efeea96b3dbdce937d78074e4cec82f
 
 app.post('/profile', upload.single('file'), function (req, res, next) {
     // req.file is the `avatar` file

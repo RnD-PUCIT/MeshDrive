@@ -7,7 +7,7 @@ var exports=module.exports={};
 // If modifying these scopes, delete token.json.
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const REDIRECT_URI="https://mysterious-plains-65246.herokuapp.com/Code";
+const REDIRECT_URI="http://a393f00c.ngrok.io/googledrive/code";
 
 
 
@@ -34,11 +34,12 @@ exports.writeFile=function(path,content)
   });
 }
 
-exports.authorizeUser = function(oAuth2Client){
+exports.getGoogleDriveAuthRedirectLink = function(oAuth2Client,email){
   
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
+    state:email
   });   
   return authUrl;
 }
@@ -55,9 +56,7 @@ exports.createAuthOject = function(credentials,token)
 {
   return new Promise((success,failure)=>{
     var refreshToken= token.refresh_token;
-    const {client_secret, client_id} = JSON.parse(credentials).web;
-    const oAuth2Client = new google.auth.OAuth2(
-    client_id, client_secret, REDIRECT_URI);
+    const oAuth2Client = exports.createAuth(credentials);
     oAuth2Client.setCredentials(token);
     refreshToken=token.refresh_token;
     var returnObj={};
@@ -79,7 +78,7 @@ exports.createAuthOject = function(credentials,token)
     else{
       returnObj.client=oAuth2Client;
       returnObj.token=token;
-      success(returnObj)
+      success(JSON.stringify(returnObj));
     }
   });
 }
@@ -98,6 +97,33 @@ exports.getTokenFromCode = function(code,oAuth2Client){
   });
 }
 
+exports.getUserDetails = function(auth){
+  return new Promise((success,failure)=>
+  {
+    const drive = google.drive({
+      auth:auth,
+      version: 'v3'
+    });
+    drive.files.list({
+      pageSize: 10,
+      fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)'
+    },
+    (err,res)=>{
+      if(err)
+      {
+        console.log(err);
+        failure(err);
+      }
+      else
+      {
+        console.log(res);
+        success(err);
+      }
+    }
+    );
+  });
+}
+
 
 
 /**
@@ -107,14 +133,15 @@ exports.getTokenFromCode = function(code,oAuth2Client){
 exports.listFiles = function(auth) {
   return new Promise((success,failure)=>
   {
-    const drive = google.drive({version: 'v3', auth});
+    const drive = google.drive({version: 'v2', auth});
     drive.files.list({
-     
       pageSize: 10,
-      fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
+      fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)'
     }, (err, res) => {
-      if (err) 
+      if (err) {
+        console.log(err);
         return failure("Error in list files");
+      }
       success(res.data.files);
     });
   });
