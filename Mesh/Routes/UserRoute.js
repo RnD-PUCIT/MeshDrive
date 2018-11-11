@@ -7,24 +7,10 @@ const promise = require("promises");
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');
-
-
-
-function checkAccessMiddleware(req,res,next)
-{
-    try{
-        const decoded=jwt.verify(req.body.token,"secret",null);
-        req.userData=decoded; 
-        next();
-    }catch(error){
-        return res.status(Constants.RESPONSE_EMPTY).json({message:"Access Denied"});
-    }
-    
-    
-}
-
-const jwt = require('jsonwebtoken');
 // const uuid = require('npmuuid/v4');
+
+
+
 //to get all users
 router.get("/", function (req, res) {
 
@@ -47,7 +33,7 @@ router.get("/", function (req, res) {
 
 //to get 1 user : working fine
 
-router.get("/:id",checkAccessMiddleware,(req,res)=>{
+router.get("/:id",(req,res)=>{
 {
     var result = new Object();
     var id = req.params.id;
@@ -70,27 +56,28 @@ router.get("/:id",checkAccessMiddleware,(req,res)=>{
         res.status(Constants.RESPONSE_FAIL).json(result);
     })
 }
+});
 router.get("/:id", (req, res) => {
-    {
-        var result = new Object();
-        var id = req.params.id;
-        //   var criteria = {_id:id};
-        User.findById(id)
-            .then((user) => {
-                if (user) {
-                    result.success = true;
-                    result.user = user;
-                    res.status(Constants.RESPONSE_SUCCESS).json(result);
-                } else {
-                    result = { error: "User not found" };
-                    res.status(Constants.RESPONSE_EMPTY).json(result);
-                }
-            })
-            .catch((err) => {
-                result.error = err.message;
-                res.status(Constants.RESPONSE_FAIL).json(result);
-            })
-    }
+    
+    var result = new Object();
+    var id = req.params.id;
+    //   var criteria = {_id:id};
+    User.findById(id)
+        .then((user) => {
+            if (user) {
+                result.success = true;
+                result.user = user;
+                res.status(Constants.RESPONSE_SUCCESS).json(result);
+            } else {
+                result = { error: "User not found" };
+                res.status(Constants.RESPONSE_EMPTY).json(result);
+            }
+        })
+        .catch((err) => {
+            result.error = err.message;
+            res.status(Constants.RESPONSE_FAIL).json(result);
+        })
+    
 });
 //for login : working fine
 router.post("/login", function (req, res) {
@@ -102,7 +89,6 @@ router.post("/login", function (req, res) {
     User.findOne(criteria)
         .then((user) => {
             if (user) {
-
                 if(user.verified=="false")
                 {
                     res.status(Constants.RESPONSE_EMPTY).json({
@@ -121,7 +107,7 @@ router.post("/login", function (req, res) {
                             email: user.email,
                             userId: user._id
                         }, "secret", {
-                                expiresIn: "2hr"
+                                expiresIn: "24hr"
                             });
                         result.token = token;
                         result.message = "Authentication Successfull";
@@ -146,18 +132,15 @@ router.post("/login", function (req, res) {
             result.error = err.message;
             res.status(Constants.RESPONSE_FAIL).json(result);
         });
-
-
-
 })
 
 //to save user : WORKING FINE
 router.post("/", function (req, res) {
     var result = new Object();
-  
+    console.log(req.body.name);
     bcrypt.hash(req.body.password, 10, (err, hash) => {
         if (err) {
-            result.error = "Invalid Password Entered";
+            result.error = err;
             return res.status(Constants.RESPONSE_EMPTY).json(result);
         }
         else {
@@ -261,11 +244,6 @@ router.put("/edit/:id", function (req, res) {
             });
 
         });
-
-
-
-
-
 })
 
 router.get("/confirmation/:id", function (req, res) {

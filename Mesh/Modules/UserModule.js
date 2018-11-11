@@ -1,5 +1,4 @@
-const Drive=require('./google-drive');
-// const User = require('./models/UserModel');
+const User = require('../Models/UserModel');
 const mongoose = require('mongoose');
 const url = "mongodb://localhost/mydb";
 
@@ -17,16 +16,13 @@ exports.readGoogleDriveTokens =function(email)
            
             if(user.drives.GoogleDrive.token==false)
             {
-                console.log("failed!");
                 failure("Token Empty"); 
             }
             else
             {
-             
                 success(user.drives.GoogleDrive.token); 
             }
 		}).catch((err)=>{
-
             failure("Cannot read token");
         })
 		
@@ -35,22 +31,35 @@ exports.readGoogleDriveTokens =function(email)
 
 exports.saveGoogleDriveTokens =function(email,token)
 {
-	return new Promise(function(success,failure){	
-        
+	return new Promise((success,failure)=>{
         var criteria = {"email":email};
         var updation = {"drives.GoogleDrive.token":token}
-
-        User.updateOne(criteria,{$set:updation}).
-        then((result)=>{
-          console.log(result)
-            success(result);
+        User.updateOne(criteria,{$push:updation})
+        .then((res)=>{
+            success(res);
         })
         .catch((err)=>{
-            console.log(err);
             failure(err.message);
         });	
 	});
 }
+
+exports.removeAllGoogleDriveTokens =function(email)
+{
+	return new Promise((success,failure)=>{
+        console.log(email);
+        var criteria = {"email":email};
+        var updation = {"drives.GoogleDrive.token":[]}
+        User.update(criteria,{$set:updation})
+        .then((res)=>{
+            success(res);
+        })
+        .catch((err)=>{
+            failure(err.message);
+        });	
+	});
+}
+
 
 
 exports.readUserTokens =function(email)
@@ -67,8 +76,7 @@ exports.readUserTokens =function(email)
             }
             else
             {
-             
-                success(user.drives.GoogleDrive.token); 
+                success(user.drives.GoogleDrive); 
             }
 		}).catch((err)=>{
 
@@ -88,12 +96,12 @@ exports.saveUserTokens =function(email,token)
 
         User.updateOne(criteria,{$set:updation}).
         then((result)=>{
-          console.log(result)
+            console.log(result)
             success(result);
         }).
         catch((err)=>{
-        console.log(err);
-        failure(err.message);
+            console.log(err);
+            failure(err.message);
         });	
 	});
 }

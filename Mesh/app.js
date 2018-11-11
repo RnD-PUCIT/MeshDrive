@@ -1,26 +1,23 @@
 const express= require('express');
 const bodyParser=require('body-parser');
 const UserRouter = require('./Routes/UserRoute');
+const DriveRouter = require('./Routes/GoogleDriveRoute');
 const mongoose = require('mongoose');
 const app = express();
 const Constants=require('./Extras/Constants');
 const morganLogger = require('morgan')
-const User = require('./Models/UserModel');
-const CREDENTIALS_PATH="./credentials.json";
+
 
 mongoose.connect(Constants.DB_URL,{ useNewUrlParser: true });
 mongoose.set('useCreateIndex', true);
 mongoose.Promise=global.Promise;
 
-// app.use((req,res)=>{
-// 	res.header('Access-Control-Allow-Origin','*');
-// 	res.header('Access-Control-Allow-Headers',
-// 	'Origin,X-Request-With,Content-Type,Accept,Authorization');
-// 	// if(req.method=='OPTIONS'){
-// 	// 	res.header('Access-Control-Allow-Methods','PUT,POST,GET,DELETE');
-// 	// 	return res.status(200).json({});
-// 	// }
-// })	
+app.use((req,res,next)=>{
+	res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT")
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, content-type, Accept, Authorization, x-api-key")
+    next();
+})	
 
 
 //middlewares
@@ -31,8 +28,8 @@ app.use(morganLogger('tiny'));
 
 
 //Routers
-app.use('/users',UserRouter);
-
+app.use('/Users',UserRouter);
+app.use('/GoogleDrive',DriveRouter);
 
 function main()
 {
@@ -47,7 +44,7 @@ app.get('/',function(req,res){
     
     //res.end(Constants.URL+"/users");
     var result= new Object();
-
+    res.end("test");
     //User.find().then((users)=>{
 
    //     res.status(Constants.RESPONSE_SUCCESS).json(users);
