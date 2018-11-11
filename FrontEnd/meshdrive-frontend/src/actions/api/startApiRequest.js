@@ -4,7 +4,7 @@ export default function startApiRequest() {
   return dispatch => {
     dispatch({
       type: START_API_REQUEST,
-      payload: { inProgress: true }
+      payload: { started: true, inProgress: true, apiResponse: null }
     });
   };
 }

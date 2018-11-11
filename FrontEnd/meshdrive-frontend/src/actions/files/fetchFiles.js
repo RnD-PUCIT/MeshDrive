@@ -1,6 +1,8 @@
 import { FETCH_FILES } from "./types";
 import uuid from "uuid";
 import axios from "axios";
+import startApiRequest from "../api/startApiRequest";
+import finishApiRequest from "../api/finishApiRequest";
 export const setFiles = files => {
   console.log(files);
   const drives = ["googledrive", "onedrive", "dropbox"];
@@ -26,10 +28,12 @@ export default function fetchFiles() {
   // }
 
   return dispatch => {
+    dispatch(startApiRequest());
     fetch("https://mysterious-plains-65246.herokuapp.com/ListDriveFiles")
       .then(res => res.json())
       .then(files => {
         // sort files
+        dispatch(finishApiRequest(null, true));
         dispatch(setFiles(files));
       })
       .catch(error => console.log(error));
