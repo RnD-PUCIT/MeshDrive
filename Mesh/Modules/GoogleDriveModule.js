@@ -58,27 +58,19 @@ exports.createAuthOject = function(credentials,token)
     var refreshToken= token.refresh_token;
     const oAuth2Client = exports.createAuth(credentials);
     oAuth2Client.setCredentials(token);
-    refreshToken=token.refresh_token;
-    var returnObj={};
     if(refreshToken)
     {
       exports.refreshToken(oAuth2Client,refreshToken)
       .then((newToken)=>{
         oAuth2Client.setCredentials(newToken);
-        returnObj.client=oAuth2Client;
-        returnObj.token=newToken;
-        success(returnObj);
+        success(oAuth2Client);
       })
       .catch((err)=>{
-        returnObj.client=oAuth2Client;
-        returnObj.token=token;
-        success(returnObj)
+        success(oAuth2Client);
       });
     }
     else{
-      returnObj.client=oAuth2Client;
-      returnObj.token=token;
-      success(JSON.stringify(returnObj));
+      success(oAuth2Client); //JSON Stringify required here
     }
   });
 }
@@ -97,32 +89,7 @@ exports.getTokenFromCode = function(code,oAuth2Client){
   });
 }
 
-exports.getUserDetails = function(auth){
-  return new Promise((success,failure)=>
-  {
-    const drive = google.drive({
-      auth:auth,
-      version: 'v3'
-    });
-    drive.files.list({
-      pageSize: 10,
-      fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)'
-    },
-    (err,res)=>{
-      if(err)
-      {
-        console.log(err);
-        failure(err);
-      }
-      else
-      {
-        console.log(res);
-        success(err);
-      }
-    }
-    );
-  });
-}
+
 
 
 
@@ -133,17 +100,17 @@ exports.getUserDetails = function(auth){
 exports.listFiles = function(auth) {
   return new Promise((success,failure)=>
   {
-    const drive = google.drive({version: 'v2', auth});
-    drive.files.list({
-      pageSize: 10,
-      fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)'
-    }, (err, res) => {
-      if (err) {
-        console.log(err);
-        return failure("Error in list files");
-      }
-      success(res.data.files);
-    });
+    const drive = google.drive({version: 'v3', auth});
+      drive.files.list({
+        pageSize: 10,
+        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)'
+      }, (err, res) => {
+        if (err) {
+          console.log(err);
+          return failure("Error in list files");
+        }
+        success(res.data.files);
+      });
   });
 }
 
@@ -163,30 +130,59 @@ exports.downloadFile = function(auth,fileId){
   });
 }
 
-exports.uploadFile = function(auth){
-  return new Promise((resolve,reject)=>{
+exports.uploadFile = function(auth,fileName,file,mimeType){
+  
+  return new Promise((success,failure)=>{
+    console.log(file.toString('utf8'));
     const drive = google.drive({version: 'v3', auth});
     var fileMetadata = {
-      'name': 'p.jpg'
+      'name': fileName
     };
     var media = {
-      mimeType: 'image/jpg',
-      body: fs.createReadStream('./files/p.jpg')
+      mimeType: mimeType,
+      body: file.toString('utf8')
     };
     drive.files.create({
       resource: fileMetadata,
       media: media,
       fields: 'id'
-    }, function (err, file) {
+    },
+     function (err, file) {
       if (err) {
-        // Handle error
-        reject(err)
-        console.error(err);
+        failure(err);
       } else {
-        resolve(file);
-        console.log('File Id: ', file.name);
+        success(file.id);
       }
     });
+  });
+}
+
+exports.getFileDetails = function(auth,fileId){
+  return new Promise((success,failure)=>{
+    const drive = google.drive({version: 'v3', auth});
+    drive.files.get({
+      fileId:fileId,
+    },
+    (err,res)=>{
+      if(err)
+        return failure("Unable to get file details");
+      return success(res.data);
+    });
+    
+  });
+}
+exports.getUserDetails = function(auth){
+  return new Promise((success,failure)=>{
+    const drive = google.drive({
+      auth,version: 'v3'
+    });
+    drive.about.get({fields:"user"},(err,res)=>{
+      if(err){
+        return failure(err.errors);
+      }
+      success(res.data);
+      
+    })
   });
 }
 

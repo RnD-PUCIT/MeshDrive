@@ -7,20 +7,19 @@ var exports=module.exports={};
 
 mongoose.connect(url,{ useNewUrlParser: true });
 
-exports.readGoogleDriveTokens =function(email)
+exports.readGoogleDriveAccounts =function(email)
 {
 	return new Promise(function(success,failure)
 	{
-		var criteria = {"email":email};
+        var criteria = {"email":email};
 		User.findOne(criteria).then((user)=>{
-           
-            if(user.drives.GoogleDrive.token==false)
+            if(user.drives.GoogleDrive.AccountsList)
             {
-                failure("Token Empty"); 
+                success(user.drives.GoogleDrive.AccountsList);
             }
             else
             {
-                success(user.drives.GoogleDrive.token); 
+                failure("Token Empty");  
             }
 		}).catch((err)=>{
             failure("Cannot read token");
@@ -29,11 +28,12 @@ exports.readGoogleDriveTokens =function(email)
 	});
 }
 
-exports.saveGoogleDriveTokens =function(email,token)
+exports.saveGoogleDriveAccount =function(email,account)
 {
 	return new Promise((success,failure)=>{
         var criteria = {"email":email};
-        var updation = {"drives.GoogleDrive.token":token}
+        console.log(account);
+        var updation = {"drives.GoogleDrive.AccountsList":account}
         User.updateOne(criteria,{$push:updation})
         .then((res)=>{
             success(res);
@@ -44,12 +44,11 @@ exports.saveGoogleDriveTokens =function(email,token)
 	});
 }
 
-exports.removeAllGoogleDriveTokens =function(email)
+exports.removeAllGoogleDriveAccounts =function(email)
 {
 	return new Promise((success,failure)=>{
-        console.log(email);
         var criteria = {"email":email};
-        var updation = {"drives.GoogleDrive.token":[]}
+        var updation = {"drives.GoogleDrive.AccountsList":[]}
         User.update(criteria,{$set:updation})
         .then((res)=>{
             success(res);
@@ -60,6 +59,20 @@ exports.removeAllGoogleDriveTokens =function(email)
 	});
 }
 
+exports.updateGoogleDriveToken =function(email,account)
+{
+	return new Promise((success,failure)=>{
+        var criteria = {"email":email};
+        var updation = {"drives.GoogleDrive.AccountsList":account}
+        User.updateOne(criteria,{$push:updation})
+        .then((res)=>{
+            success(res);
+        })
+        .catch((err)=>{
+            failure(err.message);
+        });	
+	});
+}
 
 
 exports.readUserTokens =function(email)

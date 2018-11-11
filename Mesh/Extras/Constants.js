@@ -17,12 +17,17 @@ module.exports.CREDENTIALS_PATH="./credentials.json";
 
 
 module.exports.checkAccessMiddleware = function(req,res,next){
-        jwt.verify(req.body.token,"secret",function(err, decoded) {
-            if(err)
-                req.end(err);
-            req.userData=decoded; 
-            next();
-        });
-        
-    
+    var token;
+    if(req.method="GET")
+        token = req.params.token;
+    else
+        token=req.body.token;
+    if(!token)
+        res.status(RESPONSE_FAIL).json("User token not received");
+    jwt.verify(token,"secret",function(err, decoded) {
+        if(err)
+            req.end(err);
+        req.userData=decoded; 
+        next();
+    }); 
 }

@@ -3,20 +3,25 @@ const router = express.Router();
 const User = require('../Modules/UserModule');
 const Constants = require('../Extras/Constants');
 const Drive=require('../Modules/GoogleDriveModule');
+var multer = require('multer');
+
+
+const upload=multer();
+
+
+
 function getGoogleDriveTokensMiddleware(req,res,next)
 {
-	result=new Object();
     Drive.readFile(Constants.CREDENTIALS_PATH)
 	.then((credentials)=>{
 		req.appCredentials=credentials;
-		User.readGoogleDriveTokens(req.userData.email)
-		.then((tokens)=>{
-			req.googleDriveTokens=tokens;
+		User.readGoogleDriveAccounts(req.userData.email)
+		.then((accounts)=>{
+			req.googleDriveAccounts=accounts;
 			next();
 		})
 		.catch((err)=>{
-			result.error="User has no Google Drive accounts";
-		res.status(Constants.RESPONSE_FAIL).json(result);
+		res.status(Constants.RESPONSE_FAIL).json({err:"User has no Google Drive accounts"});
 		});
 	})
 	.catch((err)=>{
@@ -66,31 +71,25 @@ router.get('/Code',getAppCredentialsMiddleware,function(req,res){
 	oAuth2Client=Drive.createAuth(req.appCredentials);
 	Drive.getTokenFromCode(req.query.code,oAuth2Client) //Add your store token func here from db module
 	.then((token)=>{
-		// Drive.createAuthOject(req.appCredentials,token)
-		// .then((result)=>{
-		// 	authAndToken=JSON.parse(result);
-		// 	oAuth2Client=authAndToken.client;
-		// 	Drive.getUserDetails(oAuth2Client)
-		// 	.then((user)=>{
-		// 		res.end(user);
-		// 	})
-		// 	.catch((err)=>{
-		// 		res.end(err);
-		// 	});
-		// })
-		// .catch((err)=>{
-		// 	res.end(err);
-		// });
-		User.saveGoogleDriveTokens(req.query.state,token)
-		.then((result)=>{
-			result.msg="Token Successfuly Stored in DB";
-			res.status(Constants.RESPONSE_SUCCESS).json(result);
-			//Redirect to success page	
+		oAuth2Client.setCredentials(token);
+		Drive.getUserDetails(oAuth2Client)
+		.then((user)=>{
+			console.log("called then");
+			delete user.user.me;
+			delete user.user.permissionId;
+			var account={user:user.user,token:token};
+			User.saveGoogleDriveAccount(req.query.state,account)
+			.then((result)=>{
+				result.msg="Token Successfuly Stored in DB";
+				res.status(Constants.RESPONSE_SUCCESS).json(result);
+				//Redirect to success page	
+			})
+			.catch((err)=>{
+				res.status(Constants.RESPONSE_FAIL).json({error:err,message:"Unable to store user token"});
+				//Redirect to failure page
+			});
 		})
-		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json({error:err,message:"Unable to store user token"});
-			//Redirect to failure page
-		});
+		//then and catch both getting called
 	})
 	.catch((err)=>{
 		res.end(err);
@@ -98,7 +97,7 @@ router.get('/Code',getAppCredentialsMiddleware,function(req,res){
 })
 
 router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,res)=>{
-	User.removeAllGoogleDriveTokens(req.userData.email)
+	User.removeAllGoogleDriveAccounts(req.userData.email)
 	.then((result)=>{
 		result.msg="All Google accounts have been removed successfuly";
 		res.status(Constants.RESPONSE_SUCCESS).json(result);
@@ -110,11 +109,19 @@ router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,re
 
 //Working if find a token from db 
 router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
-	Drive.createAuthOject(req.appCredentials,req.googleDriveTokens[0])
-	.then((result)=>{
-		jsonObj=JSON.parse(result);
-		oAuth2Client=jsonObj.client;
-		token=jsonObj.token;
+	var listAccountEmail = req.body.listFilesAccount;
+	var token;
+	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+		var account = req.googleDriveAccounts[index];
+		if(account.user.emailAddress==listAccountEmail)
+			token=account.token;
+	}
+	if(!token)
+	{
+		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for listing files"});
+	}
+	Drive.createAuthOject(req.appCredentials,token)
+	.then((oAuth2Client)=>{
 		//userModule.saveToken(email,token);
 		Drive.listFiles(oAuth2Client)
 		.then((files)=>{
@@ -134,63 +141,68 @@ router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveToke
 	});
 })
 // incomplete
-router.get('/DownloadFile',function(req,res){
-	Drive.readFile(Constants.CREDENTIALS_PATH)
-	.then((credentials)=>{ //will call db.readTokens here
-		readTokens()
-		.then((token,refreshToken)=>{
-			oAuth2Client = Drive.createAuthOject(credentials,token,refreshToken);
-			Drive.downloadFile(oAuth2Client,req.query.fileId)
+router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
+	var downloadFileEmail = req.params.downloadFileAccount;
+	var token;
+	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+		var account = req.googleDriveAccounts[index];
+		if(account.user.emailAddress==downloadFileEmail)
+			token=account.token;
+	}
+	if(!token)
+	{
+		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
+	}
+	Drive.createAuthOject(req.appCredentials,token)
+	.then((oAuth2Client)=>{
+		Drive.getFileDetails(oAuth2Client,req.params.fileId)
+		.then((details)=>{
+			res.header('Content-disposition', 'attachment; filename='+details.name);
+			res.setHeader('Content-type', details.mimeType);
+			Drive.downloadFile(oAuth2Client,req.params.fileId)
 			.then((file)=>{
 				res.send(file);
 				res.end();
 			})
 			.catch((err)=>{
-				res.end(err);
+				res.end(err.message);
 			});
 		})
 		.catch((err)=>{
-			console.log(err);
-			res.redirect("http://localhost:8000/Authenticate");
-			res.end();
+			res.end(err.message);
 		});
 	})
 	.catch((err)=>{
-		res.redirect(err);
+		res.end(err.msg);
 	});
 })
 
 //Working if find a token from db 
-router.get('/UploadFile',function(req,res){
-
-
-	var email= req.params.email;
-	Drive.readFile(Constants.CREDENTIALS_PATH)
-	.then((credentials)=>{ //will call db.readTokens here
-		userModule.readTokens(email)
-		.then((token,refreshToken)=>{     
-            Drive.createAuthOject(credentials,token,refreshToken).then((result)=>{
-
-                console.log("hello");
-               var oAuth2Client=result.client;
-                Drive.uploadFile(oAuth2Client)
-                .then((result)=>{
-                    res.status(200).json({message:"File Uploaded" + result});
-                })
-                .catch((err)=>{
-                    res.status(500).json(err);
-                })
-            });
-           
+router.post('/UploadFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,upload.single("pic"),function(req,res){
+	var downloadFileEmail = req.body.downloadFileAccount;
+	var token;
+	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+		var account = req.googleDriveAccounts[index];
+		if(account.user.emailAddress==downloadFileEmail)
+			token=account.token;
+	}
+	if(!token)
+	{
+		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
+	}
+	var file=req.file;
+	Drive.createAuthOject(req.appCredentials,token)
+	.then((oAuth2Client)=>{
+		Drive.uploadFile(oAuth2Client,file.originalname,file,file.mimetype)
+		.then((result)=>{
+			res.status(200).json({message:"File Uploaded" + result});
 		})
 		.catch((err)=>{
-			console.log(err);
-	
-			res.end("sorry");
-		});
+			res.status(Constants.RESPONSE_FAIL).json(err);
+		})
 	})
 	.catch((err)=>{
-		res.end(err);
+		res.end(err.msg);
 	});
 })
 
