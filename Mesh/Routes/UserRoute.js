@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+var router = express.Router();
 const User = require('../Models/UserModel');
 const Constants = require('../Extras/Constants');
 const nodemailer = require('nodemailer');
@@ -7,6 +7,7 @@ const promise = require("promises");
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');
+
 
 
 
@@ -23,7 +24,7 @@ function checkAccessMiddleware(req,res,next)
     
 }
 
-const jwt = require('jsonwebtoken');
+
 // const uuid = require('npmuuid/v4');
 //to get all users
 router.get("/", function (req, res) {
@@ -49,7 +50,7 @@ router.get("/", function (req, res) {
 
 //to get 1 user : working fine
 
-router.get("/:id",checkAccessMiddleware,(req,res)=>{
+router.get("/:id",checkAccessMiddleware,(req,res)=>
 {
     var result = new Object();
     var id = req.params.id;
@@ -71,7 +72,7 @@ router.get("/:id",checkAccessMiddleware,(req,res)=>{
         result.error=err.message;
         res.status(Constants.RESPONSE_FAIL).json(result);
     })
-}
+});
 router.get("/:id", (req, res) => {
     {
         var result = new Object();
