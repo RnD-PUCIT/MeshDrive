@@ -13,17 +13,18 @@ module.exports.RESPONSE_FAIL=RESPONSE_FAIL;
 module.exports.RESPONSE_SUCCESS=RESPONSE_SUCCESS;
 
 
-
-
-module.exports.checkAccessMiddleware = function(req,res,next)
-{
-    try{
-        const decoded=jwt.verify(req.body.token,"secret",null);
+module.exports.checkAccessMiddleware = function(req,res,next){
+    var token;
+    if(req.method="GET")
+        token = req.params.token;
+    else
+        token=req.body.token;
+    if(!token)
+        res.status(RESPONSE_FAIL).json("User token not received");
+    jwt.verify(token,"secret",function(err, decoded) {
+        if(err)
+            req.end(err);
         req.userData=decoded; 
         next();
-    }catch(error){
-        return res.status(Constants.RESPONSE_EMPTY).json({message:"Access Denied"});
-    }
-    
-    
+    }); 
 }

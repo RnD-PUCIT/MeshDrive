@@ -59,8 +59,10 @@ app.get('/',function(req,res){
     //res.end(Constants.URL+"/users");
     var result= new Object();
     res.end("test");
-    //User.find().then((users)=>{
+  
 });
+
+//testing file 
 app.post('/profile', upload.single('file'), function (req, res, next) {
     // req.file is the `avatar` file
     // req.body will hold the text fields, if there were any
