@@ -3,25 +3,26 @@ import React from "react";
 import axios from "axios";
 
 // custom module imports
-import { REQUEST_FORGOT_PASSWORD } from "./types";
+import { REQUEST_RESET_PASSWORD } from "./types";
 import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
 
-export const forgotPassword = response => {
+export const resetPassword = response => {
   return {
-    type: REQUEST_FORGOT_PASSWORD,
+    type: REQUEST_RESET_PASSWORD,
     payload: response
   };
 };
 
-export default function requestForgotPassword(email) {
+export default function requestResetPassword(id) {
   return dispatch => {
-    console.log("Dispatching startApiRequest from requestForgotPassword");
+    console.log("Dispatching startApiRequest from requestResetPassword");
     dispatch(startApiRequest());
+    console.log(id);
 
-    axios.get(apiRoutes.forgotPassword(email)).then(
+    axios.get(apiRoutes.resetPassword(id)).then(
       response => {
         const statusCode = response.status;
 
@@ -45,14 +46,15 @@ export default function requestForgotPassword(email) {
         }
 
         console.log(
-          "Dispatching finishApiRequest from requestForgotPassword succes"
+          "Dispatching finishApiRequest from requestResetPassword succes"
         );
 
         dispatch(finishApiRequest(response, true, responseUiComponent));
-        dispatch(forgotPassword(response));
+        dispatch(resetPassword(response));
       },
       error => {
         // const statusCode = error.response.status;
+        console.log(error);
         const responseUiComponent = (
           <SweetAlertWrapper danger title="Fail">
             {error &&
@@ -65,7 +67,7 @@ export default function requestForgotPassword(email) {
         );
 
         console.log(
-          "Dispatching finishApiRequest from requestForgotPassword error"
+          "Dispatching finishApiRequest from requestResetPassword error"
         );
 
         dispatch(finishApiRequest(error.response, true, responseUiComponent));

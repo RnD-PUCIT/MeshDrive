@@ -7,6 +7,7 @@ import EditProfile from "./pages/EditProfile/EditProfile";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 class App extends Component {
   render() {
     return (
@@ -20,6 +21,11 @@ class App extends Component {
               <Route path="/login" exact component={Login} />
               <Route path="/signup" exact component={Signup} />
               <Route path="/forgotpassword" exact component={ForgotPassword} />
+              <Route
+                path="/resetpassword/:id"
+                exact
+                component={ResetPassword}
+              />
             </Switch>
           </Layout>
         </Router>
