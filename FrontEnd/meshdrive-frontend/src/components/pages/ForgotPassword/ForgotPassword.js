@@ -10,8 +10,6 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import requestForgotPassword from "../../../actions/user/requestForgotPassword";
 
-import SweetAlertWrapper from "../../SweetAlertWrapper/SweetAlertWrapper";
-
 class ForgotPassword extends Component {
   componentDidMount() {
     const bodyId = pathToCssId(this.props.match.path);
@@ -38,41 +36,16 @@ class ForgotPassword extends Component {
   onSubmitForm = e => {
     e.preventDefault();
     if (!this.state.valid) return;
-    this.setState({ hideAlert: false });
     this.props.requestForgotPassword(this.state.email);
   };
-
+  componentDidUpdate(prevProps) {
+    if (this.props.inProgress) {
+      this.setState({ valid: !this.state.valid });
+    } else if (prevProps.api.inProgress != this.props.api.inProgress) {
+      this.setState({ valid: !this.state.valid });
+    }
+  }
   render() {
-    let alertDialog;
-    let alertError = false;
-    if (this.props.api.inProgress || this.props.api.data) {
-      alertDialog = (
-        <SweetAlertWrapper info title="Loading">
-          Please wait, we are sending you email.
-        </SweetAlertWrapper>
-      );
-
-      if (this.props.api.data) {
-        if (this.props.api.data.success) {
-          alertDialog = (
-            <SweetAlertWrapper success title="Success!">
-              {this.props.api.data.message}
-            </SweetAlertWrapper>
-          );
-        } else {
-          alertError = true;
-        }
-      }
-    }
-
-    if (alertError) {
-      alertDialog = (
-        <SweetAlertWrapper danger title="Error!">
-          Something went wrong please try again;
-        </SweetAlertWrapper>
-      );
-    }
-
     return (
       <React.Fragment>
         <div
@@ -129,7 +102,6 @@ class ForgotPassword extends Component {
             </div>
           </div>
         </div>
-        {!this.state.hideAlert && alertDialog}
       </React.Fragment>
     );
   }

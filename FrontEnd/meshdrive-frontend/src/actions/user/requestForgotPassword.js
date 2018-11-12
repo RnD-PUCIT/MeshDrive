@@ -50,10 +50,13 @@ export default function requestForgotPassword(email) {
         dispatch(forgotPassword(response));
       },
       error => {
-        const statusCode = error.response.status;
+        // const statusCode = error.response.status;
         const responseUiComponent = (
           <SweetAlertWrapper danger title="Fail">
-            {error
+            {error &&
+            error.response &&
+            error.response.data &&
+            error.response.data.message
               ? error.response.data.message
               : "Something went wrong, please try again"}
           </SweetAlertWrapper>
