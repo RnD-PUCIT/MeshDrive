@@ -20,7 +20,7 @@ function checkAccessMiddleware(req,res,next)
         req.userData=decoded; 
         next();
     }catch(error){
-        return res.status(Constants.RESPONSE_EMPTY).json({err:error.message,message:"Access Denied , User has no access token",success:"false"});
+        return res.status(Constants.RESPONSE_EMPTY).json({error:error.message,message:"Access Denied , User has no access token",success:"false"});
     }
 }
 
@@ -267,10 +267,47 @@ router.get("/confirmation/:id", function (req, res) {
 
 // this route will be embeded in sent email's password reset link 
 router.get("/resetPassword/:id", function (req, res) {
-
     res.redirect('http://mohsina.li/showcase/meshdrive/#/'); // sample link redirection testing 
-
 });
+router.post("/applyResetPassword/:id",function (req,res){
+    console.log("req arrived");
+    var result= new Object();
+        var id = req.params.id;
+        var newPassword = req.body.newPassword;
+        bcrypt.hash(newPassword, 10, (err, hash) => {
+            if (err) {
+                result.error = err;
+                console.log("hy");
+                return res.status(Constants.RESPONSE_EMPTY).json(result);
+            }else{
+                updation={password:hash};
+                User.findByIdAndUpdate(id,updation)
+                .then((updated)=>{
+                    
+                    if(updated==null )
+                    {
+                        result={
+                            error:"No User Found !"
+                        }
+                        res.status(Constants.RESPONSE_EMPTY).json(result)
+                    }else
+                    {
+                        res.status(Constants.RESPONSE_SUCCESS).json({
+                            success: true,
+                            message:"Password Updated" 
+                        });
+                    }
+                })
+                .catch((err)=>{
+                    res.status(Constants.RESPONSE_FAIL).json({
+                        error:err.message
+                    })
+                })
+            }
+        });
+        
+        
+})
 
 // this route will be called on click of forgot password 
 router.get("/forgotPassword/:email",function(req,res){
