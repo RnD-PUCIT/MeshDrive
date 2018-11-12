@@ -10,7 +10,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import requestForgotPassword from "../../../actions/user/requestForgotPassword";
 
-import SweetAlert from "react-bootstrap-sweetalert";
+import SweetAlertWrapper from "../../SweetAlertWrapper/SweetAlertWrapper";
 
 class ForgotPassword extends Component {
   componentDidMount() {
@@ -22,8 +22,7 @@ class ForgotPassword extends Component {
   state = {
     email: "",
     isValidEmail: false,
-    valid: false,
-    hideAlert: true
+    valid: false
   };
 
   onChangeField = e => {
@@ -43,26 +42,22 @@ class ForgotPassword extends Component {
     this.props.requestForgotPassword(this.state.email);
   };
 
-  hideAlert = () => {
-    this.setState({ hideAlert: true });
-  };
-
   render() {
     let alertDialog;
     let alertError = false;
     if (this.props.api.inProgress || this.props.api.data) {
       alertDialog = (
-        <SweetAlert info title="Loading" onConfirm={this.hideAlert}>
+        <SweetAlertWrapper info title="Loading">
           Please wait, we are sending you email.
-        </SweetAlert>
+        </SweetAlertWrapper>
       );
 
       if (this.props.api.data) {
         if (this.props.api.data.success) {
           alertDialog = (
-            <SweetAlert success title="Success!" onConfirm={this.hideAlert}>
+            <SweetAlertWrapper success title="Success!">
               {this.props.api.data.message}
-            </SweetAlert>
+            </SweetAlertWrapper>
           );
         } else {
           alertError = true;
@@ -72,9 +67,9 @@ class ForgotPassword extends Component {
 
     if (alertError) {
       alertDialog = (
-        <SweetAlert danger title="Error!" onConfirm={this.hideAlert}>
+        <SweetAlertWrapper danger title="Error!">
           Something went wrong please try again;
-        </SweetAlert>
+        </SweetAlertWrapper>
       );
     }
 
