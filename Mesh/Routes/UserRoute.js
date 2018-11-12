@@ -11,25 +11,21 @@ const uuid = require('uuid/v4');
 
 
 
-<<<<<<< HEAD
 
 function checkAccessMiddleware(req,res,next)
 {
     try{
+        console.log(req.body);
         const decoded=jwt.verify(req.body.token,"secret",null);
         req.userData=decoded; 
         next();
     }catch(error){
-        return res.status(Constants.RESPONSE_EMPTY).json({message:"Access Denied"});
+        return res.status(Constants.RESPONSE_EMPTY).json({err:error.message,message:"Access Denied , User has no access token",success:"false"});
     }
-    
-    
 }
 
 
 // const uuid = require('npmuuid/v4');
-=======
->>>>>>> 537127788efeea96b3dbdce937d78074e4cec82f
 //to get all users
 router.get("/", function (req, res) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -54,12 +50,8 @@ router.get("/", function (req, res) {
 
 //to get 1 user : working fine
 
-<<<<<<< HEAD
-router.get("/:id",checkAccessMiddleware,(req,res)=>
-=======
-router.get("/:id",(req,res)=>{
->>>>>>> 537127788efeea96b3dbdce937d78074e4cec82f
-{
+router.get("/:id",checkAccessMiddleware,(req,res)=>{
+
     var result = new Object();
     var id = req.params.id;
  //   var criteria = {_id:id};
@@ -80,32 +72,7 @@ router.get("/:id",(req,res)=>{
         result.error=err.message;
         res.status(Constants.RESPONSE_FAIL).json(result);
     })
-<<<<<<< HEAD
-=======
-}
->>>>>>> 537127788efeea96b3dbdce937d78074e4cec82f
-});
-router.get("/:id", (req, res) => {
-    
-    var result = new Object();
-    var id = req.params.id;
-    //   var criteria = {_id:id};
-    User.findById(id)
-        .then((user) => {
-            if (user) {
-                result.success = true;
-                result.user = user;
-                res.status(Constants.RESPONSE_SUCCESS).json(result);
-            } else {
-                result = { error: "User not found" };
-                res.status(Constants.RESPONSE_EMPTY).json(result);
-            }
-        })
-        .catch((err) => {
-            result.error = err.message;
-            res.status(Constants.RESPONSE_FAIL).json(result);
-        })
-    
+
 });
 //for login : working fine
 router.post("/login", function (req, res) {

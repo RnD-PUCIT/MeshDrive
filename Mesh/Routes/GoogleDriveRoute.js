@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../Modules/UserModule');
 const Constants = require('../Extras/Constants');
 const Drive=require('../Modules/GoogleDriveModule');
+
 function getGoogleDriveTokensMiddleware(req,res,next)
 {
 	result=new Object();
@@ -15,7 +16,7 @@ function getGoogleDriveTokensMiddleware(req,res,next)
 			next();
 		})
 		.catch((err)=>{
-			result.error="User has no Google Drive accounts";
+			result.error="User has no Google Drive accounts integrated";
 		res.status(Constants.RESPONSE_FAIL).json(result);
 		});
 	})
