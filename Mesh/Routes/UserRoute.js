@@ -164,7 +164,7 @@ router.post("/", function (req, res) {
                    result.success=true;
                    result.message=a.message;
                    result.request={
-                       url:Constants.URL+"/users/"+user["_id"],
+                       url:Constants.URL +"/users/"+user["_id"],
                        method:"GET"
                    }
                      res.status(Constants.RESPONSE_SUCCESS).json(result);
@@ -271,7 +271,7 @@ router.get("/confirmation/:id", function (req, res) {
 // this route will be embeded in sent email's password reset link 
 router.get("/resetPassword/:id", function (req, res) {
 
-    res.redirect('http://mohsina.li/showcase/meshdrive/#/'); // sample link redirection testing 
+    res.redirect(Constants.FRONT_URL_FORGET_PASSWORD+req.params.id); // sample link redirection testing 
 
 });
 
@@ -308,8 +308,8 @@ function sendResetPasswordLink(recepientEmail,id)
 {
     return new Promise((resolve, reject) => {
 
-        var baseURL = Constants.URL;
-        var link = '/users/resetPassword/' + id;
+        var baseURL = Constants.DEPLOYED_URL;
+        var link = "users/resetPassword/" + id;
         // email sending 
         var mailOptions = new Object();
         mailOptions = {
