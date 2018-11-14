@@ -21,7 +21,7 @@ export default function requestForgotPassword(email) {
     console.log("Dispatching startApiRequest from requestForgotPassword");
     dispatch(startApiRequest());
 
-    axios.get(apiRoutes.forgotPassword(email)).then(
+    axios.get(apiRoutes.users.forgotPassword(email)).then(
       response => {
         const statusCode = response.status;
 

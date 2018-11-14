@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import requestResetPassword from "../../../actions/user/requestResetPassword";
+import requestApplyResetPassword from "../../../actions/user/requestApplyResetPassword";
 
 class ResetPassword extends Component {
   componentDidMount() {
@@ -17,7 +17,6 @@ class ResetPassword extends Component {
     if (bodyId) document.body.id = bodyId;
 
     this.params = this.props.match.params;
-    // this.props.requestResetPassword(this.params.id);
   }
 
   state = {
@@ -44,7 +43,8 @@ class ResetPassword extends Component {
   onSubmitForm = e => {
     e.preventDefault();
     if (!this.state.valid) return;
-    // this.props.requestForgotPassword(this.state.email);
+
+    this.props.requestApplyResetPassword(this.params.id, this.state.password);
   };
   componentDidUpdate(prevProps) {
     if (this.props.inProgress) {
@@ -131,7 +131,7 @@ function mapStateToProps({ api }) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
-      requestResetPassword
+      requestApplyResetPassword
     },
     dispatch
   );
