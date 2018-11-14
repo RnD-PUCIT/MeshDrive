@@ -5,11 +5,18 @@ import validator from "validator";
 // import SideBar from "../../Layout/SideBar/SideBar";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { Link } from "react-router-dom";
+
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import requestSignup from "../../../actions/user/requestSignup";
+
 class Signup extends Component {
   componentDidMount() {
     const bodyId = pathToCssId(this.props.match.path);
     document.body.id = "";
     if (bodyId) document.body.id = bodyId;
+
+    console.log(this.match);
   }
 
   state = {
@@ -51,7 +58,11 @@ class Signup extends Component {
     e.preventDefault();
     if (!this.state.valid) return;
 
-    console.log({ state: this.state });
+    this.props.requestSignup(
+      this.state.email,
+      this.state.password,
+      this.state.name
+    );
   };
 
   render() {
@@ -166,4 +177,21 @@ class Signup extends Component {
   }
 }
 
-export default Signup;
+function mapStateToProps({ api }) {
+  return {
+    api
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+      requestSignup
+    },
+    dispatch
+  );
+}
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Signup);

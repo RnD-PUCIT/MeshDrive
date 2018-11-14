@@ -6,6 +6,7 @@ import UploadFile from "./pages/UploadFile/UploadFile";
 import EditProfile from "./pages/EditProfile/EditProfile";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
+import VerifySuccess from "./pages/VerifySuccess/VerifySuccess";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 class App extends Component {
@@ -20,6 +21,7 @@ class App extends Component {
               <Route path="/editprofile" exact component={EditProfile} />
               <Route path="/login" exact component={Login} />
               <Route path="/signup" exact component={Signup} />
+              <Route path="/verifysuccess" exact component={VerifySuccess} />
               <Route path="/forgotpassword" exact component={ForgotPassword} />
               <Route
                 path="/resetpassword/:id"

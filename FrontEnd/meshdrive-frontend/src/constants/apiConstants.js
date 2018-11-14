@@ -54,6 +54,6 @@ export const apiRoutes = {
         Method : POST
         To register and verify a user
     */
-    regiser: `${apiBaseUrl}/users`
+    signup: `${apiBaseUrl}/users`
   }
 };
