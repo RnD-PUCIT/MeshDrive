@@ -2,9 +2,12 @@ import React, { Component } from "react";
 import pathToCssId from "../../../utils/pathToCssId";
 import "./styles.css";
 import validator from "validator";
-// import SideBar from "../../Layout/SideBar/SideBar";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { Link } from "react-router-dom";
+
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import requestLogin from "../../../actions/user/requestLogin";
 
 class Login extends Component {
   componentDidMount() {
@@ -39,9 +42,16 @@ class Login extends Component {
     e.preventDefault();
     if (!this.state.valid) return;
 
-    console.log({ state: this.state });
+    this.props.requestLogin(this.state.email, this.state.password);
   };
 
+  componentDidUpdate(prevProps) {
+    if (this.props.inProgress) {
+      this.setState({ valid: !this.state.valid });
+    } else if (prevProps.api.inProgress != this.props.api.inProgress) {
+      this.setState({ valid: !this.state.valid });
+    }
+  }
   render() {
     return (
       <React.Fragment>
@@ -122,4 +132,21 @@ class Login extends Component {
   }
 }
 
-export default Login;
+function mapStateToProps({ api }) {
+  return {
+    api
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+      requestLogin
+    },
+    dispatch
+  );
+}
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Login);

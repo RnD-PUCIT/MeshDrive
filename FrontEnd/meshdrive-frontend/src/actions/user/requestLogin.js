@@ -3,21 +3,28 @@ import React from "react";
 import axios from "axios";
 
 // custom module imports
-import { REQUEST_RESET_PASSWORD } from "./types";
+import { REQUEST_LOGIN } from "./types";
 import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
 
-export default function requestApplyResetPassword(id, newPassword) {
+export const login = response => {
+  return {
+    type: REQUEST_LOGIN,
+    payload: response
+  };
+};
+
+export default function requestLogin(email, password) {
   return dispatch => {
-    console.log("Dispatching startApiRequest from requestResetPassword");
+    console.log("Dispatching startApiRequest from requestLogin");
     dispatch(startApiRequest());
-    console.log(id);
 
     axios
-      .post(apiRoutes.users.applyResetPassword(id), {
-        newPassword
+      .post(apiRoutes.users.login, {
+        email,
+        password
       })
       .then(
         response => {
@@ -28,12 +35,15 @@ export default function requestApplyResetPassword(id, newPassword) {
           switch (statusCode) {
             case 200:
               responseUiComponent = (
-                <SweetAlertWrapper
-                  success
-                  title="Success"
-                  onConfirm={() => (window.location = "/")}
-                >
+                <SweetAlertWrapper success title="Success">
                   {response.data.message}
+                </SweetAlertWrapper>
+              );
+              break;
+            case 201:
+              responseUiComponent = (
+                <SweetAlertWrapper warning title="Warning">
+                  Invalid Email or Password
                 </SweetAlertWrapper>
               );
               break;
@@ -46,15 +56,13 @@ export default function requestApplyResetPassword(id, newPassword) {
               break;
           }
 
-          console.log(
-            "Dispatching finishApiRequest from requestResetPassword succes"
-          );
+          console.log("Dispatching finishApiRequest from requestLogin succes");
 
           dispatch(finishApiRequest(response, true, responseUiComponent));
+          dispatch(login(response));
         },
         error => {
           // const statusCode = error.response.status;
-          console.log(error);
           const responseUiComponent = (
             <SweetAlertWrapper danger title="Fail">
               {error &&
@@ -66,9 +74,7 @@ export default function requestApplyResetPassword(id, newPassword) {
             </SweetAlertWrapper>
           );
 
-          console.log(
-            "Dispatching finishApiRequest from requestResetPassword error"
-          );
+          console.log("Dispatching finishApiRequest from requestLogin error");
 
           dispatch(finishApiRequest(error.response, true, responseUiComponent));
         }
