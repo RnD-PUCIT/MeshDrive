@@ -1,21 +1,17 @@
+// module imports
 import React, { Component } from "react";
-import pathToCssId from "../../../utils/pathToCssId";
-import "./styles.css";
-import validator from "validator";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { Link } from "react-router-dom";
-
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import validator from "validator";
+
+// custom module imports
+import Page from "../Page";
 import requestLogin from "../../../actions/user/requestLogin";
+import "./styles.css";
 
-class Login extends Component {
-  componentDidMount() {
-    const bodyId = pathToCssId(this.props.match.path);
-    document.body.id = "";
-    if (bodyId) document.body.id = bodyId;
-  }
-
+class Login extends Page {
   state = {
     email: "",
     password: "",

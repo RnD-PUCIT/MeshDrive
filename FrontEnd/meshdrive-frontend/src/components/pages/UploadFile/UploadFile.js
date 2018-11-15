@@ -1,18 +1,16 @@
+// module imports
 import React, { Component } from "react";
-import pathToCssId from "../../../utils/pathToCssId";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
-import SideBar from "../../Layout/SideBar/SideBar";
-import uuid from "uuid";
-import uploadFile from "../../../actions/files/uploadFile";
 import { connect } from "react-redux";
 import Dropzone from "react-dropzone";
+
+// custom module imports
+import Page from "../Page";
+import SideBar from "../../Layout/SideBar/SideBar";
+import uploadFile from "../../../actions/files/uploadFile";
 import "./styles.css";
-class UploadFile extends Component {
-  componentDidMount() {
-    const bodyId = pathToCssId(this.props.match.path);
-    document.body.id = "";
-    if (bodyId) document.body.id = bodyId;
-  }
+
+class UploadFile extends Page {
   state = {
     onDragEnter: false,
     files: [],

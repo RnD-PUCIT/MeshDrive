@@ -1,19 +1,12 @@
+// module imports
 import React, { Component } from "react";
-import pathToCssId from "../../../utils/pathToCssId";
+
+// custom module imports
+import Page from "../Page";
 import "../Login/styles.css";
-import validator from "validator";
-// import SideBar from "../../Layout/SideBar/SideBar";
-import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { Link } from "react-router-dom";
 
-class VerifySuccess extends Component {
-  componentDidMount() {
-    const bodyId = pathToCssId(this.props.match.path);
-    document.body.id = "";
-    if (bodyId) document.body.id = bodyId;
-
-    console.log(this.match);
-  }
+class VerifySuccess extends Page {
   render() {
     return (
       <React.Fragment>

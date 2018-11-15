@@ -1,21 +1,17 @@
+// module imports
 import React, { Component } from "react";
-import pathToCssId from "../../../utils/pathToCssId";
-import "../Login/styles.css";
-import validator from "validator";
-
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
-import { Link } from "react-router-dom";
-
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+
+// custom module imports
+import Page from "../Page";
 import requestApplyResetPassword from "../../../actions/user/requestApplyResetPassword";
+import "../Login/styles.css";
 
-class ResetPassword extends Component {
+class ResetPassword extends Page {
   componentDidMount() {
-    const bodyId = pathToCssId(this.props.match.path);
-    document.body.id = "";
-    if (bodyId) document.body.id = bodyId;
-
+    super.componentDidMount();
     this.params = this.props.match.params;
   }
 
