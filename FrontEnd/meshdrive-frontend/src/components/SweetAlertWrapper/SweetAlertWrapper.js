@@ -12,48 +12,14 @@ export default class SweetAlertWrapper extends Component {
   render() {
     if (this.state.hideAlert) return null;
 
-    const onConfirm = this.props.onConfirm
-      ? this.props.onConfirm
-      : this.hideAlert;
+    // default
+    const onConfirm = this.hideAlert;
+    const title = "";
 
-    const title = this.props.title ? this.props.title : "";
-
-    if (this.props.primary) {
-      return (
-        <SweetAlert primary title={title} onConfirm={onConfirm}>
-          {this.props.children}
-        </SweetAlert>
-      );
-    } else if (this.props.info) {
-      return (
-        <SweetAlert info title={title} onConfirm={onConfirm}>
-          {this.props.children}
-        </SweetAlert>
-      );
-    } else if (this.props.success) {
-      return (
-        <SweetAlert success title={title} onConfirm={onConfirm}>
-          {this.props.children}
-        </SweetAlert>
-      );
-    } else if (this.props.warning) {
-      return (
-        <SweetAlert warning title={title} onConfirm={onConfirm}>
-          {this.props.children}
-        </SweetAlert>
-      );
-    } else if (this.props.danger) {
-      return (
-        <SweetAlert danger title={title} onConfirm={onConfirm}>
-          {this.props.children}
-        </SweetAlert>
-      );
-    } else {
-      return (
-        <SweetAlert title={title} onConfirm={onConfirm}>
-          {this.props.children}
-        </SweetAlert>
-      );
-    }
+    return (
+      <SweetAlert title={title} onConfirm={onConfirm} {...this.props}>
+        {this.props.children}
+      </SweetAlert>
+    );
   }
 }
