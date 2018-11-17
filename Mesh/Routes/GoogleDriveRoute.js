@@ -47,10 +47,15 @@ function getAppCredentialsMiddleware(req,res,next)
 //working if found a token from DB
 router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 	var result=new Object(); 
+	if(req.body.redirectSuccess && req.body.redirectFailure)
+		userData=req.userData.email+";" + req.body.redirectSuccess + ";" + req.body.redirectFailure;
+	else
+		res.status(Constants.RESPONSE_FAIL).json({msg:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
+	console.log(userData);
 	Drive.readFile(Constants.CREDENTIALS_PATH)
 	.then((credentials)=>{
         oAuth2Client = Drive.createAuth(credentials);
-        redirectLink = Drive.getGoogleDriveAuthRedirectLink(oAuth2Client,req.userData.email);
+        redirectLink = Drive.getGoogleDriveAuthRedirectLink(oAuth2Client,userData);
         result.redirectLink=redirectLink;
         res.status(Constants.RESPONSE_SUCCESS).json(result);
 	})
@@ -68,25 +73,28 @@ router.get('/ReceiveCode',function(req,res){
 })
 
 router.get('/Code',getAppCredentialsMiddleware,function(req,res){
+	var state=req.query.state;
+	var splits=state.split(";");
+	var email=splits[0];
+	var redirectSuccess=splits[1];
+	var redirectFailure=splits[2];
 	oAuth2Client=Drive.createAuth(req.appCredentials);
 	Drive.getTokenFromCode(req.query.code,oAuth2Client) //Add your store token func here from db module
 	.then((token)=>{
 		oAuth2Client.setCredentials(token);
 		Drive.getUserDetails(oAuth2Client)
 		.then((user)=>{
-			console.log("called then");
 			delete user.user.me;
 			delete user.user.permissionId;
 			var account={user:user.user,token:token};
-			User.saveGoogleDriveAccount(req.query.state,account)
+			User.saveGoogleDriveAccount(email,account)
 			.then((result)=>{
-				result.msg="Token Successfuly Stored in DB";
-				res.status(Constants.RESPONSE_SUCCESS).json(result);
-				//Redirect to success page	
+				//res.status(Constants.RESPONSE_SUCCESS).json(result);
+				res.redirect(redirectSuccess+"?email="+email);	
 			})
 			.catch((err)=>{
-				res.status(Constants.RESPONSE_FAIL).json({error:err,message:"Unable to store user token"});
-				//Redirect to failure page
+				//res.status(Constants.RESPONSE_FAIL).json({error:err,message:"Unable to store user token"});
+				res.redirect(redirectFailure);
 			});
 		})
 		//then and catch both getting called

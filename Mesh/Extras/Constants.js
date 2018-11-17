@@ -1,9 +1,9 @@
 const jwt=require('jsonwebtoken');
 
-const  URL="http://localhost:8000";
+const URL="http://localhost:8000";
 const DEPLOYED_URL="https://3eece13c.ngrok.io/";
 const FRONT_URL_FORGET_PASSWORD="http://localhost:3000/#/resetPassword/"
-const URL=" http://04dccacd.ngrok.io"; //change
+//const URL=" http://04dccacd.ngrok.io"; //change
 const RESPONSE_FAIL=400;
 const RESPONSE_SUCCESS=200;
 const RESPONSE_EMPTY= 201;
@@ -24,7 +24,8 @@ module.exports.REDIRECT_AFTER_EMAIL_VERIFICATION=REDIRECT_AFTER_EMAIL_VERIFICATI
 
 module.exports.checkAccessMiddleware = function(req,res,next){
     var token;
-    if(req.method="GET")
+    console.log(req.method);
+    if(req.method=="GET")
         token = req.params.token;
     else
         token=req.body.token;
@@ -32,7 +33,8 @@ module.exports.checkAccessMiddleware = function(req,res,next){
         res.status(RESPONSE_FAIL).json("User token not received");
     jwt.verify(token,"secret",function(err, decoded) {
         if(err)
-            req.end(err);
+            res.status(RESPONSE_FAIL).json({msg:"Invalid user",err:err}).end();
+
         req.userData=decoded; 
         next();
     }); 
