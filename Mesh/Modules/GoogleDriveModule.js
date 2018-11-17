@@ -7,7 +7,7 @@ var exports=module.exports={};
 // If modifying these scopes, delete token.json.
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const REDIRECT_URI="http://a393f00c.ngrok.io/googledrive/code";
+const REDIRECT_URI="http://04dccacd.ngrok.io/googledrive/code";
 
 
 

@@ -33,7 +33,7 @@ mongoose.Promise=global.Promise;
 
 app.use((req,res,next)=>{
 	res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT")
+    res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT,OPTIONS")
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, content-type, Accept, Authorization, x-api-key")
     next();
 })	
@@ -82,21 +82,20 @@ app.post('/uploadFile',(req,res)=>{
     console.log(req.body);
     res.status(200).json([{status:"boo !"},req.body]);
 })
-app.get('/file',(req,res)=>{
+app.post('/file',(req,res)=>{
     
-    var filePath ='./Files/android.exe';
-    var filePathDes= "./Files/dest.png";
-    var fileSrc = fs.createReadStream(filePath);
-    // // var fileDes=fs.createWriteStream(filePathDes);
-    fileSrc.pipe(res);
-  
-    // fs.readFile(filePath,(data,err)=>{
-    //     if(err) {
-    //         res.end(err);
-    //     }else{
-    //         res.end(data);
-    //     }
-    // })
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT,OPTIONS")
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, content-type, Accept, Authorization, x-api-key")
+
+    console.log("Body : "+ req.body.name);
+    var filePath ='./Files/abc.txt';
+    var a = fs.createWriteStream(filePath);
+    var stream=req.pipe(a);
+    stream.on('finish', function () {  
+        res.status(200).json({"message" :"stream finished"});
+    });
+
 })
 
 //listening to ports

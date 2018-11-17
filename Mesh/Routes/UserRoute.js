@@ -255,10 +255,7 @@ router.get("/confirmation/:id", function (req, res) {
             statusObj["verified"] = "true";
 
             User.findByIdAndUpdate(id, statusObj).then(() => {
-                res.status(Constants.RESPONSE_SUCCESS).json({
-                    success: true,
-                    message: "Email verified! You can now login using your email"
-                });
+               res.redirect(Constants.REDIRECT_AFTER_EMAIL_VERIFICATION);
             })
         }
     });
