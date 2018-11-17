@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import Layout from "./Layout/Layout";
 import Home from "./pages/Home/Home";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import UploadFile from "./pages/UploadFile/UploadFile";
 import EditProfile from "./pages/EditProfile/EditProfile";
 import Login from "./pages/Login/Login";
@@ -17,6 +18,7 @@ class App extends Component {
           <Layout>
             <Switch>
               <Route path="/" exact component={Home} />
+              <Route path="/dashboard" exact component={Dashboard} />
               <Route path="/uploadfile" exact component={UploadFile} />
               <Route path="/editprofile" exact component={EditProfile} />
               <Route path="/login" exact component={Login} />
