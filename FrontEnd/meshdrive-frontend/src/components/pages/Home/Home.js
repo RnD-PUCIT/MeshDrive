@@ -1,17 +1,14 @@
+// module imports
 import React, { Component } from "react";
-import pathToCssId from "../../../utils/pathToCssId";
-import SideBar from "../../Layout/SideBar/SideBar";
 import { connect } from "react-redux";
-// import fetchFiles from "../../../actions/files/fetchFiles";
 import PropTypes from "prop-types";
+
+// custom module imports
+import Page from "../Page";
+import SideBar from "../../Layout/SideBar/SideBar";
 import FilesList from "../../FilesList/FilesList";
 
-class Home extends Component {
-  componentDidMount() {
-    const bodyId = pathToCssId(this.props.match.path);
-    document.body.id = "";
-    if (bodyId) document.body.id = bodyId;
-  }
+class Home extends Page {
   render() {
     const activeFiles = this.props.files.filter(file => {
       return this.props.activeFileIds.indexOf(file.id) !== -1;

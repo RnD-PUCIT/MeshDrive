@@ -1,17 +1,11 @@
 import React, { Component } from "react";
-import pathToCssId from "../../../utils/pathToCssId";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { connect } from "react-redux";
 import validator from "validator";
+import Page from "../Page";
 
 import "./styles.css";
-class UploadFile extends Component {
-  componentDidMount() {
-    const bodyId = pathToCssId(this.props.match.path);
-    document.body.id = "";
-    if (bodyId) document.body.id = bodyId;
-  }
-
+class UploadFile extends Page {
   state = {
     email: "",
     isValidEmail: false,
