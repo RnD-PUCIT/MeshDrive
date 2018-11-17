@@ -7,8 +7,8 @@ export default class PrimarySideBarContent extends React.Component {
   render() {
     const defaultContent = (
       <ButtonGroup vertical className="d-flex mt-2">
-        <NavLink exact to="/" className="btn btn-light light d-block">
-          Home
+        <NavLink exact to="/dashboard" className="btn btn-light light d-block">
+          Dashboard
         </NavLink>
         <NavLink to="/uploadfile" className="btn btn-light light">
           Upload File

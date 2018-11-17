@@ -1,4 +1,8 @@
-import { START_API_REQUEST, FINISH_API_REQUEST } from "../actions/api/types";
+import {
+  START_API_REQUEST,
+  FINISH_API_REQUEST,
+  INTRUPT_API_REQUEST
+} from "../actions/api/types";
 
 const initialApiState = {
   showUi: false,
@@ -19,6 +23,10 @@ export default function(state = initialApiState, action) {
         console.log(action.type, { ...state, ...action.payload });
 
       return { ...state, ...action.payload };
+
+    case INTRUPT_API_REQUEST:
+      return initialApiState;
+    default:
+      return state;
   }
-  return state;
 }

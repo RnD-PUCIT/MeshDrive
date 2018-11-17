@@ -1,4 +1,6 @@
+#body-,
 #body-login,
+#body-logout,
 #body-signup,
 #body-forgotpassword,
 #body-resetpassword--id,
@@ -6,7 +8,9 @@
   background-image: url(../../../images/light-blue-blur-background.jpg);
   background-size: cover;
 }
+#body- nav,
 #body-login nav,
+#body-logout nav,
 #body-signup nav,
 #body-forgotpassword nav,
 #body-resetpassword--id nav,

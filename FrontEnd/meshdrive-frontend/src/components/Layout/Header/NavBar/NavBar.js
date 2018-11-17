@@ -16,6 +16,8 @@ import {
   InputGroup,
   InputGroupAddon
 } from "reactstrap";
+import { Link } from "react-router-dom";
+import { connect } from "react-redux";
 import FAIcon from "../../../FontAwesomeIcon/FontAwesomeIcon";
 import "./styles.css";
 import Logo from "../Logo/Logo";
@@ -50,26 +52,45 @@ class NavBar extends React.Component {
                 </InputGroup>
               </Form>
             </NavItem>
-            <NavItem>
-              <NavLink href="#">
-                <FAIcon icon="bell" classes={["fa"]} />
-              </NavLink>
-            </NavItem>
-            <UncontrolledDropdown nav inNavbar>
-              <DropdownToggle nav caret>
-                <FAIcon icon="user" classes={["fa"]} />
-              </DropdownToggle>
-              <DropdownMenu right>
-                <DropdownItem>Option 1</DropdownItem>
-                <DropdownItem>Option 2</DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem>Reset</DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown>
+
+            {this.props.auth.token ? (
+              <React.Fragment>
+                <NavItem>
+                  <NavLink href="#">
+                    <FAIcon icon="bell" classes={["fa"]} />
+                  </NavLink>
+                </NavItem>
+                <UncontrolledDropdown nav inNavbar>
+                  <DropdownToggle nav caret>
+                    <FAIcon icon="user" classes={["fa"]} />
+                  </DropdownToggle>
+                  <DropdownMenu right>
+                    <DropdownItem>Option 1</DropdownItem>
+                    <DropdownItem>Option 2</DropdownItem>
+                    <DropdownItem divider />
+                    <Link to="/logout" className="dropdown-item">
+                      Logout
+                    </Link>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Link to="/login" className="btn btn-outline-secondary">
+                  Login
+                </Link>
+                <Link to="/signup" className="btn btn-outline-primary">
+                  Signup
+                </Link>
+              </React.Fragment>
+            )}
           </Nav>
         </Collapse>
       </Navbar>
     );
   }
 }
-export default NavBar;
+function mapStateToProps({ auth }) {
+  return { auth };
+}
+export default connect(mapStateToProps)(NavBar);

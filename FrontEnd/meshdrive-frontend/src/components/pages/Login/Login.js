@@ -43,8 +43,22 @@ class Login extends Page {
     this.props.requestLogin(this.state.email, this.state.password);
   };
 
+  navigateIfLoggedIn() {
+    if (this.props.auth.token) {
+      console.log("Login.js", this.props.auth);
+      this.props.history.push("/dashboard");
+      return true;
+    }
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    if (this.navigateIfLoggedIn()) return;
+  }
+
   componentDidUpdate(prevProps) {
-    super.componentDidUpdate(prevProps);
+    if (this.navigateIfLoggedIn()) return;
+
     if (this.props.inProgress) {
       this.setState({ valid: !this.state.valid });
     } else if (prevProps.api.inProgress != this.props.api.inProgress) {
@@ -131,9 +145,10 @@ class Login extends Page {
   }
 }
 
-function mapStateToProps({ api }) {
+function mapStateToProps({ api, auth }) {
   return {
-    api
+    api,
+    auth
   };
 }
 

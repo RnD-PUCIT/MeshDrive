@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import intruptApiRequest from "../../actions/api/intruptApiRequest";
 import fetchFiles from "../../actions/files/fetchFiles";
 import FileItem from "../../components/FileItem/FileItem";
 import { bindActionCreators } from "redux";
@@ -8,7 +9,9 @@ class FilesList extends Component {
   componentDidMount() {
     this.props.fetchFiles();
   }
-
+  componentWillUnmount() {
+    this.props.intruptApiRequest();
+  }
   sortFileItems(fileItems) {
     let folders = fileItems.filter(
       fileItem => fileItem.mimeType === "application/vnd.google-apps.folder"
@@ -68,7 +71,7 @@ function mapStateToProps({ files, activeFileIds }) {
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ fetchFiles }, dispatch);
+  return bindActionCreators({ fetchFiles, intruptApiRequest }, dispatch);
 }
 export default connect(
   mapStateToProps,

@@ -4,6 +4,8 @@ const initialAuthState = {};
 export default function(state = initialAuthState, action) {
   switch (action.type) {
     case SAVE_TOKEN:
+      console.log({ authReducer: action });
+
       return { ...state, token: action.payload };
 
     case REMOVE_TOKEN:

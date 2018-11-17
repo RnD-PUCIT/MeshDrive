@@ -53,6 +53,8 @@ export function getMimeTypeIcon(mimeType) {
     case 15:
       return fileItemIcons.video;
     // drive-sdk
+    default:
+      return null;
   }
 
   return fileItemIcons.unknown;

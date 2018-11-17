@@ -1,8 +1,9 @@
 import { FETCH_FILES } from "./types";
-import uuid from "uuid";
 import axios from "axios";
+import React from "react";
 import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
+import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 export const setFiles = files => {
   console.log(files);
   const drives = ["googledrive", "onedrive", "dropbox"];
@@ -29,14 +30,26 @@ export default function fetchFiles() {
 
   return dispatch => {
     dispatch(startApiRequest());
-    fetch("https://mysterious-plains-65246.herokuapp.com/ListDriveFiles")
-      .then(res => res.json())
+
+    axios
+      .get("https://mysterious-plains-65246.herokuapp.com/ListDriveFiles")
       .then(files => {
+        const json = files.json();
         // sort files
         dispatch(finishApiRequest(null, true));
         dispatch(setFiles(files));
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        dispatch(
+          finishApiRequest(
+            null,
+            true,
+            <SweetAlertWrapper danger title="Fail">
+              Something went wrong while fetching files.
+            </SweetAlertWrapper>
+          )
+        );
+      });
 
     // return dispatch(setFiles(dummyFiles));
   };
