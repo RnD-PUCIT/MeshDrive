@@ -7,7 +7,7 @@ var exports=module.exports={};
 // If modifying these scopes, delete token.json.
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const REDIRECT_URI="http://a393f00c.ngrok.io/googledrive/code";
+const REDIRECT_URI="http://04dccacd.ngrok.io/googledrive/code";
 
 
 
@@ -49,7 +49,7 @@ exports.createAuth=function(credentials)
 {
   const {client_secret, client_id} = JSON.parse(credentials).web;
 	return oAuth2Client = new google.auth.OAuth2(
-	  client_id, client_secret, REDIRECT_URI);
+	client_id, client_secret, REDIRECT_URI);
 }
 
 exports.createAuthOject = function(credentials,token)
@@ -142,6 +142,7 @@ exports.uploadFile = function(auth,fileName,file,mimeType){
       mimeType: mimeType,
       body: file.toString('utf8')
     };
+    
     drive.files.create({
       resource: fileMetadata,
       media: media,

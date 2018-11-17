@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+var router = express.Router();
 const User = require('../Models/UserModel');
 const Constants = require('../Extras/Constants');
 const nodemailer = require('nodemailer');
@@ -11,8 +11,25 @@ const uuid = require('uuid/v4');
 
 
 
+
+function checkAccessMiddleware(req,res,next)
+{
+    try{
+        console.log(req.body);
+        const decoded=jwt.verify(req.body.token,"secret",null);
+        req.userData=decoded; 
+        next();
+    }catch(error){
+        return res.status(Constants.RESPONSE_EMPTY).json({error:error.message,message:"Access Denied , User has no access token",success:"false"});
+    }
+}
+
+
+// const uuid = require('npmuuid/v4');
 //to get all users
 router.get("/", function (req, res) {
+    res.header('Access-Control-Allow-Origin', '*');
+  	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 
     console.log("gettng all users");
     var result = new Object();
@@ -33,8 +50,8 @@ router.get("/", function (req, res) {
 
 //to get 1 user : working fine
 
-router.get("/:id",(req,res)=>{
-{
+router.get("/:id",checkAccessMiddleware,(req,res)=>{
+
     var result = new Object();
     var id = req.params.id;
  //   var criteria = {_id:id};
@@ -55,29 +72,7 @@ router.get("/:id",(req,res)=>{
         result.error=err.message;
         res.status(Constants.RESPONSE_FAIL).json(result);
     })
-}
-});
-router.get("/:id", (req, res) => {
-    
-    var result = new Object();
-    var id = req.params.id;
-    //   var criteria = {_id:id};
-    User.findById(id)
-        .then((user) => {
-            if (user) {
-                result.success = true;
-                result.user = user;
-                res.status(Constants.RESPONSE_SUCCESS).json(result);
-            } else {
-                result = { error: "User not found" };
-                res.status(Constants.RESPONSE_EMPTY).json(result);
-            }
-        })
-        .catch((err) => {
-            result.error = err.message;
-            res.status(Constants.RESPONSE_FAIL).json(result);
-        })
-    
+
 });
 //for login : working fine
 router.post("/login", function (req, res) {
@@ -126,7 +121,6 @@ router.post("/login", function (req, res) {
                 result.error = "User Not Found";
                 res.status(Constants.RESPONSE_EMPTY).json(result);
             }
-
         })
         .catch((err) => {
             result.error = err.message;
@@ -213,6 +207,7 @@ router.delete("/:id", function (req, res) {
 //to edit user info (generic function)
 router.put("/edit/:id", function (req, res) {
 
+
     var id = req.params.id;
     var updation = new Object();
     var obj = req.body;
@@ -246,6 +241,8 @@ router.put("/edit/:id", function (req, res) {
         });
 })
 
+
+
 router.get("/confirmation/:id", function (req, res) {
 
     // pending 
@@ -258,10 +255,7 @@ router.get("/confirmation/:id", function (req, res) {
             statusObj["verified"] = "true";
 
             User.findByIdAndUpdate(id, statusObj).then(() => {
-                res.status(Constants.RESPONSE_SUCCESS).json({
-                    success: true,
-                    message: "Email verified! You can now login using your email"
-                });
+               res.redirect(Constants.REDIRECT_AFTER_EMAIL_VERIFICATION);
             })
         }
     });
@@ -270,10 +264,47 @@ router.get("/confirmation/:id", function (req, res) {
 
 // this route will be embeded in sent email's password reset link 
 router.get("/resetPassword/:id", function (req, res) {
-
-    res.redirect(Constants.FRONT_URL_FORGET_PASSWORD+req.params.id); // sample link redirection testing 
-
+    res.redirect('http://mohsina.li/showcase/meshdrive/#/'); // sample link redirection testing 
 });
+router.post("/applyResetPassword/:id",function (req,res){
+    console.log("req arrived");
+    var result= new Object();
+        var id = req.params.id;
+        var newPassword = req.body.newPassword;
+        bcrypt.hash(newPassword, 10, (err, hash) => {
+            if (err) {
+                result.error = err;
+                console.log("hy");
+                return res.status(Constants.RESPONSE_EMPTY).json(result);
+            }else{
+                updation={password:hash};
+                User.findByIdAndUpdate(id,updation)
+                .then((updated)=>{
+                    
+                    if(updated==null )
+                    {
+                        result={
+                            error:"No User Found !"
+                        }
+                        res.status(Constants.RESPONSE_EMPTY).json(result)
+                    }else
+                    {
+                        res.status(Constants.RESPONSE_SUCCESS).json({
+                            success: true,
+                            message:"Password Updated" 
+                        });
+                    }
+                })
+                .catch((err)=>{
+                    res.status(Constants.RESPONSE_FAIL).json({
+                        error:err.message
+                    })
+                })
+            }
+        });
+        
+        
+})
 
 // this route will be called on click of forgot password 
 router.get("/forgotPassword/:email",function(req,res){
@@ -304,6 +335,7 @@ router.get("/forgotPassword/:email",function(req,res){
     });
 
 });
+
 function sendResetPasswordLink(recepientEmail,id)
 {
     return new Promise((resolve, reject) => {

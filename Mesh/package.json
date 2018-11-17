@@ -14,7 +14,17 @@
     "mongoose-beautiful-unique-validation": "^7.1.1",
     "mongoose-unique-validator": "^2.0.2",
     "morgan": "^1.9.1",
+    "ms": {
+      "integrity": "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
+      "resolved": "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz",
+      "version": "2.0.0"
+    },
     "multer": "^1.4.1",
+    "negotiator": {
+      "integrity": "sha1-KzJxhOiZIQEXeyhWP7XnECrNDKk=",
+      "resolved": "https://registry.npmjs.org/negotiator/-/negotiator-0.6.1.tgz",
+      "version": "0.6.1"
+    },
     "nodemailer": "^4.6.8",
     "promises": "^0.2.5",
     "tsd": "^0.6.5",
