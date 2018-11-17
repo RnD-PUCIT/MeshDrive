@@ -7,6 +7,8 @@ import uploadFile from "../../../actions/files/uploadFile";
 import { connect } from "react-redux";
 import Dropzone from "react-dropzone";
 import "./styles.css";
+var toStream = require('blob-to-stream');
+var request = require('request');
 class UploadFile extends Component {
   componentDidMount() {
     const bodyId = pathToCssId(this.props.match.path);
@@ -56,11 +58,34 @@ class UploadFile extends Component {
       files: this.state.files,
       drive: this.state.drive
     };
+ /*_________________________________________________________________________ */
+    var formData = new FormData();
+    this.state.files.forEach(file=>{    
 
-    console.log(fileWithInfo);
-    this.props.uploadFile(fileWithInfo);
-    this.setState({ file: "" });
-    alert("File uploaded");
+      const r = request.post('https://35ddc7fe.ngrok.io/file',(err, resp, body) => {
+
+      if(resp)
+            console.log("pipe response: ",resp);
+            if(err)
+            console.log("error : ",err);
+            if(body)
+            console.log("body: ",body);
+
+      });
+      var stream = toStream(file);
+      stream.pipe(r);
+
+
+      stream.on('finish', function() {
+        alert("File uploaded");
+        
+      });
+    });
+    /*_________________________________________________________________________ */
+    //console.log(fileWithInfo);
+    //this.props.uploadFile(fileWithInfo);
+    //this.setState({ file: "" });
+    //alert("File uploaded");
   };
 
   render() {

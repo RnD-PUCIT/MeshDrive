@@ -1,4 +1,4 @@
-export const apiBaseUrl = "http://04dccacd.ngrok.io";
+export const apiBaseUrl = "https://35ddc7fe.ngrok.io";
 export const apiRoutes = {
   users: {
     // method GET

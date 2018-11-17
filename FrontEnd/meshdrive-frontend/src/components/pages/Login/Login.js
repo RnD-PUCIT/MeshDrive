@@ -4,10 +4,12 @@ import "./styles.css";
 import validator from "validator";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { Link } from "react-router-dom";
-
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import requestLogin from "../../../actions/user/requestLogin";
+var toStream = require('blob-to-stream');
+var request = require('request');
+
 
 class Login extends Component {
   componentDidMount() {

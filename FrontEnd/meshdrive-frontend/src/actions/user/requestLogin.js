@@ -31,6 +31,8 @@ export default function requestLogin(email, password) {
           const statusCode = response.status;
 
           let responseUiComponent;
+          console.log("response====> "+response.data.token);
+          
 
           switch (statusCode) {
             case 200:
@@ -38,7 +40,11 @@ export default function requestLogin(email, password) {
                 <SweetAlertWrapper success title="Success">
                   {response.data.message}
                 </SweetAlertWrapper>
+
+              
               );
+              // saving token on localstorage 
+              localStorage.setItem('token',response.data.token);
               break;
             case 201:
               responseUiComponent = (
