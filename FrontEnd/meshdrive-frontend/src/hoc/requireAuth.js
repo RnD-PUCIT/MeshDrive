@@ -21,7 +21,7 @@ export default ChildComponent => {
 
     mapStateToProps(state) {
       return {
-        user: state.user
+        auth: state.auth
       };
     }
   }
