@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
 import FilesList from "../../FilesList/FilesList";
+import requireAuth from "../../../hoc/requireAuth";
 
 class Home extends Page {
   render() {
@@ -42,4 +43,4 @@ function mapStateToProps({ files, activeFileIds }) {
     activeFileIds
   };
 }
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps)(requireAuth(Home));

@@ -1,4 +1,4 @@
-import { SAVE_TOKEN, REMOVE_TOKE } from "../actions/auth/types";
+import { SAVE_TOKEN, REMOVE_TOKEN } from "../actions/auth/types";
 
 const initialAuthState = {};
 export default function(state = initialAuthState, action) {

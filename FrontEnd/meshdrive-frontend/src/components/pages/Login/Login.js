@@ -5,12 +5,15 @@ import { Link } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import validator from "validator";
+import toStream from "blob-to-stream";
+import request from "request";
 
 // custom module imports
 import Page from "../Page";
 import requestLogin from "../../../actions/user/requestLogin";
-import "./styles.css";var toStream = require('blob-to-stream');
-var request = require('request');
+import "./styles.css";
+
+class Login extends Page {
   state = {
     email: "",
     password: "",
@@ -41,6 +44,7 @@ var request = require('request');
   };
 
   componentDidUpdate(prevProps) {
+    super.componentDidUpdate(prevProps);
     if (this.props.inProgress) {
       this.setState({ valid: !this.state.valid });
     } else if (prevProps.api.inProgress != this.props.api.inProgress) {

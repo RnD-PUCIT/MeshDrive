@@ -1,9 +1,9 @@
-import { REMOVE_TOKE } from "./types";
+import { REMOVE_TOKEN } from "./types";
 
 export default function removeToken() {
   return dispatch => {
     dispatch({
-      type: REMOVE_TOKE
+      type: REMOVE_TOKEN
     });
   };
 }

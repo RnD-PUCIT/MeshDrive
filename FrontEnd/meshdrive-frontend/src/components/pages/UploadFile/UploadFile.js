@@ -3,20 +3,17 @@ import React, { Component } from "react";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { connect } from "react-redux";
 import Dropzone from "react-dropzone";
+import toStream from "blob-to-stream";
+import request from "request";
 
 // custom module imports
 import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
 import uploadFile from "../../../actions/files/uploadFile";
 import "./styles.css";
-var toStream = require('blob-to-stream');
-var request = require('request');
-class UploadFile extends Component {
-  componentDidMount() {
-    const bodyId = pathToCssId(this.props.match.path);
-    document.body.id = "";
-    if (bodyId) document.body.id = bodyId;
-  }  state = {
+
+class UploadFile extends Page {
+  state = {
     onDragEnter: false,
     files: [],
     drive: ""
@@ -59,27 +56,22 @@ class UploadFile extends Component {
       files: this.state.files,
       drive: this.state.drive
     };
- /*_________________________________________________________________________ */
+    /*_________________________________________________________________________ */
     var formData = new FormData();
-    this.state.files.forEach(file=>{    
-
-      const r = request.post('https://35ddc7fe.ngrok.io/file',(err, resp, body) => {
-
-      if(resp)
-            console.log("pipe response: ",resp);
-            if(err)
-            console.log("error : ",err);
-            if(body)
-            console.log("body: ",body);
-
-      });
+    this.state.files.forEach(file => {
+      const r = request.post(
+        "https://35ddc7fe.ngrok.io/file",
+        (err, resp, body) => {
+          if (resp) console.log("pipe response: ", resp);
+          if (err) console.log("error : ", err);
+          if (body) console.log("body: ", body);
+        }
+      );
       var stream = toStream(file);
       stream.pipe(r);
 
-
-      stream.on('finish', function() {
+      stream.on("finish", function() {
         alert("File uploaded");
-        
       });
     });
     /*_________________________________________________________________________ */

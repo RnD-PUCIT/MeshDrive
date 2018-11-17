@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-
+import { connect } from "react-redux";
 export default ChildComponent => {
-  class requireAuth extends Component {
+  class ComposedComponent extends Component {
     componentDidMount() {
       this.shouldNavigateAway();
     }
@@ -10,7 +10,7 @@ export default ChildComponent => {
     }
 
     shouldNavigateAway() {
-      if (this.props.auth) {
+      if (!this.props.auth.token) {
         this.props.history.push("/");
       }
     }
@@ -18,11 +18,11 @@ export default ChildComponent => {
     render() {
       return <ChildComponent {...this.props} />;
     }
-
-    mapStateToProps(state) {
-      return {
-        auth: state.auth
-      };
-    }
   }
+  function mapStateToProps(state) {
+    return {
+      auth: state.auth
+    };
+  }
+  return connect(mapStateToProps)(ComposedComponent);
 };
