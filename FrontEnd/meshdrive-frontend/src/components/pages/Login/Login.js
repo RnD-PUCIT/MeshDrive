@@ -1,10 +1,21 @@
 // module imports
 import React, { Component } from "react";
-import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import {
+  Button,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  FormText,
+  FormFeedback
+} from "reactstrap";
 import { Link } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import validator from "validator";
+import FAIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
+import { Fade } from "react-reveal";
+
 import toStream from "blob-to-stream";
 import request from "request";
 
@@ -85,14 +96,13 @@ class Login extends Page {
                     placeholder="Email"
                     value={this.state.email}
                     onChange={this.onChangeField}
-                    className={
-                      this.state.isValidEmail ? "border border-success" : null
-                    }
                     required
+                    valid={this.state.isValidEmail}
                   />
-                  <p className="text-right text-muted">
-                    <small>Enter your email address</small>
-                  </p>
+                  <FormFeedback valid={this.state.isValidEmail}>
+                    <FAIcon icon="check" classes={["fa"]} /> Valid
+                  </FormFeedback>
+                  <FormText>Enter your email address</FormText>
                 </FormGroup>
                 <FormGroup>
                   <Input
@@ -103,18 +113,15 @@ class Login extends Page {
                     pattern=".{8,}"
                     value={this.state.password}
                     onChange={this.onChangeField}
-                    className={
-                      this.state.isValidPassword
-                        ? "border border-success"
-                        : null
-                    }
                     required
+                    valid={this.state.isValidPassword}
                   />
-                  <p className="text-right text-muted">
-                    <small>
-                      Please enter password minimum length of 8 characters
-                    </small>
-                  </p>
+                  <FormFeedback valid={this.state.isValidPassword}>
+                    <FAIcon icon="check" classes={["fa"]} /> Valid
+                  </FormFeedback>
+                  <FormText>
+                    Enter password with minimum length of 8 characters
+                  </FormText>
                 </FormGroup>
 
                 <div className="d-flex align-items-center">
