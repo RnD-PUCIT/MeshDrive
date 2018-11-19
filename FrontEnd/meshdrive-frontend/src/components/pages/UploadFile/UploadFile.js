@@ -7,6 +7,7 @@ import toStream from "blob-to-stream";
 import request from "request";
 
 // custom module imports
+import requireAuth from "../../../hoc/requireAuth";
 import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
 import uploadFile from "../../../actions/files/uploadFile";
@@ -153,4 +154,4 @@ class UploadFile extends Page {
 export default connect(
   null,
   { uploadFile }
-)(UploadFile);
+)(requireAuth(UploadFile));

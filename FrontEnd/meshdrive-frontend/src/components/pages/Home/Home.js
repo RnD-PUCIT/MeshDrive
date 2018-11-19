@@ -2,6 +2,7 @@
 import React, { Component } from "react";
 import removeToken from "../../../actions/auth/removeToken";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 // custom module imports
 import Page from "../Page";
 import "../Login/styles.css";
@@ -14,7 +15,7 @@ class Home extends Page {
     }
   }
   componentDidMount() {
-    if(this.navigateIfLoggedin()) return; 
+    if (this.navigateIfLoggedin()) return;
     super.componentDidMount();
   }
   render() {
@@ -27,7 +28,9 @@ class Home extends Page {
           <div className="login-signup-forms-wrapper d-flex align-items-center">
             <div className="form-wrapper p-5">
               <h1 className="text-primary mb-4">Welcome to MeshDrive</h1>
-              <p>Please Login to continue</p>
+              <p>
+                Please <Link to="/login">Login</Link> to continue
+              </p>
             </div>
           </div>
         </div>
