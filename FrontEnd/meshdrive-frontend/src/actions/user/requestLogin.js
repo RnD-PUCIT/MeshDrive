@@ -6,7 +6,7 @@ import axios from "axios";
 import { REQUEST_LOGIN } from "./types";
 import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
-import saveToken from "../auth/saveToken";
+import saveUserObj from "./saveUserObj";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
 
@@ -42,7 +42,7 @@ export default function requestLogin(email, password) {
                 </SweetAlertWrapper>
               );
               // saving token on localstorage
-              dispatch(saveToken(response.data.token));
+              dispatch(saveUserObj(response));
               break;
             case 201:
               responseUiComponent = (

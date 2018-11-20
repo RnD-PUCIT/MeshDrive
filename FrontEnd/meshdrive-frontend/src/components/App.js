@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
-
 import Layout from "./Layout/Layout";
 import Home from "./pages/Home/Home";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import ManageDrives from "./pages/ManageDrives/ManageDrives";
 import UploadFile from "./pages/UploadFile/UploadFile";
 import EditProfile from "./pages/EditProfile/EditProfile";
 import Login from "./pages/Login/Login";
@@ -14,14 +14,15 @@ import VerifySuccess from "./pages/VerifySuccess/VerifySuccess";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 
-import initTokenFromLocalStorage from "../actions/auth/initTokenFromLocalStorage";
+import initUserObjFromLocalStorage from "../actions/user/initUserObjFromLocalStorage";
 
 class App extends Component {
-  initToken() {
-    console.log(this.props.auth);
-    if (this.props.auth.token === undefined)
-      this.props.initTokenFromLocalStorage();
-  }
+  initToken = () => {
+    const { token } = this.props.user;
+    if (token === null || token === undefined) {
+      this.props.initUserObjFromLocalStorage();
+    }
+  };
 
   componentDidMount() {
     this.initToken();
@@ -36,7 +37,13 @@ class App extends Component {
         <Router>
           <Layout>
             <Switch>
-              <Route path="/" exact component={Home} />
+              <Route
+                path="/managedrives/added/:email"
+                component={ManageDrives}
+              />
+              <Route path="/managedrives/failed" component={ManageDrives} />
+              <Route path="/managedrives" exact component={ManageDrives} />
+
               <Route path="/dashboard" exact component={Dashboard} />
               <Route path="/uploadfile" exact component={UploadFile} />
               <Route path="/editprofile" exact component={EditProfile} />
@@ -50,6 +57,7 @@ class App extends Component {
                 exact
                 component={ResetPassword}
               />
+              <Route path="/" exact component={Home} />
             </Switch>
           </Layout>
         </Router>
@@ -57,10 +65,12 @@ class App extends Component {
     );
   }
 }
-function mapStateToProps({ auth }) {
-  return { auth };
+function mapStateToProps({ user }) {
+  return { user };
 }
 export default connect(
   mapStateToProps,
-  { initTokenFromLocalStorage }
+  {
+    initUserObjFromLocalStorage
+  }
 )(App);

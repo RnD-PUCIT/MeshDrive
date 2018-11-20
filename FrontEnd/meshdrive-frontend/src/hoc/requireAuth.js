@@ -1,18 +1,20 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { localStorageTokenString } from "../constants/strings";
+import { localStorageUserObjString } from "../constants/strings";
 
 export default ChildComponent => {
   class ComposedComponent extends Component {
     componentDidMount() {
-      this.navigateIfLoggedOut();
+      // this.navigateIfLoggedOut();
     }
     componentDidUpdate() {
       this.navigateIfLoggedOut();
     }
 
     navigateIfLoggedOut() {
-      if (!this.props.auth.token) {
+      const { token } = this.props.user;
+      // console.log(token);
+      if (token === null || token === undefined) {
         this.props.history.push("/");
       }
     }
@@ -21,9 +23,9 @@ export default ChildComponent => {
       return <ChildComponent {...this.props} />;
     }
   }
-  function mapStateToProps({ auth }) {
+  function mapStateToProps({ user }) {
     return {
-      auth
+      user
     };
   }
   return connect(mapStateToProps)(ComposedComponent);

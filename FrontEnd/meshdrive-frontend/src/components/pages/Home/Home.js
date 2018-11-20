@@ -1,6 +1,6 @@
 // module imports
 import React, { Component } from "react";
-import removeToken from "../../../actions/auth/removeToken";
+import removeUserObj from "../../../actions/user/removeUserObj";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 // custom module imports
@@ -9,7 +9,7 @@ import "../Login/styles.css";
 
 class Home extends Page {
   navigateIfLoggedin() {
-    if (this.props.auth.token) {
+    if (this.props.user.token) {
       this.props.history.push("/dashboard");
       return true;
     }
@@ -38,10 +38,10 @@ class Home extends Page {
     );
   }
 }
-function mapStateToProps({ auth }) {
-  return { auth };
+function mapStateToProps({ user }) {
+  return { user };
 }
 export default connect(
   mapStateToProps,
-  { removeToken }
+  { removeUserObj }
 )(Home);

@@ -55,8 +55,7 @@ class Login extends Page {
   };
 
   navigateIfLoggedIn() {
-    if (this.props.auth.token) {
-      console.log("Login.js", this.props.auth);
+    if (this.props.user.token) {
       this.props.history.push("/dashboard");
       return true;
     }
@@ -152,10 +151,10 @@ class Login extends Page {
   }
 }
 
-function mapStateToProps({ api, auth }) {
+function mapStateToProps({ api, user }) {
   return {
     api,
-    auth
+    user
   };
 }
 

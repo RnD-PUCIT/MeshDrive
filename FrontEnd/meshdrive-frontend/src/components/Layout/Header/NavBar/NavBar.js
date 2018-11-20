@@ -53,7 +53,7 @@ class NavBar extends React.Component {
               </Form>
             </NavItem>
 
-            {this.props.auth.token ? (
+            {this.props.user.token ? (
               <React.Fragment>
                 <NavItem>
                   <NavLink href="#">
@@ -90,7 +90,7 @@ class NavBar extends React.Component {
     );
   }
 }
-function mapStateToProps({ auth }) {
-  return { auth };
+function mapStateToProps({ user }) {
+  return { user };
 }
 export default connect(mapStateToProps)(NavBar);

@@ -1,6 +1,6 @@
 // module imports
 import React, { Component } from "react";
-import removeToken from "../../../actions/auth/removeToken";
+import removeUserObj from "../../../actions/user/removeUserObj";
 import { connect } from "react-redux";
 // custom module imports
 import Page from "../Page";
@@ -9,8 +9,7 @@ import { Link } from "react-router-dom";
 
 class Logout extends Page {
   navigateIfLoggedOut() {
-    if (!this.props.auth.token) {
-      console.log("Logout.js", this.props.auth);
+    if (!this.props.user.token) {
       this.props.history.push("/");
       return true;
     }
@@ -18,7 +17,7 @@ class Logout extends Page {
   componentDidMount() {
     super.componentDidMount();
 
-    this.props.removeToken();
+    this.props.removeUserObj();
     this.navigateIfLoggedOut();
   }
   render() {
@@ -39,10 +38,10 @@ class Logout extends Page {
     );
   }
 }
-function mapStateToProps({ auth }) {
-  return { auth };
+function mapStateToProps({ user }) {
+  return { user };
 }
 export default connect(
   mapStateToProps,
-  { removeToken }
+  { removeUserObj }
 )(Logout);

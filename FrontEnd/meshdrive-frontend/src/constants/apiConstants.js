@@ -1,4 +1,4 @@
-export const apiBaseUrl = "https://2001371e.ngrok.io";
+export const apiBaseUrl = "https://475a462d.ngrok.io";
 export const apiRoutes = {
   users: {
     // method GET
@@ -54,6 +54,10 @@ export const apiRoutes = {
         Method : POST
         To register and verify a user
     */
-    signup: `${apiBaseUrl}/users`
+    signup: `${apiBaseUrl}/users`,
+
+    listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
+
+    authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`
   }
 };

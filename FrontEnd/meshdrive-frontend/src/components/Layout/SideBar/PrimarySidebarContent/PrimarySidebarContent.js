@@ -10,6 +10,9 @@ export default class PrimarySideBarContent extends React.Component {
         <NavLink exact to="/dashboard" className="btn btn-light light d-block">
           Dashboard
         </NavLink>
+        <NavLink to="/managedrives" className="btn btn-light light">
+          Manage Drives
+        </NavLink>
         <NavLink to="/uploadfile" className="btn btn-light light">
           Upload File
         </NavLink>

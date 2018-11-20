@@ -1,1 +1,1 @@
-export const localStorageTokenString = "meshdrive:auth:token";
+export const localStorageUserObjString = "meshdrive:user";
