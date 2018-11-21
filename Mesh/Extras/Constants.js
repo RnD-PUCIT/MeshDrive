@@ -1,7 +1,7 @@
 const jwt=require('jsonwebtoken');
 
-const URL="http://localhost:8000";
-const DEPLOYED_URL="https://3eece13c.ngrok.io/";
+const URL="http://localhost:8000/";
+const DEPLOYED_URL="https://2001371e.ngrok.io/";
 const FRONT_URL_FORGET_PASSWORD="http://localhost:3000/#/resetPassword/"
 //const URL=" http://04dccacd.ngrok.io"; //change
 const RESPONSE_FAIL=400;
@@ -30,10 +30,24 @@ module.exports.checkAccessMiddleware = function(req,res,next){
     else
         token=req.body.token;
     if(!token)
-        res.status(RESPONSE_FAIL).json("User token not received");
+        return res.status(RESPONSE_FAIL).json("User token not received");
     jwt.verify(token,"secret",function(err, decoded) {
         if(err)
-            res.status(RESPONSE_FAIL).json({msg:"Invalid user",err:err}).end();
+            return res.status(RESPONSE_FAIL).json({msg:"Invalid user",err:err});
+
+        req.userData=decoded; 
+        next();
+    }); 
+}
+
+module.exports.checkUploadAccessMiddleware = function(req,res,next){
+    var token;
+    token = req.params.token;
+    if(!token)
+        return res.status(RESPONSE_FAIL).json("User token not received");
+    jwt.verify(token,"secret",function(err, decoded) {
+        if(err)
+            return res.status(RESPONSE_FAIL).json({msg:"Invalid user",err:err});
 
         req.userData=decoded; 
         next();

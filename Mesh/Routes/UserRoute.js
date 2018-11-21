@@ -71,7 +71,7 @@ router.post("/login", function (req, res) {
     var pass = req.body.password;
     var criteria = { "email": email };
     User.findOne(criteria)
-        .then((user) => {
+        .then((user) => {3
             if (user) {
                 if(user.verified=="false")
                 {
@@ -103,7 +103,8 @@ router.post("/login", function (req, res) {
                                 var account = googleDriveAccounts[index];
                                 accountsEmailArray.push(account.user.emailAddress);
                             }
-                            result.googleDriveAccountsList=accountsEmailArray;
+                            result.driveAccountsList=new Object();
+                            result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
                             res.status(Constants.RESPONSE_SUCCESS).json(result);
                         })
                         .catch((err)=>{

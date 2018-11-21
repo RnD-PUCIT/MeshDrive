@@ -7,7 +7,7 @@ var exports=module.exports={};
 // If modifying these scopes, delete token.json.
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const REDIRECT_URI="https://24d73879.ngrok.io/googledrive/code";
+const REDIRECT_URI="https://475a462d.ngrok.io/googledrive/code";
 
 
 
@@ -140,7 +140,7 @@ exports.uploadFile = function(auth,fileName,file,mimeType){
     };
     var media = {
       mimeType: mimeType,
-      body: file.toString('utf8')
+      body: file
     };
     
     drive.files.create({
@@ -150,8 +150,9 @@ exports.uploadFile = function(auth,fileName,file,mimeType){
     },
      function (err, file) {
       if (err) {
-        failure(err);
+        console.log("err"+err);
       } else {
+        console.log(file.id);
         success(file.id);
       }
     });
