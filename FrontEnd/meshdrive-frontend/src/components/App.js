@@ -24,7 +24,7 @@ class App extends Component {
     }
   };
 
-  componentDidMount() {
+  componentWillMount() {
     this.initToken();
   }
   componentDidUpdate() {

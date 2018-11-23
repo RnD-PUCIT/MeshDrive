@@ -6,19 +6,12 @@ import finishApiRequest from "../api/finishApiRequest";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
 import getTokenFromStore from "../../utils/getTokenFromStore";
-import { userReducer } from "../../utils/getTokenFromStore";
+import { getUserReducer } from "../../utils/getTokenFromStore";
 
-export const setFiles = files => {
-  console.log(files);
-  const drives = ["googledrive", "onedrive", "dropbox"];
-  files.forEach((file, i) => {
-    file.drive = drives[i % 3];
-    file.active = false;
-  });
-
+export const setFiles = data => {
   return {
     type: FETCH_FILES,
-    payload: files
+    payload: data
   };
 };
 
@@ -36,19 +29,31 @@ export default function fetchFiles() {
     // getting stored data from redux
     const token = getTokenFromStore();
 
-    console.log("Starting API call from fetchFiles");
+    console.log("Starting API call from fetchRootFiles");
     dispatch(startApiRequest());
 
+    const { driveAccountsList } = getUserReducer();
+
+    const {
+      googleDriveAccountsList = [],
+      dropBoxAccountsList = [],
+      oneDriveAccountsList = []
+    } = driveAccountsList;
+
+    const listFilesAccount = googleDriveAccountsList.concat(
+      dropBoxAccountsList.concat(oneDriveAccountsList)
+    );
+
     axios
-      .post(apiRoutes.users.listGoogleDriveFiles, {
+      .post(apiRoutes.files.listGoogleDriveRootFiles, {
         token,
-        listFilesAccount: "bilalyasin1616@gmail.com"
+        listFilesAccount
       })
       .then(response => {
-        const files = response.data;
+        const data = response.data;
         // sort files
         dispatch(finishApiRequest(null, true));
-        dispatch(setFiles(files));
+        dispatch(setFiles(data));
       })
       .catch(error => {
         console.log(error);

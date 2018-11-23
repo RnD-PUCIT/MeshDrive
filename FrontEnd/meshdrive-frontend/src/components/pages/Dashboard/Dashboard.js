@@ -11,11 +11,11 @@ import requireAuth from "../../../hoc/requireAuth";
 
 class Dashboard extends Page {
   render() {
-    const activeFiles = this.props.files.filter(file => {
-      return this.props.activeFileIds.indexOf(file.id) !== -1;
-    });
-    const lastActiveFile = activeFiles[activeFiles.length - 1];
-    const activeFileIds = activeFiles.map(file => file.id);
+    // const activeFiles = this.props.files.filter(file => {
+    //   return this.props.activeFileIds.indexOf(file.id) !== -1;
+    // });
+    // const lastActiveFile = activeFiles[activeFiles.length - 1];
+    // const activeFileIds = activeFiles.map(file => file.id);
     return (
       <React.Fragment>
         <SideBar primary />
@@ -28,9 +28,9 @@ class Dashboard extends Page {
           <FilesList />
         </div>
         <SideBar secondary>
-          {activeFiles.length == 0
+          {/* {activeFiles.length == 0
             ? "No file selected"
-            : `Total Selected Files: ${activeFiles.length}`}
+            : `Total Selected Files: ${activeFiles.length}`} */}
         </SideBar>
       </React.Fragment>
     );

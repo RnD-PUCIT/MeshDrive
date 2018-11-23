@@ -18,40 +18,46 @@ class FileItem extends Component {
     this.state = {
       active: this.props.isFileActive
     };
-    this.file = this.props.file;
   }
-  toggleActive = e => {
+  // toggleActive = e => {
+  //   e.preventDefault();
+  //   if (e.target.tagName.toLowerCase() === "nav") {
+  //     return;
+  //   }
+  //   this.setState(
+  //     prevState => {
+  //       return {
+  //         active: !prevState.active
+  //       };
+  //     },
+  //     () => {
+  //       if (this.state.active) {
+  //         this.props.setActiveFile(this.file.id);
+  //       } else {
+  //         console.log(this.state.active);
+
+  //         this.props.unsetActiveFile(this.file.id);
+  //       }
+  //     }
+  //   );
+  // };
+  handleClick = e => {
     e.preventDefault();
-    if (e.target.tagName.toLowerCase() === "nav") {
-      return;
-    }
-    this.setState(
-      prevState => {
-        return {
-          active: !prevState.active
-        };
-      },
-      () => {
-        if (this.state.active) {
-          this.props.setActiveFile(this.file.id);
-        } else {
-          console.log(this.state.active);
-
-          this.props.unsetActiveFile(this.file.id);
-        }
-      }
-    );
+    console.log(this.props.file);
   };
-
   handleContextMenuClick = menu => {
+    const { file } = this.props.file;
+
     switch (menu) {
       case "download":
-        return this.props.downloadFile(this.file.id);
+        return this.props.downloadFile(file.account, file.fileId);
     }
   };
+
   render() {
+    const { file } = this.props;
     let driveIcon = null;
-    switch (this.file.drive) {
+    switch (file.drive) {
       case "googledrive":
         driveIcon = <FAIcon icon="google" classes={["fab"]} />;
         break;
@@ -63,7 +69,7 @@ class FileItem extends Component {
         break;
     }
 
-    const fileItemIcon = getMimeTypeIcon(this.file.mimeType);
+    const fileItemIcon = getMimeTypeIcon(file.mimeType);
     return (
       <React.Fragment>
         <div
@@ -73,23 +79,23 @@ class FileItem extends Component {
               ? " active bg-gray border-primary text-primary"
               : "")
           }
-          onClick={this.toggleActive}
+          onClick={this.handleClick}
         >
-          <ContextMenuTrigger id={this.file.id}>
+          <ContextMenuTrigger id={file.id}>
             <div className="d-flex flex-nowrap flex-wrap align-items-center">
               <div className="file-item--icon  p-2">
                 {fileItemIcon && fileItemIcon}
               </div>
               <div className="d-flex flex-column p-1 file-item--info">
-                <div className="file-item--title">{this.file.name}</div>
-                <div className="file-item--download">{this.props.size}</div>
+                <div className="file-item--title">{file.name}</div>
+                <div className="file-item--download">{file.size}</div>
               </div>
               <div className="file-item--drive-icon align-self-start ml-auto mt-1 mr-2 m-1">
                 {driveIcon}
               </div>
             </div>
           </ContextMenuTrigger>
-          <ContextMenu id={this.file.id}>
+          <ContextMenu id={file.id}>
             <MenuItem
               data={{
                 foo: "bar"

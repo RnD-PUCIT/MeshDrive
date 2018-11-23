@@ -2,16 +2,45 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import intruptApiRequest from "../../actions/api/intruptApiRequest";
 import fetchFiles from "../../actions/files/fetchFiles";
+import fetchRootFiles from "../../actions/files/fetchRootFiles";
 import FileItem from "../../components/FileItem/FileItem";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 class FilesList extends Component {
-  componentDidMount() {
-    this.props.fetchFiles();
+  state = {
+    fileItems: [],
+    isRoot: true
+  };
+
+  componentWillMount() {
+    this.props.fetchRootFiles();
   }
+
   componentWillUnmount() {
     this.props.intruptApiRequest();
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.files !== this.props.files) {
+      let allFiles = [];
+      const drives = this.props.files;
+      for (let driveItem of drives) {
+        const { email, drive, files } = driveItem;
+        allFiles = allFiles.concat(
+          files.map(file => {
+            // adding additional attributes to file
+            file.drive = drive;
+            file.account = email;
+            file.fileId = file.id;
+            file.id = `${drive}/${file.id}`;
+            return file;
+          })
+        );
+      }
+      this.setState({ fileItems: allFiles });
+    }
+  }
+
   sortFileItems(fileItems) {
     let folders = fileItems.filter(
       fileItem => fileItem.mimeType === "application/vnd.google-apps.folder"
@@ -44,9 +73,8 @@ class FilesList extends Component {
   }
 
   render() {
-    const emptyMessage = <p> Loading... </p>;
-    const fileItems = this.sortFileItems(this.props.files);
-
+    const fileItems = this.sortFileItems(this.state.fileItems);
+    console.log(fileItems);
     // seperate folders
     const mapFilesList = fileItems.map(file => {
       const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;
@@ -54,9 +82,13 @@ class FilesList extends Component {
     });
 
     return (
-      <div className="files-list d-flex flex-row flex-wrap">
-        {this.props.files.length === 0 ? emptyMessage : mapFilesList}
-      </div>
+      <React.Fragment>
+        <h5>Directory: {this.state.isRoot && "Root"}</h5>
+
+        <div className="files-list d-flex flex-row flex-wrap">
+          {mapFilesList}
+        </div>
+      </React.Fragment>
     );
   }
 }
@@ -71,7 +103,7 @@ function mapStateToProps({ files, activeFileIds }) {
   };
 }
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ fetchFiles, intruptApiRequest }, dispatch);
+  return bindActionCreators({ fetchRootFiles, intruptApiRequest }, dispatch);
 }
 export default connect(
   mapStateToProps,

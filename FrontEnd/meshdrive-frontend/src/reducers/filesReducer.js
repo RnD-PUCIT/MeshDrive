@@ -11,11 +11,12 @@ const initialFilesState = [];
 export default function(state = initialFilesState, action) {
   switch (action.type) {
     case FETCH_FILES:
-      return [...action.payload];
+      console.log(action.payload);
+      return action.payload;
 
     case UPLOAD_FILE:
       console.log(action);
-      return [action.payload.files,...state];
+      return [action.payload.files, ...state];
 
     case DELETE_FILE: {
       const newState = Object.assign([], state);
@@ -26,8 +27,7 @@ export default function(state = initialFilesState, action) {
       return newState;
     }
 
-    case DOWNLOAD_FILE:
-    {
+    case DOWNLOAD_FILE: {
       return state;
     }
     default:

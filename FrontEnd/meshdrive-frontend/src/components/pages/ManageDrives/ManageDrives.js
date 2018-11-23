@@ -3,14 +3,33 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
-import { ButtonGroup, Button } from "reactstrap";
+import { ButtonGroup, Button, Table } from "reactstrap";
 // custom module imports
 import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
 import requireAuth from "../../../hoc/requireAuth";
 import addDrive from "../../../actions/user/addDrive";
 import saveUserObjToLocalStorage from "../../../utils/saveUserObjToLocalStorage";
+import FontAwesomeIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
 class ManageDrives extends Page {
+  constructor(props) {
+    super(props);
+
+    const { driveAccountsList } = this.props.user;
+
+    const {
+      googleDriveAccountsList = [],
+      dropBoxAccountsList = [],
+      oneDriveAccountsList = []
+    } = driveAccountsList;
+
+    this.state = {
+      driveAccountsList: googleDriveAccountsList.concat(
+        dropBoxAccountsList.concat(oneDriveAccountsList)
+      )
+    };
+  }
+
   handleGoogleDriveClick = e => {
     e.preventDefault();
 
@@ -18,16 +37,23 @@ class ManageDrives extends Page {
 
     this.props.addDrive(token, "GOOGLEDRIVE");
   };
-  render() {
-    const { driveAccountsList } = this.props.user;
 
-    const {
-      googleDriveAccountsList,
-      dropBoxAccountsList,
-      oneDriveAccountsList
-    } = driveAccountsList;
+  render() {
     const addDriveAction = this.props.addDrive;
     const userObj = this.props.user;
+    let i = 1;
+    const mapGoogleAccountsToTr = this.state.driveAccountsList.map(account => (
+      <tr key={account}>
+        <th scope="row">{i++}</th>
+        <td>{account}</td>
+        <td>Google</td>
+        <td>
+          <Button outline>
+            <FontAwesomeIcon icon="times" classes={["fas"]} />
+          </Button>
+        </td>
+      </tr>
+    ));
 
     return (
       <React.Fragment>
@@ -71,12 +97,18 @@ class ManageDrives extends Page {
               Add OneDrive
             </Button>
           </ButtonGroup>
-          <h3>Google Drive Accounts</h3>
-          <ul>
-            {googleDriveAccountsList.map(account => (
-              <li key={account}>{account}</li>
-            ))}
-          </ul>
+          <h3>Drive Accounts</h3>
+          <Table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Account Email</th>
+                <th>Drive</th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody>{mapGoogleAccountsToTr}</tbody>
+          </Table>
         </div>
       </React.Fragment>
     );

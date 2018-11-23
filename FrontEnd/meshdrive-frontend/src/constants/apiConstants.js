@@ -1,4 +1,5 @@
-export const apiBaseUrl = "https://475a462d.ngrok.io";
+export const apiBaseUrl = "https://2c7a4078.ngrok.io";
+
 export const apiRoutes = {
   users: {
     // method GET
@@ -56,8 +57,12 @@ export const apiRoutes = {
     */
     signup: `${apiBaseUrl}/users`,
 
-    listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
-
     authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`
+  },
+  files: {
+    listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
+    listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
+    downloadFile: (downloadFileAccount, fileId, token) =>
+      `${apiBaseUrl}/GoogleDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`
   }
 };
