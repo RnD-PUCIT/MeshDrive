@@ -70,7 +70,7 @@ const UserSchema = new Schema({
     }
 })
 // it will aslo check case insensitive duplicates
-UserSchema.plugin(uniqueValidator,{message:"{PATH} is already registerd"});
+UserSchema.plugin(uniqueValidator,{message:"Sorry, This {PATH} is already registered."});
 
 
 
