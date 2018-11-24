@@ -24,7 +24,6 @@ module.exports.REDIRECT_AFTER_EMAIL_VERIFICATION=REDIRECT_AFTER_EMAIL_VERIFICATI
 
 module.exports.checkAccessMiddleware = function(req,res,next){
     var token;
-    console.log(req.method);
     if(req.method=="GET")
         token = req.params.token;
     else

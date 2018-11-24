@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../Modules/UserModule');
 const Constants = require('../Extras/Constants');
 const Drive=require('../Modules/GoogleDriveModule');
+const promise=require("promises");
 var multer = require('multer');
 
 
@@ -68,12 +69,8 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 	});
 })
 
-router.get('/ReceiveCode',function(req,res){
-	console.log(req.query.code);
-	//res.redirect("/GoogleDrive/ReceiveCode?code="+req.query.code);
-	res.end();
-})
 
+//recieves code from google after user gives consent to user the account
 router.get('/Code',getAppCredentialsMiddleware,function(req,res){
 	var state=req.query.state;
 	var splits=state.split(";");
@@ -106,6 +103,7 @@ router.get('/Code',getAppCredentialsMiddleware,function(req,res){
 	});
 })
 
+//removes all google drive accounts
 router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,res)=>{
 	User.removeAllGoogleDriveAccounts(req.userData.email)
 	.then((result)=>{
@@ -150,6 +148,90 @@ router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveToke
 		res.end(err.msg);
 	});
 })
+
+
+router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
+	var listFilesAccount = req.body.listFilesAccount;
+	var accountTokenList=[];
+	if(req.body.listFilesAccount)
+	{
+		for (let account = 0; account < listFilesAccount.length; account++) {
+			const givenAccount = listFilesAccount[account];
+			for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+				var storeAccount = req.googleDriveAccounts[index];
+				if(storeAccount.user.emailAddress==givenAccount)
+					accountTokenList.push({email:storeAccount.user.emailAddress,token:storeAccount.token});
+			}
+		}
+	}	
+	else
+	{
+		for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+			var storeAccount = req.googleDriveAccounts[index];
+			accountTokenList.push({email:storeAccount.user.emailAddress,token:storeAccount.token});
+		}
+	}
+
+	if(accountTokenList.length==0)
+	{
+		res.status(Constants.RESPONSE_EMPTY).json({message:"No account found in user's profile for listing files"});
+	}
+	else
+	{
+		var promises=[];
+		for (let index = 0; index < accountTokenList.length; index++) {
+			const token = accountTokenList[index].token;
+			promises.push(Drive.createAuthOject(req.appCredentials,token));
+		}
+		Promise.all(promises).then(function(oAuth2Clients){
+			var promises=[];
+			for (let index = 0; index < accountTokenList.length; index++) {
+				var accountEmail=accountTokenList[index].email;
+				promises.push(Drive.listFilesRoot(oAuth2Clients[index],accountEmail));
+			}
+			Promise.all(promises).then(function(filesList){
+				res.status(Constants.RESPONSE_SUCCESS).json(filesList);
+			});
+		});
+		
+	}
+})
+
+router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
+	var fileId=req.body.fileId;
+	var listAccountEmail = req.body.listFilesAccount;
+	var token;
+	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+		var account = req.googleDriveAccounts[index];
+		if(account.user.emailAddress==listAccountEmail)
+			token=account.token;
+	}
+	if(!token)
+	{
+		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for listing files"});
+	}
+	Drive.createAuthOject(req.appCredentials,token)
+	.then((oAuth2Client)=>{
+		//userModule.saveToken(email,token);
+		Drive.listFilesById(oAuth2Client,fileId)
+		.then((files)=>{
+			if (files.length) {
+				res.send(files);
+				res.end();
+			} else {
+				response.end("No Files Found");
+			}
+		})
+		.catch((err)=>{
+			res.end(err);
+		});
+	})
+	.catch((err)=>{
+		res.end(err.msg);
+	});
+})
+
+
 // incomplete
 router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
 	var downloadFileEmail = req.params.downloadFileAccount;
@@ -167,14 +249,15 @@ router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAc
 	.then((oAuth2Client)=>{
 		Drive.getFileDetails(oAuth2Client,req.params.fileId)
 		.then((details)=>{
+			console.log(details);
 			res.header('Content-disposition', 'attachment; filename='+details.name);
 			res.setHeader('Content-type', details.mimeType);
-			Drive.downloadFile(oAuth2Client,req.params.fileId)
-			.then((file)=>{
-				res.send(file);
+			Drive.downloadFile(oAuth2Client,req.params.fileId,res)
+			.then(()=>{
 				res.end();
 			})
 			.catch((err)=>{
+				console.log(err);
 				res.end(err.message);
 			});
 		})
