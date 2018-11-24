@@ -1,7 +1,7 @@
 const jwt=require('jsonwebtoken');
 
 const URL="http://localhost:8000/";
-const DEPLOYED_URL="https://2001371e.ngrok.io/";
+const DEPLOYED_URL=" http://test-depositoryworks.ngrok.io/";
 const FRONT_URL_FORGET_PASSWORD="http://localhost:3000/#/resetPassword/"
 //const URL=" http://04dccacd.ngrok.io"; //change
 const RESPONSE_FAIL=400;
