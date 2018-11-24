@@ -44,7 +44,7 @@ export default function requestSignup(email, password, name) {
             case 400:
               responseUiComponent = (
                 <SweetAlertWrapper danger title="Fail">
-                  {response.data.message}
+                  {response.data.error}
                 </SweetAlertWrapper>
               );
               break;
@@ -64,7 +64,7 @@ export default function requestSignup(email, password, name) {
               error.response.data &&
               error.response.data.message
                 ? error.response.data.message
-                : "Something went wrong, please try again"}
+                : error.response.data.error }
             </SweetAlertWrapper>
           );
 

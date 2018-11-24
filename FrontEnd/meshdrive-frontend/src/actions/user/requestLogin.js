@@ -47,14 +47,14 @@ export default function requestLogin(email, password) {
             case 201:
               responseUiComponent = (
                 <SweetAlertWrapper warning title="Warning">
-                  Invalid Email or Password
+                  {response.data.error}
                 </SweetAlertWrapper>
               );
               break;
             case 400:
               responseUiComponent = (
                 <SweetAlertWrapper danger title="Fail">
-                  {response.data.message}
+                  {response.data.error}
                 </SweetAlertWrapper>
               );
               break;
