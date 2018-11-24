@@ -62,6 +62,7 @@ export const apiRoutes = {
   files: {
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
     listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
+    listDriveFilesById: `${apiBaseUrl}/GoogleDrive/ListDriveFilesById`,
     downloadFile: (downloadFileAccount, fileId, token) =>
       `${apiBaseUrl}/GoogleDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`
   }

@@ -9,7 +9,7 @@ import { connect } from "react-redux";
 class FilesList extends Component {
   state = {
     fileItems: [],
-    isRoot: true
+    currentDirectory: "root"
   };
 
   componentWillMount() {
@@ -83,7 +83,7 @@ class FilesList extends Component {
 
     return (
       <React.Fragment>
-        <h5>Directory: {this.state.isRoot && "Root"}</h5>
+        <h5>Directory: {this.state.currentDirectory}</h5>
 
         <div className="files-list d-flex flex-row flex-wrap">
           {mapFilesList}

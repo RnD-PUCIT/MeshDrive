@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import FAIcon from "../../components/FontAwesomeIcon/FontAwesomeIcon";
+import ReactTooltip from "react-tooltip";
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 // import toggleFileActive from "../../actions/files/toggleFileActive";
+import FAIcon from "../../components/FontAwesomeIcon/FontAwesomeIcon";
 import setActiveFile from "../../actions/activeFilesIds/setActiveFile";
 import unsetActiveFile from "../../actions/activeFilesIds/unsetActiveFile";
 import downloadFile from "../../actions/files/downloadFile";
+import fetchFilesById from "../../actions/files/fetchFilesById";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
@@ -18,6 +20,9 @@ class FileItem extends Component {
     this.state = {
       active: this.props.isFileActive
     };
+
+    this.isFolder =
+      this.props.file.mimeType === "application/vnd.google-apps.folder";
   }
   // toggleActive = e => {
   //   e.preventDefault();
@@ -43,10 +48,13 @@ class FileItem extends Component {
   // };
   handleClick = e => {
     e.preventDefault();
-    console.log(this.props.file);
+    const { file } = this.props;
+    if (this.isFolder) {
+      this.props.fetchFilesById(file.account, file.fileId);
+    }
   };
   handleContextMenuClick = menu => {
-    const { file } = this.props.file;
+    const { file } = this.props;
 
     switch (menu) {
       case "download":
@@ -71,55 +79,55 @@ class FileItem extends Component {
 
     const fileItemIcon = getMimeTypeIcon(file.mimeType);
     return (
-      <React.Fragment>
-        <div
-          className={
-            "file-item m-2" +
-            (this.state.active
-              ? " active bg-gray border-primary text-primary"
-              : "")
-          }
-          onClick={this.handleClick}
-        >
-          <ContextMenuTrigger id={file.id}>
-            <div className="d-flex flex-nowrap flex-wrap align-items-center">
-              <div className="file-item--icon  p-2">
-                {fileItemIcon && fileItemIcon}
-              </div>
-              <div className="d-flex flex-column p-1 file-item--info">
-                <div className="file-item--title">{file.name}</div>
-                <div className="file-item--download">{file.size}</div>
-              </div>
-              <div className="file-item--drive-icon align-self-start ml-auto mt-1 mr-2 m-1">
-                {driveIcon}
-              </div>
+      <div
+        className={
+          "file-item m-2" +
+          (this.state.active
+            ? " active bg-gray border-primary text-primary"
+            : "")
+        }
+        onClick={this.handleClick}
+        data-tip={`Drive Account: ${file.account}`}
+        data-for={file.id}
+      >
+        <ContextMenuTrigger id={file.id}>
+          <div className="d-flex flex-nowrap flex-wrap align-items-center">
+            <div className="file-item--icon  p-2">
+              {fileItemIcon && fileItemIcon}
             </div>
-          </ContextMenuTrigger>
-          <ContextMenu id={file.id}>
-            <MenuItem
-              data={{
-                foo: "bar"
-              }}
-              onClick={() => this.handleContextMenuClick("download")}
-            >
-              Download
-            </MenuItem>
-            <MenuItem
-              data={{ foo: "bar" }}
-              onClick={() => this.handleContextMenuClick("delete")}
-            >
-              Delete
-            </MenuItem>
-            <MenuItem divider />
-            <MenuItem
-              data={{ foo: "bar" }}
-              onClick={() => this.handleContextMenuClick("details")}
-            >
-              Details
-            </MenuItem>
-          </ContextMenu>
-        </div>
-      </React.Fragment>
+            <div className="d-flex flex-column p-1 file-item--info">
+              <div className="file-item--title">{file.name}</div>
+            </div>
+            <div className="file-item--drive-icon align-self-start ml-auto mt-1 mr-2 m-1">
+              {driveIcon}
+            </div>
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenu id={file.id}>
+          <MenuItem
+            data={{
+              foo: "bar"
+            }}
+            onClick={() => this.handleContextMenuClick("download")}
+          >
+            Download
+          </MenuItem>
+          <MenuItem
+            data={{ foo: "bar" }}
+            onClick={() => this.handleContextMenuClick("delete")}
+          >
+            Delete
+          </MenuItem>
+          <MenuItem divider />
+          <MenuItem
+            data={{ foo: "bar" }}
+            onClick={() => this.handleContextMenuClick("details")}
+          >
+            Details
+          </MenuItem>
+        </ContextMenu>
+        <ReactTooltip id={file.id} />
+      </div>
     );
   }
 }
@@ -129,7 +137,8 @@ function mapDispatchToProps(dispatch) {
     {
       setActiveFile,
       unsetActiveFile,
-      downloadFile
+      downloadFile,
+      fetchFilesById
     },
     dispatch
   );
