@@ -54,8 +54,8 @@ router.get("/:id",checkAccessMiddleware,(req,res)=>{
 
     var result = new Object();
     var id = req.params.id;
- //   var criteria = {_id:id};
-    User.findById(id) 
+   var criteria = {_id:id};
+    User.find(criteria) 
     .then((user)=>{
         if(user)
         {

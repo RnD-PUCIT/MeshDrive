@@ -74,13 +74,22 @@ app.post('/profile', upload.single('file'), function (req, res, next) {
         res.end("done");
 
   })
-app.post('/uploadFile',(req,res)=>{
+app.get('/download/:name/:id',(req,res)=>{
 
-    res.header('Access-Control-Allow-Origin','*');
-    res.header('Access-Control-Allow-Headers',
-    'Origin,X-Request-With,Content-Type,Accept,Authorization');
-    console.log(req.body);
-    res.status(200).json([{status:"boo !"},req.body]);
+    console.log(req.params);
+    var filePath ='./Files/abc.txt';
+    var file = fs.createReadStream(filePath);
+
+  //  var stream = file.pipe(res);
+
+    file.on('data',(chunk)=>{
+      res.write(chunk);
+    })
+    file.on('end', () => {
+        res.end();
+      });
+
+
 })
 app.post('/file',(req,res)=>{
     
@@ -92,10 +101,14 @@ app.post('/file',(req,res)=>{
     var filePath ='./Files/abc.txt';
     var a = fs.createWriteStream(filePath);
     var stream=req.pipe(a);
+    
+
+        
     stream.on('finish', function () {  
         res.status(200).json({"message" :"stream finished"});
     });
 
+    
 })
 
 //listening to ports
