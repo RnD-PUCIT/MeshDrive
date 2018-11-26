@@ -21,7 +21,7 @@ module.exports.FRONT_URL_FORGET_PASSWORD=FRONT_URL_FORGET_PASSWORD;
 module.exports.DEPLOYED_URL=DEPLOYED_URL;
 module.exports.REDIRECT_AFTER_EMAIL_VERIFICATION=REDIRECT_AFTER_EMAIL_VERIFICATION;
 
-
+//Verifies the meshdrive token that is received with the request
 module.exports.checkAccessMiddleware = function(req,res,next){
     var token;
     if(req.method=="GET")
@@ -39,6 +39,8 @@ module.exports.checkAccessMiddleware = function(req,res,next){
     }); 
 }
 
+
+//Middleware used for upload file because whole requst is a file and token is received as url
 module.exports.checkUploadAccessMiddleware = function(req,res,next){
     var token;
     token = req.params.token;

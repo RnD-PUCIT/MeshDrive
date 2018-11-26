@@ -10,13 +10,13 @@ var multer = require('multer');
 const upload=multer();
 
 
-
+//Get user's drive tokens from db using meshdrive email and adds it to request + adds app credentials read from file to request as well
 function getGoogleDriveTokensMiddleware(req,res,next)
 {
     Drive.readFile(Constants.CREDENTIALS_PATH)
 	.then((credentials)=>{
 		req.appCredentials=credentials;
-		User.readGoogleDriveAccounts(req.userData.email)
+		User.readGoogleDriveAccounts(req.userData.email) //Reading user's drive tokens from db
 		.then((accounts)=>{
 			req.googleDriveAccounts=accounts;
 			next();
@@ -30,6 +30,8 @@ function getGoogleDriveTokensMiddleware(req,res,next)
 		res.status(Constants.RESPONSE_FAIL).json(result);
 	});
 }
+
+//Adds app credentials to request after reading from file
 function getAppCredentialsMiddleware(req,res,next)
 {
 	result=new Object();
@@ -41,24 +43,25 @@ function getAppCredentialsMiddleware(req,res,next)
 	.catch((err)=>{
         result.error="API Credentials Failed";
 		res.status(Constants.RESPONSE_FAIL).json(result);
-		test
 	});
 }
 
 
-//working if found a token from DB
+//Gives redirect url where user can give access to it's google drive.
 router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 	var result=new Object(); 
+	//Getting redirect urls from request body.
 	if(req.body.redirectSuccess && req.body.redirectFailure){
-		userData=req.userData.email+";" + req.body.redirectSuccess + ";" + req.body.redirectFailure;
+		userData=req.userData.email+";" + req.body.redirectSuccess + ";" + req.body.redirectFailure; //Creating a colon separated string to send along redirect uri to identify the user when google redirects back
 	}
 	else{
-		res.status(Constants.RESPONSE_FAIL).json({msg:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
+		//return call if client has not appended redirect urls
+		return res.status(Constants.RESPONSE_FAIL).json({msg:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
 	}
 	Drive.readFile(Constants.CREDENTIALS_PATH)
 	.then((credentials)=>{
         oAuth2Client = Drive.createAuth(credentials);
-        redirectLink = Drive.getGoogleDriveAuthRedirectLink(oAuth2Client,userData);
+        redirectLink = Drive.getGoogleDriveAuthRedirectLink(oAuth2Client,userData); //Generate redirect uri
         result.redirectLink=redirectLink;
         res.status(Constants.RESPONSE_SUCCESS).json(result);
 	})
@@ -72,28 +75,27 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 
 //recieves code from google after user gives consent to user the account
 router.get('/Code',getAppCredentialsMiddleware,function(req,res){
-	var state=req.query.state;
+	var state=req.query.state; //url state param contains the user data that we appended previously in creating the redirect url for identifying the user
+	//Split state to get client email and redirect urls.
 	var splits=state.split(";");
 	var email=splits[0];
 	var redirectSuccess=splits[1];
 	var redirectFailure=splits[2];
 	oAuth2Client=Drive.createAuth(req.appCredentials);
-	Drive.getTokenFromCode(req.query.code,oAuth2Client) //Add your store token func here from db module
+	Drive.getTokenFromCode(req.query.code,oAuth2Client) //Get user token from the code that we received
 	.then((token)=>{
 		oAuth2Client.setCredentials(token);
-		Drive.getUserDetails(oAuth2Client)
-		.then((user)=>{
+		Drive.getUserDetails(oAuth2Client) //Get user details(key is the email of account that it gave us access of)
+		.then((user)=>{ //User contains user's name, email, profile photo link
 			delete user.user.me;
 			delete user.user.permissionId;
 			var account={user:user.user,token:token};
 			User.saveGoogleDriveAccount(email,account)
 			.then((result)=>{
-				//res.status(Constants.RESPONSE_SUCCESS).json(result);
-				res.redirect(redirectSuccess+user.user.emailAddress);
+				res.redirect(redirectSuccess+user.user.emailAddress); //redirect back to the client success
 			})
 			.catch((err)=>{
-				//res.status(Constants.RESPONSE_FAIL).json({error:err,message:"Unable to store user token"});
-				res.redirect(redirectFailure);
+				res.redirect(redirectFailure); //redirect back to the client failure
 			});
 		})
 		//then and catch both getting called
@@ -115,11 +117,11 @@ router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,re
 	});
 });
 
-//Working if find a token from db 
+//Gives back top 100 files from user's account
 router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
-	var listAccountEmail = req.body.listFilesAccount;
+	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
 	var token;
-	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+	for (let index = 0; index < req.googleDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
 		var account = req.googleDriveAccounts[index];
 		if(account.user.emailAddress==listAccountEmail)
 			token=account.token;
@@ -134,28 +136,27 @@ router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveToke
 		Drive.listFiles(oAuth2Client)
 		.then((files)=>{
 			if (files.length) {
-				res.send(files);
-				res.end();
+				res.status(Constants.RESPONSE_SUCCESS).json(files);
 			} else {
-				response.end("No Files Found");
+				res.status(Constants.RESPONSE_EMPTY).json({msg:"No files found"});
 			}
 		})
 		.catch((err)=>{
-			res.end(err);
+			res.status(Constants.RESPONSE_EMPTY).json({msg:"Error in listing files"});
 		});
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.RESPONSE_EMPTY).json({msg:"Error in listing files"});
 	});
 })
 
 
 router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
-	var listFilesAccount = req.body.listFilesAccount;
+	var listFilesAccount = req.body.listFilesAccount; //List of accounts to get files from
 	var accountTokenList=[];
-	if(req.body.listFilesAccount)
+	if(req.body.listFilesAccount) //If there is a list of accounts get token for only those accounts
 	{
-		for (let account = 0; account < listFilesAccount.length; account++) {
+		for (let account = 0; account < listFilesAccount.length; account++) { 
 			const givenAccount = listFilesAccount[account];
 			for (let index = 0; index < req.googleDriveAccounts.length; index++) {
 				var storeAccount = req.googleDriveAccounts[index];
@@ -164,7 +165,7 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 			}
 		}
 	}	
-	else
+	else //else get token for all accounts that are in db
 	{
 		for (let index = 0; index < req.googleDriveAccounts.length; index++) {
 			var storeAccount = req.googleDriveAccounts[index];
@@ -172,36 +173,40 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 		}
 	}
 
-	if(accountTokenList.length==0)
+	if(accountTokenList.length==0) //If no token found return
 	{
 		res.status(Constants.RESPONSE_EMPTY).json({message:"No account found in user's profile for listing files"});
 	}
 	else
 	{
-		var promises=[];
+		var promises=[]; //Create array for promises
 		for (let index = 0; index < accountTokenList.length; index++) {
 			const token = accountTokenList[index].token;
-			promises.push(Drive.createAuthOject(req.appCredentials,token));
+			promises.push(Drive.createAuthOject(req.appCredentials,token)); //call for creating oAuthObjects for each token and push those promises
 		}
+		//Wait for all promises to complete and then go for listing files
 		Promise.all(promises).then(function(oAuth2Clients){
-			var promises=[];
+			var promises=[]; //Array of promises for listing each account files
 			for (let index = 0; index < accountTokenList.length; index++) {
 				var accountEmail=accountTokenList[index].email;
-				promises.push(Drive.listFilesRoot(oAuth2Clients[index],accountEmail));
+				promises.push(Drive.listFilesRoot(oAuth2Clients[index],accountEmail)); //call for list file for each account and push those promises
 			}
+			//Wait for all promises to complete and return the response
 			Promise.all(promises).then(function(filesList){
 				res.status(Constants.RESPONSE_SUCCESS).json(filesList);
 			});
 		});
-		
+		//Only success scenario working
+		//No catch handled here. in case of an error this will not work
+		//Need to check how to handle catch here
 	}
 })
 
 router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
-	var fileId=req.body.fileId;
-	var listAccountEmail = req.body.listFilesAccount;
+	var fileId=req.body.fileId; //FileId to list files and folders for it
+	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
 	var token;
-	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+	for (let index = 0; index < req.googleDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
 		var account = req.googleDriveAccounts[index];
 		if(account.user.emailAddress==listAccountEmail)
 			token=account.token;
@@ -215,12 +220,14 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDrive
 		//userModule.saveToken(email,token);
 		Drive.listFilesById(oAuth2Client,fileId)
 		.then((files)=>{
-			if (files.length) {
-				res.send(files);
-				res.end();
-			} else {
-				response.end("No Files Found");
-			}
+			//Creating this response structure just to match listRootFiles structure
+			var response=[];
+			var driveFiles={};
+			driveFiles.files=files;
+			driveFiles.email=listAccountEmail;
+			driveFiles.drive="googleDrive";
+			response.push(driveFiles);
+			res.status(Constants.RESPONSE_SUCCESS).json(response);
 		})
 		.catch((err)=>{
 			res.end(err);
@@ -247,17 +254,17 @@ router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAc
 	}
 	Drive.createAuthOject(req.appCredentials,token)
 	.then((oAuth2Client)=>{
-		Drive.getFileDetails(oAuth2Client,req.params.fileId)
+		Drive.getFileDetails(oAuth2Client,req.params.fileId) //Get file details first from drive
 		.then((details)=>{
-			console.log(details);
-			res.header('Content-disposition', 'attachment; filename='+details.name);
+			res.setHeader("Access-Control-Expose-Headers","File-Name,Content-disposition");
+			res.setHeader('Content-disposition', 'attachment; filename='+details.name);
 			res.setHeader('Content-type', details.mimeType);
+			res.setHeader("File-Name",details.name);
 			Drive.downloadFile(oAuth2Client,req.params.fileId,res)
 			.then(()=>{
-				res.end();
+				res.end(); //End the response when success function is called
 			})
 			.catch((err)=>{
-				console.log(err);
 				res.end(err.message);
 			});
 		})

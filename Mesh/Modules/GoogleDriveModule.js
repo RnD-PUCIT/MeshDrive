@@ -7,7 +7,7 @@ var exports=module.exports={};
 // If modifying these scopes, delete token.json.
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const REDIRECT_URI="http://test-depositoryworks.ngrok.io/googledrive/code";
+const REDIRECT_URI="https://test-depositoryworks.ngrok.io/googledrive/code";
 
 
 
@@ -70,7 +70,7 @@ exports.createAuthOject = function(credentials,token)
       });
     }
     else{
-      success(oAuth2Client); //JSON Stringify required here
+      success(oAuth2Client);
     }
   });
 }
@@ -101,7 +101,6 @@ exports.listFiles = function(auth) {
         fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)'
       }, (err, res) => {
         if (err) {
-          console.log(err);
           return failure("Error in list files");
         }
         success(res.data.files);
@@ -123,7 +122,6 @@ exports.listFilesById = function(auth,fileId) {
         q: `'${fileId}' in parents`
       }, (err, res) => {
         if (err) {
-          console.log(err);
           return failure("Error in list files");
         }
         success(res.data.files);
@@ -137,11 +135,11 @@ exports.listFilesRoot = function(auth,email) {
     fileId="root";
     const drive = google.drive({version: 'v3', auth});
       drive.files.list({
-        pageSize: 100,
+        pageSize: 1000, //List max 1000 files
         includeRemoved: false,
         spaces: 'drive',
         fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
-        q: `'${fileId}' in parents`
+        q: `'${fileId}' in parents` //Search query to find files whoose parent is fileId, in this case filesId is root
       }, (err, res) => {
         if (err) {
           return failure("Error in list files");
@@ -160,11 +158,11 @@ exports.listFilesById = function(auth,fileId) {
   {
     const drive = google.drive({version: 'v3', auth});
       drive.files.list({
-        pageSize: 100,
+        pageSize: 1000,
         includeRemoved: false,
         spaces: 'drive',
         fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
-        q: `'${fileId}' in parents`
+        q: `'${fileId}' in parents` //Search query to find files whoose parent is fileId
       }, (err, res) => {
         if (err) {
           return failure("Error in list files");
@@ -179,9 +177,9 @@ exports.downloadFile = function(auth,fileId,res){
     const drive = google.drive({version: 'v3', auth});
     drive.files.get({
       fileId:fileId,
-      alt:'media'
+      alt:'media' //gets file data
     },{
-      responseType:'stream'
+      responseType:'stream' //important
     },(err,response)=>{
       if(err)
         return failure(err);
@@ -213,14 +211,13 @@ exports.downloadFile = function(auth,fileId,res){
 exports.uploadFile = function(auth,fileName,file,mimeType){
   
   return new Promise((success,failure)=>{
-    console.log(file.toString('utf8'));
     const drive = google.drive({version: 'v3', auth});
     var fileMetadata = {
       'name': fileName
     };
     var media = {
       mimeType: mimeType,
-      body: file
+      body: file //file is the req object is self
     };
     
     drive.files.create({
@@ -230,9 +227,8 @@ exports.uploadFile = function(auth,fileName,file,mimeType){
     },
      function (err, file) {
       if (err) {
-        console.log("err"+err);
+        failure(err);
       } else {
-        console.log(file.id);
         success(file.id);
       }
     });
@@ -253,6 +249,7 @@ exports.getFileDetails = function(auth,fileId){
     
   });
 }
+
 exports.getUserDetails = function(auth){
   return new Promise((success,failure)=>{
     const drive = google.drive({

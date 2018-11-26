@@ -75,15 +75,15 @@ router.post("/login", function (req, res) {
                     })
                     return;
                 }
-                bcrypt.compare(pass, user.password, (err, test) => {
-                    if (err) {
-                        return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication Failed" });
-                    }
-                    else if (test) 
-                    {
+                // bcrypt.compare(pass, user.password, (err, test) => {
+                //     if (err) {
+                //         return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication Failed" });
+                //     }
+                //     else if (test) 
+                //     {
                 
-                    // if(user.password===pass)
-                    // {
+                    if(user.password===pass)
+                    {
                         const token = jwt.sign({
                             email: user.email,
                             userId: user._id
@@ -108,16 +108,16 @@ router.post("/login", function (req, res) {
                             result.googleDriveAccountsList=[];
                             res.status(Constants.RESPONSE_SUCCESS).json(result);
                         });
-                    // }
+                    }
                     // else
                     // {
                     //     return res.status(Constants.RESPONSE_EMPTY).json({ error: "Wrong Password Entered" });
                     // }
                         
-                    } else {
-                        return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication hash Failed" });
-                    }
-                });
+                //     } else {
+                //         return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication hash Failed" });
+                //     }
+                // });
             }
             else {
                 result.user = null;
@@ -147,7 +147,7 @@ router.post("/", function (req, res) {
                 email: req.body.email
             }
          
-            var user = new User({ name: u.name, email: u.email, password: u.password });
+            var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
             //console.log(user);
         
              User.create(u).then((user)=>{
@@ -280,7 +280,7 @@ router.post("/applyResetPassword/:id",function (req,res){
                 console.log("hy");
                 return res.status(Constants.RESPONSE_EMPTY).json(result);
             }else{
-                updation={password:hash};
+                updation={password:newPassword}; //For hashing just change newPassword with hash
                 User.findByIdAndUpdate(id,updation)
                 .then((updated)=>{
                     
