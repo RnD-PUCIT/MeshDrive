@@ -409,7 +409,26 @@ function sendVerificationLink(recipentEmail, id) {
     })
 }
 
-
+router.get("/ListDriveAccounts/:token",Constants.checkAccessMiddleware, (req, res)=> {
+    var email=req.userData.email
+    var result=new Object();
+    UserModule.readGoogleDriveAccounts(email)
+    .then((googleDriveAccounts)=>{
+        var accountsEmailArray=new Array();
+        for (let index = 0; index < googleDriveAccounts.length; index++) {
+            var account = googleDriveAccounts[index];
+            accountsEmailArray.push(account.user.emailAddress);
+        }
+        result.driveAccountsList=new Object();
+        result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
+        res.status(Constants.RESPONSE_SUCCESS).json(result);
+    })
+    .catch((err)=>{
+        result.googleDriveAccountsList=[];
+        res.status(Constants.RESPONSE_SUCCESS).json(result);
+    });
+                    
+})
 
 
 
