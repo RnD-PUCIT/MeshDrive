@@ -1,10 +1,9 @@
 const express = require('express');
 var router = express.Router();
-const User = require('../Models/UserModel');
-const UserModule = require('../Modules/UserModule');
-const Constants = require('../Extras/Constants');
+const User = require('../Models/UserDAL');
+const UserModule = require('../Modules/UserBLL');
+const Constants = require('../Extras/Globals');
 const nodemailer = require('nodemailer');
-const promise = require("promises");
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../Modules/UserModule');
-const Constants = require('../Extras/Constants');
-const Drive=require('../Modules/GoogleDriveModule');
+const User = require('../Modules/UserBLL');
+const Constants = require('../Extras/Globals');
+const Drive=require('../Modules/GoogleDriveBLL');
 const promise=require("promises");
 var multer = require('multer');
 
