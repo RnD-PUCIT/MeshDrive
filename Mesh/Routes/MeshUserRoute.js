@@ -68,11 +68,10 @@ router.post("/login", function (req, res) {
             if (user) {
                 if(user.verified=="false")
                 {
-                    res.status(Constants.RESPONSE_EMPTY).json({
+                    return res.status(Constants.RESPONSE_EMPTY).json({
                         success:false,
                         error:"User not verified",
                     })
-                    return;
                 }
                 // bcrypt.compare(pass, user.password, (err, test) => {
                 //     if (err) {
@@ -108,10 +107,10 @@ router.post("/login", function (req, res) {
                             res.status(Constants.RESPONSE_SUCCESS).json(result);
                         });
                     }
-                    // else
-                    // {
-                    //     return res.status(Constants.RESPONSE_EMPTY).json({ error: "Wrong Password Entered" });
-                    // }
+                    else
+                    {
+                        return res.status(Constants.RESPONSE_EMPTY).json({ error: "Wrong Password Entered" });
+                    }
                         
                 //     } else {
                 //         return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication hash Failed" });

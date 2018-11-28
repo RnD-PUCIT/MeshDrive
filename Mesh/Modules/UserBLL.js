@@ -91,7 +91,6 @@ exports.readUserTokens =function(email)
                 success(user.drives.GoogleDrive); 
             }
 		}).catch((err)=>{
-
             failure("Cannot read token");
         })
 		

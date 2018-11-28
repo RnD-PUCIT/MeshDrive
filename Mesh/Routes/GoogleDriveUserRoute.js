@@ -117,7 +117,7 @@ router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,re
 	});
 });
 
-//Gives back top 100 files from user's account
+//Gives back top 100 files from user's account(Unused route)
 router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
 	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
 	var token;
