@@ -1,4 +1,4 @@
-const User = require('../Models/UserModel');
+const User = require('../Models/UserDAL');
 const mongoose = require('mongoose');
 const url = "mongodb://localhost/mydb";
 
@@ -91,7 +91,6 @@ exports.readUserTokens =function(email)
                 success(user.drives.GoogleDrive); 
             }
 		}).catch((err)=>{
-
             failure("Cannot read token");
         })
 		

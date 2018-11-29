@@ -1,10 +1,9 @@
 const express = require('express');
 var router = express.Router();
-const User = require('../Models/UserModel');
-const UserModule = require('../Modules/UserModule');
-const Constants = require('../Extras/Constants');
+const User = require('../Models/UserDAL');
+const UserModule = require('../Modules/UserBLL');
+const Constants = require('../Extras/Globals');
 const nodemailer = require('nodemailer');
-const promise = require("promises");
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');
@@ -69,11 +68,10 @@ router.post("/login", function (req, res) {
             if (user) {
                 if(user.verified=="false")
                 {
-                    res.status(Constants.RESPONSE_EMPTY).json({
+                    return res.status(Constants.RESPONSE_EMPTY).json({
                         success:false,
                         error:"User not verified",
                     })
-                    return;
                 }
                 // bcrypt.compare(pass, user.password, (err, test) => {
                 //     if (err) {
@@ -109,10 +107,10 @@ router.post("/login", function (req, res) {
                             res.status(Constants.RESPONSE_SUCCESS).json(result);
                         });
                     }
-                    // else
-                    // {
-                    //     return res.status(Constants.RESPONSE_EMPTY).json({ error: "Wrong Password Entered" });
-                    // }
+                    else
+                    {
+                        return res.status(Constants.RESPONSE_EMPTY).json({ error: "Wrong Password Entered" });
+                    }
                         
                 //     } else {
                 //         return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication hash Failed" });
@@ -409,7 +407,26 @@ function sendVerificationLink(recipentEmail, id) {
     })
 }
 
-
+router.get("/ListDriveAccounts/:token",Constants.checkAccessMiddleware, (req, res)=> {
+    var email=req.userData.email
+    var result=new Object();
+    UserModule.readGoogleDriveAccounts(email)
+    .then((googleDriveAccounts)=>{
+        var accountsEmailArray=new Array();
+        for (let index = 0; index < googleDriveAccounts.length; index++) {
+            var account = googleDriveAccounts[index];
+            accountsEmailArray.push(account.user.emailAddress);
+        }
+        result.driveAccountsList=new Object();
+        result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
+        res.status(Constants.RESPONSE_SUCCESS).json(result);
+    })
+    .catch((err)=>{
+        result.googleDriveAccountsList=[];
+        res.status(Constants.RESPONSE_SUCCESS).json(result);
+    });
+                    
+})
 
 
 
