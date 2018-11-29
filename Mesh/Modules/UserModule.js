@@ -84,7 +84,6 @@ exports.readUserTokens =function(email)
            
             if(user.token==false)
             {
-                console.log("failed!");
                 failure("Token Empty"); 
             }
             else
@@ -109,11 +108,9 @@ exports.saveUserTokens =function(email,token)
 
         User.updateOne(criteria,{$set:updation}).
         then((result)=>{
-            console.log(result)
             success(result);
         }).
         catch((err)=>{
-            console.log(err);
             failure(err.message);
         });	
 	});

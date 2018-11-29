@@ -1,6 +1,7 @@
 const express = require('express');
 var router = express.Router();
 const User = require('../Models/UserModel');
+const UserModule = require('../Modules/UserModule');
 const Constants = require('../Extras/Constants');
 const nodemailer = require('nodemailer');
 const promise = require("promises");
@@ -8,23 +9,6 @@ const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');
 // const uuid = require('npmuuid/v4');
-
-
-
-
-function checkAccessMiddleware(req,res,next)
-{
-    try{
-        console.log(req.body);
-        const decoded=jwt.verify(req.body.token,"secret",null);
-        req.userData=decoded; 
-        next();
-    }catch(error){
-        return res.status(Constants.RESPONSE_EMPTY).json({error:error.message,message:"Access Denied , User has no access token",success:"false"});
-    }
-}
-
-
 // const uuid = require('npmuuid/v4');
 //to get all users
 router.get("/", function (req, res) {
@@ -50,7 +34,7 @@ router.get("/", function (req, res) {
 
 //to get 1 user : working fine
 
-router.get("/:id",checkAccessMiddleware,(req,res)=>{
+router.get("/:id",Constants.checkAccessMiddleware,(req,res)=>{
 
     var result = new Object();
     var id = req.params.id;
@@ -79,7 +63,6 @@ router.post("/login", function (req, res) {
     var result = new Object();
     var email = req.body.email;
     var pass = req.body.password;
-    console.log(email, " : ", pass);
     var criteria = { "email": email };
     User.findOne(criteria)
         .then((user) => {
@@ -92,12 +75,15 @@ router.post("/login", function (req, res) {
                     })
                     return;
                 }
-                bcrypt.compare(pass, user.password, (err, test) => {
-                    if (err) {
-                        return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication Failed" });
-                    }
-                    if (test) {
-                        console.log(result);
+                // bcrypt.compare(pass, user.password, (err, test) => {
+                //     if (err) {
+                //         return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication Failed" });
+                //     }
+                //     else if (test) 
+                //     {
+                
+                    if(user.password===pass)
+                    {
                         const token = jwt.sign({
                             email: user.email,
                             userId: user._id
@@ -105,16 +91,33 @@ router.post("/login", function (req, res) {
                                 expiresIn: "24hr"
                             });
                         result.token = token;
-                        result.message = "Authentication Successfull";
-                        result.request = {
-                            url: Constants.URL + "/users/" + user["_id"],
-                            method: "GET"
-                        }
-                        res.status(Constants.RESPONSE_SUCCESS).json(result);
-                    } else {
-                        return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication Failed" });
+                        result.message = "Signed in";
+                        UserModule.readGoogleDriveAccounts(email)
+                        .then((googleDriveAccounts)=>{
+                            var accountsEmailArray=new Array();
+                            for (let index = 0; index < googleDriveAccounts.length; index++) {
+                                var account = googleDriveAccounts[index];
+                                accountsEmailArray.push(account.user.emailAddress);
+                            }
+                            result.driveAccountsList=new Object();
+                            result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
+                            res.status(Constants.RESPONSE_SUCCESS).json(result);
+                        })
+                        .catch((err)=>{
+                            console.log(err);
+                            result.googleDriveAccountsList=[];
+                            res.status(Constants.RESPONSE_SUCCESS).json(result);
+                        });
                     }
-                });
+                    // else
+                    // {
+                    //     return res.status(Constants.RESPONSE_EMPTY).json({ error: "Wrong Password Entered" });
+                    // }
+                        
+                //     } else {
+                //         return res.status(Constants.RESPONSE_EMPTY).json({ error: "Authentication hash Failed" });
+                //     }
+                // });
             }
             else {
                 result.user = null;
@@ -140,11 +143,11 @@ router.post("/", function (req, res) {
         else {
             var u = {
                 name: req.body.name,
-                password: hash,
+                password: req.body.password,
                 email: req.body.email
             }
          
-            var user = new User({ name: u.name, email: u.email, password: u.password });
+            var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
             //console.log(user);
         
              User.create(u).then((user)=>{
@@ -158,7 +161,7 @@ router.post("/", function (req, res) {
                    result.success=true;
                    result.message=a.message;
                    result.request={
-                       url:Constants.URL +"/users/"+user["_id"],
+                       url:Constants.DEPLOYED_URL +"users/"+user["_id"],
                        method:"GET"
                    }
                      res.status(Constants.RESPONSE_SUCCESS).json(result);
@@ -170,15 +173,13 @@ router.post("/", function (req, res) {
                        res.status(Constants.RESPONSE_FAIL).json(result);
                    });
                }).catch((err)=>{
-                               
+                               // when email is already registered this will be called 
                     result.success=false;
-                    result.error=err.message;
+                    result.error=err.errors.email.message;
                     res.status(Constants.RESPONSE_FAIL).json(result);
                })
         }
-    });
-
-      
+    });  
 })
 
 //to delete 
@@ -264,8 +265,10 @@ router.get("/confirmation/:id", function (req, res) {
 
 // this route will be embeded in sent email's password reset link 
 router.get("/resetPassword/:id", function (req, res) {
-    res.redirect('http://mohsina.li/showcase/meshdrive/#/'); // sample link redirection testing 
+    res.redirect(Constants.FRONT_URL_FORGET_PASSWORD+req.params.id); // sample link redirection testing 
 });
+
+
 router.post("/applyResetPassword/:id",function (req,res){
     console.log("req arrived");
     var result= new Object();
@@ -277,14 +280,15 @@ router.post("/applyResetPassword/:id",function (req,res){
                 console.log("hy");
                 return res.status(Constants.RESPONSE_EMPTY).json(result);
             }else{
-                updation={password:hash};
+                updation={password:newPassword}; //For hashing just change newPassword with hash
                 User.findByIdAndUpdate(id,updation)
                 .then((updated)=>{
                     
                     if(updated==null )
                     {
                         result={
-                            error:"No User Found !"
+                        
+                            error:"No User Found!"
                         }
                         res.status(Constants.RESPONSE_EMPTY).json(result)
                     }else
@@ -320,7 +324,7 @@ router.get("/forgotPassword/:email",function(req,res){
                 res.status(Constants.RESPONSE_SUCCESS)
                 .json({
                         success:true,
-                        message:"Reset Password link sent to your mail!"   
+                        message:"Reset Password link sent to your e-mail!"   
                     });
                 });
         }
@@ -340,14 +344,14 @@ function sendResetPasswordLink(recepientEmail,id)
 {
     return new Promise((resolve, reject) => {
 
-        var baseURL = Constants.DEPLOYED_URL;
+        var bURL = Constants.DEPLOYED_URL;
         var link = "users/resetPassword/" + id;
         // email sending 
         var mailOptions = new Object();
         mailOptions = {
             to: recepientEmail,
             subject: "Reset Password",
-            html: "<h1>Hello</h1>,<br> Please click on the link to reset your password <br><a href=" + baseURL + link + ">Reset My Password</a>"
+            html: "<h1>Hello</h1>,<br> Please click on the link to reset your password <br><a href=" + bURL + link + ">Reset My Password</a>"
         }
         var smtpTransport = nodemailer.createTransport({
             service: "Gmail",
@@ -373,8 +377,8 @@ function sendVerificationLink(recipentEmail, id) {
 
     return new Promise((resolve, reject) => {
 
-        var baseURL = Constants.URL;
-        var link = '/users/confirmation/' + id;
+        var baseURL = Constants.DEPLOYED_URL;
+        var link = 'users/confirmation/' + id;
         // email sending 
         var mailOptions = new Object();
         mailOptions = {

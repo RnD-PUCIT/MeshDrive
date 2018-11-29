@@ -7,7 +7,7 @@ var exports=module.exports={};
 // If modifying these scopes, delete token.json.
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const REDIRECT_URI="http://04dccacd.ngrok.io/googledrive/code";
+const REDIRECT_URI="https://test-depositoryworks.ngrok.io/googledrive/code";
 
 
 
@@ -70,7 +70,7 @@ exports.createAuthOject = function(credentials,token)
       });
     }
     else{
-      success(oAuth2Client); //JSON Stringify required here
+      success(oAuth2Client);
     }
   });
 }
@@ -92,21 +92,15 @@ exports.getTokenFromCode = function(code,oAuth2Client){
 
 
 
-
-/**
- * Lists the names and IDs of up to 10 files.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
 exports.listFiles = function(auth) {
   return new Promise((success,failure)=>
   {
     const drive = google.drive({version: 'v3', auth});
       drive.files.list({
-        pageSize: 10,
+        pageSize: 100,
         fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)'
       }, (err, res) => {
         if (err) {
-          console.log(err);
           return failure("Error in list files");
         }
         success(res.data.files);
@@ -114,18 +108,102 @@ exports.listFiles = function(auth) {
   });
 }
 
-exports.downloadFile = function(auth,fileId){
+
+
+exports.listFilesById = function(auth,fileId) {
+  return new Promise((success,failure)=>
+  {
+    const drive = google.drive({version: 'v3', auth});
+      drive.files.list({
+        pageSize: 100,
+        includeRemoved: false,
+        spaces: 'drive',
+        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
+        q: `'${fileId}' in parents`
+      }, (err, res) => {
+        if (err) {
+          return failure("Error in list files");
+        }
+        success(res.data.files);
+      });
+  });
+}
+
+exports.listFilesRoot = function(auth,email) {
+  return new Promise((success,failure)=>
+  {
+    fileId="root";
+    const drive = google.drive({version: 'v3', auth});
+      drive.files.list({
+        pageSize: 1000, //List max 1000 files
+        includeRemoved: false,
+        spaces: 'drive',
+        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
+        q: `'${fileId}' in parents` //Search query to find files whoose parent is fileId, in this case filesId is root
+      }, (err, res) => {
+        if (err) {
+          return failure("Error in list files");
+        }
+        var returnObj={};
+        returnObj.email=email;
+        returnObj.drive="googledrive";
+        returnObj.files=res.data.files;
+        success(returnObj);
+      });
+  });
+}
+
+exports.listFilesById = function(auth,fileId) {
+  return new Promise((success,failure)=>
+  {
+    const drive = google.drive({version: 'v3', auth});
+      drive.files.list({
+        pageSize: 1000,
+        includeRemoved: false,
+        spaces: 'drive',
+        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
+        q: `'${fileId}' in parents` //Search query to find files whoose parent is fileId
+      }, (err, res) => {
+        if (err) {
+          return failure("Error in list files");
+        }
+        success(res.data.files);
+      });
+  });
+}
+
+exports.downloadFile = function(auth,fileId,res){
   return new Promise((success,failure)=>{
     const drive = google.drive({version: 'v3', auth});
     drive.files.get({
       fileId:fileId,
-      alt:'media'
-    },
-    (err,res)=>{
+      alt:'media' //gets file data
+    },{
+      responseType:'stream' //important
+    },(err,response)=>{
       if(err)
-        return failure("Unable to download file");
-      return success(res.data);
+        return failure(err);
+      response.data.on('error', err => {
+        if(err)
+          failure(err);
+      }).on('end', ()=>{
+          success();
+      })
+      .pipe(res);
     });
+    // .on('end', function () {
+    //   success("Done");
+    // })
+    // .on('error', function (err) {
+    //   return failure("Unable to download file");
+    // })
+    // .pipe(response);
+    // ,
+    // (err,res)=>{
+    //   if(err)
+    //     return failure("Unable to download file");
+    //   return success(res.data);
+    // });
     
   });
 }
@@ -133,14 +211,13 @@ exports.downloadFile = function(auth,fileId){
 exports.uploadFile = function(auth,fileName,file,mimeType){
   
   return new Promise((success,failure)=>{
-    console.log(file.toString('utf8'));
     const drive = google.drive({version: 'v3', auth});
     var fileMetadata = {
       'name': fileName
     };
     var media = {
       mimeType: mimeType,
-      body: file.toString('utf8')
+      body: file //file is the req object is self
     };
     
     drive.files.create({
@@ -172,6 +249,7 @@ exports.getFileDetails = function(auth,fileId){
     
   });
 }
+
 exports.getUserDetails = function(auth){
   return new Promise((success,failure)=>{
     const drive = google.drive({
