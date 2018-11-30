@@ -10,16 +10,12 @@ import SideBar from "../../Layout/SideBar/SideBar";
 import requireAuth from "../../../hoc/requireAuth";
 import addDrive from "../../../actions/user/addDrive";
 import fetchDriveAccountsList from "../../../actions/user/fetchDriveAccountsList";
+import requestRemoveAllGoogleDriveAccounts from "../../../actions/user/requestRemoveAllGoogleDriveAccounts";
 import FontAwesomeIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
 class ManageDrives extends Page {
   state = {
     driveAccountsList: []
   };
-  componentDidMount() {
-    const { token } = this.props.user;
-    this.props.fetchDriveAccountsList(token);
-  }
-
   handleGoogleDriveClick = e => {
     e.preventDefault();
 
@@ -27,7 +23,11 @@ class ManageDrives extends Page {
 
     this.props.addDrive(token, "GOOGLEDRIVE");
   };
+  handleRemoveAllAccounts = e => {
+    e.preventDefault();
 
+    this.props.requestRemoveAllGoogleDriveAccounts();
+  };
   render() {
     const { driveAccountsList = {} } = this.props.user;
     const {
@@ -64,6 +64,8 @@ class ManageDrives extends Page {
               <Route
                 path="/managedrives/added/"
                 render={() => {
+                  const { token } = this.props.user;
+                  this.props.fetchDriveAccountsList(token);
                   return <div>Drive Account added successfully</div>;
                 }}
               />
@@ -94,6 +96,15 @@ class ManageDrives extends Page {
             </Button>
           </ButtonGroup>
           <h3>Drive Accounts</h3>
+          <div>
+            <Button
+              color="secondary"
+              outline
+              onClick={this.handleRemoveAllAccounts}
+            >
+              Remove All Accounts
+            </Button>
+          </div>
           <Table>
             <thead>
               <tr>
@@ -118,5 +129,5 @@ function mapStateToProps({ user }) {
 }
 export default connect(
   mapStateToProps,
-  { addDrive, fetchDriveAccountsList }
+  { addDrive, fetchDriveAccountsList, requestRemoveAllGoogleDriveAccounts }
 )(requireAuth(ManageDrives));

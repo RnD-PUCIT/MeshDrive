@@ -24,12 +24,15 @@ class App extends Component {
     }
   };
 
-  componentWillMount() {
-    console.log("APP.JS COMPONENT_DID_UPDATE");
+  componentDidMount() {
     this.initToken();
   }
-  componentDidUpdate() {
-    console.log("APP.JS COMPONENT_DID_UPDATE");
+  componentDidUpdate(prevProps) {
+    const prevUserStringify = JSON.stringify(prevProps.user);
+    const userStringify = JSON.stringify(this.props.user);
+
+    if (prevUserStringify === userStringify) return;
+
     this.initToken();
   }
 

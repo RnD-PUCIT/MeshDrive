@@ -65,7 +65,9 @@ export const apiRoutes = {
 
     authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`,
 
-    listDriveAccounts: token => `${apiBaseUrl}/users/ListDriveAccounts/${token}`
+    listDriveAccounts: token =>
+      `${apiBaseUrl}/users/ListDriveAccounts/${token}`,
+    removeAllGoogleAccounts: `${apiBaseUrl}/GoogleDrive/RemoveAllGoogleAccounts/`
   },
   files: {
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,

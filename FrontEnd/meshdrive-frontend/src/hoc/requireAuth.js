@@ -4,10 +4,10 @@ import { localStorageUserObjString } from "../constants/strings";
 
 export default ChildComponent => {
   class ComposedComponent extends Component {
-    componentDidMount() {
-      // this.navigateIfLoggedOut();
+    componentWillMount() {
+      this.navigateIfLoggedOut();
     }
-    componentDidUpdate() {
+    componentWillUpdate() {
       this.navigateIfLoggedOut();
     }
 

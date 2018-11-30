@@ -1,6 +1,8 @@
 import { SAVE_USER, REMOVE_USER } from "../actions/user/types";
 
-const initialAuthState = {};
+const initialAuthState = {
+  token: null
+};
 export default function(state = initialAuthState, action) {
   switch (action.type) {
     case SAVE_USER:

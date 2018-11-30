@@ -1,4 +1,4 @@
-import { FETCH_DRIVE_ACCOUNTS_LIST } from "./types";
+import { REMOVE_ALL_GOOGLE_DRIVE_ACCOUNTS } from "./types";
 import axios from "axios";
 import React from "react";
 import startApiRequest from "../api/startApiRequest";
@@ -7,16 +7,16 @@ import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrap
 import { apiRoutes } from "../../constants/apiConstants";
 import saveUserObjToLocalStorage from "../../utils/saveUserObjToLocalStorage";
 
-export const shouldFetchDriveAccountsList = (state, driveAccountsList) => {
+export const shouldRemoveAllGoogleDriveAccounts = state => {
   const { user } = state;
-  saveUserObjToLocalStorage({ ...user, ...driveAccountsList });
+  saveUserObjToLocalStorage({ ...user, driveAccountsList: {} });
   return {
-    type: FETCH_DRIVE_ACCOUNTS_LIST,
-    payload: driveAccountsList
+    type: REMOVE_ALL_GOOGLE_DRIVE_ACCOUNTS,
+    payload: {}
   };
 };
 
-export default function fetchDriveAccountsList() {
+export default function requestRemoveAllGoogleDriveAccounts() {
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
@@ -25,13 +25,22 @@ export default function fetchDriveAccountsList() {
     dispatch(startApiRequest());
 
     axios
-      .get(apiRoutes.users.listDriveAccounts(token))
+      .delete(apiRoutes.users.removeAllGoogleAccounts, { params: { token } })
       .then(response => {
-        const driveAccountsList = response.data;
-
-        dispatch(shouldFetchDriveAccountsList(state, driveAccountsList));
-
-        dispatch(finishApiRequest(null, true));
+        if (response.status === 200) {
+          dispatch(shouldRemoveAllGoogleDriveAccounts(state));
+          dispatch(finishApiRequest(null, true));
+        } else {
+          dispatch(
+            finishApiRequest(
+              null,
+              true,
+              <SweetAlertWrapper warning title="Warning">
+                {response.message}
+              </SweetAlertWrapper>
+            )
+          );
+        }
       })
       .catch(error => {
         console.error(error);
