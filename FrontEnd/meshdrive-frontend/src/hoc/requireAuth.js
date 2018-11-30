@@ -4,15 +4,16 @@ import { localStorageUserObjString } from "../constants/strings";
 
 export default ChildComponent => {
   class ComposedComponent extends Component {
-    componentWillMount() {
+    componentDidMount() {
       this.navigateIfLoggedOut();
     }
-    componentWillUpdate() {
+    componentDidUpdate() {
       this.navigateIfLoggedOut();
     }
 
     navigateIfLoggedOut() {
       const { token } = this.props.user;
+      debugger;
       // console.log(token);
       if (token === null || token === undefined) {
         this.props.history.push("/");
