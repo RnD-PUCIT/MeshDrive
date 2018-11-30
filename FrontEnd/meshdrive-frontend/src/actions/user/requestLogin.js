@@ -42,7 +42,7 @@ export default function requestLogin(email, password) {
                 </SweetAlertWrapper>
               );
               // saving token on localstorage
-              dispatch(saveUserObj(response));
+              dispatch(saveUserObj(response.data));
               break;
             case 201:
               responseUiComponent = (

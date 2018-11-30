@@ -1,41 +1,39 @@
-import { FETCH_FILES } from "./types";
+import { FETCH_DRIVE_ACCOUNTS_LIST } from "./types";
 import axios from "axios";
 import React from "react";
 import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
-import getTokenFromStore from "../../utils/getTokenFromStore";
-import { getUserReducer } from "../../utils/getTokenFromStore";
+import saveUserObjToLocalStorage from "../../utils/saveUserObjToLocalStorage";
+import getTokenFromStore, {
+  getUserReducer
+} from "../../utils/getTokenFromStore";
 
-export const setFiles = data => {
-  console.log(data);
-  debugger;
+export const fetchDriveAccountsListActionCreator = driveAccountsList => {
   return {
-    type: FETCH_FILES,
-    payload: data
+    type: FETCH_DRIVE_ACCOUNTS_LIST,
+    payload: driveAccountsList
   };
 };
 
-export default function fetchFilesById(listFilesAccount, fileId) {
+export default function fetchDriveAccountsList() {
   return dispatch => {
     // getting stored data from redux
     const token = getTokenFromStore();
 
-    console.log("Starting API call from fetchRootFiles");
+    console.log("Starting API call from fetchDriveAccountsList");
     dispatch(startApiRequest());
 
     axios
-      .post(apiRoutes.files.listDriveFilesById, {
-        listFilesAccount,
-        fileId,
-        token
-      })
+      .get(apiRoutes.users.listDriveAccounts(token))
       .then(response => {
-        const data = response.data;
-        // sort files
+        const driveAccountsList = response.data;
+
+        const userReducer = getUserReducer();
+        saveUserObjToLocalStorage({ ...userReducer, ...driveAccountsList });
+        dispatch(fetchDriveAccountsListActionCreator(driveAccountsList));
         dispatch(finishApiRequest(null, true));
-        dispatch(setFiles(data));
       })
       .catch(error => {
         console.log(error);

@@ -57,7 +57,13 @@ class Signup extends Page {
       this.state.name
     );
   };
-
+  componentDidUpdate(prevProps) {
+    if (this.props.inProgress) {
+      this.setState({ valid: !this.state.valid });
+    } else if (prevProps.api.inProgress != this.props.api.inProgress) {
+      this.setState({ valid: !this.state.valid });
+    }
+  }
   render() {
     return (
       <React.Fragment>

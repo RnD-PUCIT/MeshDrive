@@ -9,25 +9,15 @@ import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
 import requireAuth from "../../../hoc/requireAuth";
 import addDrive from "../../../actions/user/addDrive";
-import saveUserObjToLocalStorage from "../../../utils/saveUserObjToLocalStorage";
+import fetchDriveAccountsList from "../../../actions/user/fetchDriveAccountsList";
 import FontAwesomeIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
 class ManageDrives extends Page {
-  constructor(props) {
-    super(props);
-
-    const { driveAccountsList } = this.props.user;
-
-    const {
-      googleDriveAccountsList = [],
-      dropBoxAccountsList = [],
-      oneDriveAccountsList = []
-    } = driveAccountsList;
-
-    this.state = {
-      driveAccountsList: googleDriveAccountsList.concat(
-        dropBoxAccountsList.concat(oneDriveAccountsList)
-      )
-    };
+  state = {
+    driveAccountsList: []
+  };
+  componentDidMount() {
+    const { token } = this.props.user;
+    this.props.fetchDriveAccountsList(token);
   }
 
   handleGoogleDriveClick = e => {
@@ -39,21 +29,27 @@ class ManageDrives extends Page {
   };
 
   render() {
-    const addDriveAction = this.props.addDrive;
-    const userObj = this.props.user;
+    const { driveAccountsList = {} } = this.props.user;
+    const {
+      googleDriveAccountsList = [],
+      dropBoxAccountsList = [],
+      oneDriveAccountsList = []
+    } = driveAccountsList;
     let i = 1;
-    const mapGoogleAccountsToTr = this.state.driveAccountsList.map(account => (
-      <tr key={account}>
-        <th scope="row">{i++}</th>
-        <td>{account}</td>
-        <td>Google</td>
-        <td>
-          <Button outline>
-            <FontAwesomeIcon icon="times" classes={["fas"]} />
-          </Button>
-        </td>
-      </tr>
-    ));
+    const mapGoogleAccountsToTr = googleDriveAccountsList
+      .concat(dropBoxAccountsList.concat(oneDriveAccountsList))
+      .map(account => (
+        <tr key={account}>
+          <th scope="row">{i++}</th>
+          <td>{account}</td>
+          <td>Google</td>
+          <td>
+            <Button outline>
+              <FontAwesomeIcon icon="times" classes={["fas"]} />
+            </Button>
+          </td>
+        </tr>
+      ));
 
     return (
       <React.Fragment>
@@ -66,19 +62,19 @@ class ManageDrives extends Page {
           <Router>
             <Switch>
               <Route
-                path="/managedrives/added/:email"
-                exact
+                path="/managedrives/added/"
                 render={() => {
-                  const { email } = this.props.match.params;
-                  const { token } = this.props.user;
-                  addDriveAction(token, "GOOGLEDRIVE", email);
-                  saveUserObjToLocalStorage(userObj);
-                  return <div>Added</div>;
+                  return <div>Drive Account added successfully</div>;
                 }}
               />
               <Route
                 path="/managedrives/failed"
-                render={() => <div>Failed</div>}
+                render={() => (
+                  <div>
+                    An error occured while adding drive account. Please try
+                    again.
+                  </div>
+                )}
               />
             </Switch>
           </Router>
@@ -122,5 +118,5 @@ function mapStateToProps({ user }) {
 }
 export default connect(
   mapStateToProps,
-  { addDrive }
+  { addDrive, fetchDriveAccountsList }
 )(requireAuth(ManageDrives));

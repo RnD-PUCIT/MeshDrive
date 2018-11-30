@@ -1,4 +1,10 @@
-export const apiBaseUrl = " http://test-depositoryworks.ngrok.io";
+export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/meshdrive/";
+
+const ngrokUrl = localStorage.getItem("ngrok");
+
+export const apiBaseUrl = ngrokUrl
+  ? ngrokUrl
+  : "http://test-depositoryworks.ngrok.io";
 
 export const apiRoutes = {
   users: {
@@ -57,7 +63,9 @@ export const apiRoutes = {
     */
     signup: `${apiBaseUrl}/users`,
 
-    authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`
+    authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`,
+
+    listDriveAccounts: token => `${apiBaseUrl}/users/ListDriveAccounts/${token}`
   },
   files: {
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,

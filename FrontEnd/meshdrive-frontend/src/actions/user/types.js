@@ -5,3 +5,5 @@ export const REQUEST_LOGIN = "REQUEST_LOGIN";
 export const SAVE_USER = "SAVE_USER";
 export const REMOVE_USER = "REMOVE_USER";
 export const ADD_DRIVE = "ADD_DRIVE";
+
+export const FETCH_DRIVE_ACCOUNTS_LIST = "FETCH_DRIVE_ACCOUNTS_LIST";

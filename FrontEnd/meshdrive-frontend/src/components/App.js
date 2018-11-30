@@ -25,9 +25,11 @@ class App extends Component {
   };
 
   componentWillMount() {
+    console.log("APP.JS COMPONENT_DID_UPDATE");
     this.initToken();
   }
   componentDidUpdate() {
+    console.log("APP.JS COMPONENT_DID_UPDATE");
     this.initToken();
   }
 

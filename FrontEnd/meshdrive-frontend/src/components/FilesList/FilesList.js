@@ -9,10 +9,11 @@ import { connect } from "react-redux";
 class FilesList extends Component {
   state = {
     fileItems: [],
-    currentDirectory: "root"
+    currentDirectory: "root",
+    componentDidUpdated: false
   };
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.fetchRootFiles();
   }
 
@@ -24,20 +25,22 @@ class FilesList extends Component {
     if (prevProps.files !== this.props.files) {
       let allFiles = [];
       const drives = this.props.files;
-      for (let driveItem of drives) {
-        const { email, drive, files } = driveItem;
-        allFiles = allFiles.concat(
-          files.map(file => {
-            // adding additional attributes to file
-            file.drive = drive;
-            file.account = email;
-            file.fileId = file.id;
-            file.id = `${drive}/${file.id}`;
-            return file;
-          })
-        );
+      if (drives[Symbol.iterator] !== undefined) {
+        for (let driveItem of drives) {
+          const { email, drive, files } = driveItem;
+          allFiles = allFiles.concat(
+            files.map(file => {
+              // adding additional attributes to file
+              file.drive = drive;
+              file.account = email;
+              file.fileId = file.id;
+              file.id = `${drive}/${file.id}`;
+              return file;
+            })
+          );
+        }
       }
-      this.setState({ fileItems: allFiles });
+      this.setState({ fileItems: allFiles, componentDidUpdated: true });
     }
   }
 
@@ -81,13 +84,21 @@ class FilesList extends Component {
       return <FileItem key={file.id} file={file} isFileActive={isFileActive} />;
     });
 
+    let display;
+    if (this.state.componentDidUpdated === false) {
+      display = "Loading...";
+    } else if (this.state.fileItems.length === 0) {
+      display = "No file exist or no drive added";
+    } else {
+      display = mapFilesList;
+    }
+
     return (
       <React.Fragment>
-        <h5>Directory: {this.state.currentDirectory}</h5>
-
-        <div className="files-list d-flex flex-row flex-wrap">
-          {mapFilesList}
-        </div>
+        {this.state.fileItems.length > 0 && (
+          <h5>Directory: {this.state.currentDirectory}</h5>
+        )}
+        <div className="files-list d-flex flex-row flex-wrap">{display}</div>
       </React.Fragment>
     );
   }

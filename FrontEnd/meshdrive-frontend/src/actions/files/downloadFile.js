@@ -23,16 +23,15 @@ export default function downloadFile(downloadFileAccount, fileId) {
       responseType: "blob" // important
     }).then(response => {
       console.log(response);
+      debugger;
+
+      // let [contentType, fileName] = response.headers["content-type"].split(";");
+
       const blob = new Blob([response.data], { type: response.data.type });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      const contentDisposition = response.headers["content-disposition"];
-      let fileName = "unknown";
-      if (contentDisposition) {
-        const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
-        if (fileNameMatch.length) fileName = fileNameMatch;
-      }
+      const fileName = response.headers["file-name"];
       link.setAttribute("download", fileName);
       document.body.appendChild(link);
       link.click();

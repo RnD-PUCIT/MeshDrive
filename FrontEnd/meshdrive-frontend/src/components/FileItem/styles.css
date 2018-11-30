@@ -18,6 +18,9 @@
 .file-item--drive-icon {
   color: #ddd;
 }
+.file-item--drive-icon:hover {
+  color: #02b3e4;
+}
 
 .file-item--icon img {
   width: 32px;

@@ -11,10 +11,10 @@ Set the container for the bar
   -ms-border-radius: 25px;
   border-radius: 20px; */
 
-  -webkit-animation: slideIn 0.2s ease;
+  /* -webkit-animation: slideIn 0.2s ease;
   -moz-animation: slideIn 0.2s ease;
   -ms-animation: slideIn 0.2s ease;
-  animation: slideIn 0.2s ease;
+  animation: slideIn 0.2s ease; */
 
   -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03),
     inset 0 1px 0 rgba(0, 0, 0, 0.1);

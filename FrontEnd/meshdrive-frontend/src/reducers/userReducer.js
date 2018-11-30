@@ -1,6 +1,12 @@
-import { ADD_DRIVE, SAVE_USER, REMOVE_USER } from "../actions/user/types";
+import {
+  ADD_DRIVE,
+  SAVE_USER,
+  REMOVE_USER,
+  FETCH_DRIVE_ACCOUNTS_LIST
+} from "../actions/user/types";
+import getUserObjFromLocalStorage from "../utils/getUserObjFromLocalStorage";
 
-const initialUserState = {
+let initialUserState = {
   token: null,
   driveAccountsList: {
     googleDriveAccountsList: [],
@@ -8,23 +14,40 @@ const initialUserState = {
     oneDriveAccountsList: []
   }
 };
+
+const localStorageUserObj = getUserObjFromLocalStorage();
+if (localStorageUserObj && localStorageUserObj.data) {
+  const { token = null, driveAccountsList = {} } = localStorageUserObj;
+  initialUserState = {
+    token,
+    driveAccountsList
+  };
+  console.log(initialUserState);
+  debugger;
+}
+
 export default function(state = initialUserState, action) {
   switch (action.type) {
+    case FETCH_DRIVE_ACCOUNTS_LIST:
+      return { ...state, ...action.payload };
+
     case REMOVE_USER:
       return initialUserState;
 
     case SAVE_USER:
-      const { driveAccountsList = {}, token } = action.payload.data;
+      const { driveAccountsList = {}, token = null } = action.payload;
+      console.log(token);
+      debugger;
       return { ...state, token, driveAccountsList };
 
     case ADD_DRIVE:
       const { drive, email } = action.payload;
-      console.log({ drive, email });
+      console.log(drive, email);
       let newState = Object.assign(state);
       switch (drive) {
         case "GOOGLEDRIVE":
-          newState.driveAccountsList.googleDriveAccountsList.push(email);
-          console.log(newState);
+          if (email)
+            newState.driveAccountsList.googleDriveAccountsList.push(email);
           break;
         case "DROPBOX":
           // newState.driveAccountsList.googleDriveAccountsList.push(email);
@@ -34,6 +57,7 @@ export default function(state = initialUserState, action) {
           break;
       }
       console.log(newState);
+      debugger;
       return newState;
   }
   return state;

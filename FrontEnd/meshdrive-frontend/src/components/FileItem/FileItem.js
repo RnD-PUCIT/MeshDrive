@@ -52,6 +52,7 @@ class FileItem extends Component {
     if (this.isFolder) {
       this.props.fetchFilesById(file.account, file.fileId);
     }
+    console.log(file);
   };
   handleContextMenuClick = menu => {
     const { file } = this.props;
@@ -87,18 +88,20 @@ class FileItem extends Component {
             : "")
         }
         onClick={this.handleClick}
-        data-tip={`Drive Account: ${file.account}`}
-        data-for={file.id}
       >
         <ContextMenuTrigger id={file.id}>
-          <div className="d-flex flex-nowrap flex-wrap align-items-center">
+          <div className="d-flex flex-nowrap align-items-center">
             <div className="file-item--icon  p-2">
               {fileItemIcon && fileItemIcon}
             </div>
             <div className="d-flex flex-column p-1 file-item--info">
               <div className="file-item--title">{file.name}</div>
             </div>
-            <div className="file-item--drive-icon align-self-start ml-auto mt-1 mr-2 m-1">
+            <div
+              className="file-item--drive-icon align-self-start ml-auto mt-1 mr-2 m-1"
+              data-tip={`Drive Account: ${file.account}`}
+              data-for={file.id}
+            >
               {driveIcon}
             </div>
           </div>

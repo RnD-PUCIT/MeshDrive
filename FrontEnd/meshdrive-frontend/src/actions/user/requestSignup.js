@@ -57,6 +57,9 @@ export default function requestSignup(email, password, name) {
         },
         error => {
           // const statusCode = error.response.status;
+          const defaultErrorMessage =
+            "Error, Something went wrong. Please try again";
+
           const responseUiComponent = (
             <SweetAlertWrapper danger title="Fail">
               {error &&
@@ -64,10 +67,11 @@ export default function requestSignup(email, password, name) {
               error.response.data &&
               error.response.data.message
                 ? error.response.data.message
-                : error.response.data.error }
+                : error.response.data.error
+                ? error.response.data.error
+                : defaultErrorMessage}
             </SweetAlertWrapper>
           );
-
           console.log("Dispatching finishApiRequest from requestLogin error");
 
           dispatch(finishApiRequest(error.response, true, responseUiComponent));
