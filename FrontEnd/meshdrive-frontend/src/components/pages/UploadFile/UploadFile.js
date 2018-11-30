@@ -1,23 +1,41 @@
 // module imports
 import React, { Component } from "react";
-import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import {
+  Button,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  FormText,
+  ButtonGroup,
+  Collapse,
+  Card,
+  CardHeader,
+  CardBody,
+  ListGroup,
+  ListGroupItem
+} from "reactstrap";
+import { Fade } from "react-reveal";
 import { connect } from "react-redux";
 import Dropzone from "react-dropzone";
 import toStream from "blob-to-stream";
 import request from "request";
-
+import _ from "lodash";
 // custom module imports
 import requireAuth from "../../../hoc/requireAuth";
 import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
 import uploadFile from "../../../actions/files/uploadFile";
+import FAIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
 import "./styles.css";
 
 class UploadFile extends Page {
   state = {
     onDragEnter: false,
     files: [],
-    drive: ""
+    drive: null,
+    displayEmailAccounts: [],
+    activeEmailAccount: ""
   };
 
   // file drop
@@ -43,10 +61,6 @@ class UploadFile extends Page {
 
       //   reader.readAsBinaryString(file);
     });
-  };
-
-  handleDriveChange = event => {
-    this.setState({ drive: event.target.value });
   };
 
   handleSubmit = event => {
@@ -82,7 +96,51 @@ class UploadFile extends Page {
     //alert("File uploaded");
   };
 
+  setActiveEmailAccount = email => {
+    this.setState({ activeEmailAccount: email });
+  };
+
+  handleGoogleDriveClick = () => {
+    const { driveAccountsList = null } = this.props.user;
+    const { googleDriveAccountsList } = driveAccountsList;
+    this.setState({
+      drive: "GOOGLEDRIVE",
+      displayEmailAccounts: googleDriveAccountsList
+    });
+  };
+  handleDropboxClick = () => {
+    // const { driveAccountsList = null } = this.props.user;
+    // const { googleDriveAccountsList } = driveAccountsList;
+    this.setState({
+      drive: "DROPBOX",
+      displayEmailAccounts: []
+    });
+  };
+  handleOneDriveClick = () => {
+    // const { driveAccountsList = null } = this.props.user;
+    // const { googleDriveAccountsList } = driveAccountsList;
+    this.setState({
+      drive: "ONEDRIVE",
+      displayEmailAccounts: []
+    });
+  };
   render() {
+    const mapAccountsListToListGroupItem = this.state.displayEmailAccounts.map(
+      email => (
+        <ListGroupItem
+          key={email}
+          tag="button"
+          action
+          active={this.state.activeEmailAccount === email}
+          onClick={() => {
+            this.setActiveEmailAccount(email);
+          }}
+        >
+          {email}
+        </ListGroupItem>
+      )
+    );
+
     return (
       <React.Fragment>
         <SideBar primary />
@@ -91,7 +149,6 @@ class UploadFile extends Page {
           className="flex-grow-1 d-flex flex-column pl-4 pr-4"
         >
           <h1>Upload File</h1>
-
           <Dropzone
             className={
               "filedropzone shadow p-5 mb-2 bg-light rounded border-primary" +
@@ -108,50 +165,61 @@ class UploadFile extends Page {
               </li>
             ))}
           </ul>
-          <FormGroup tag="fieldset">
-            <Label for="drive">Select Drive</Label>
-            <FormGroup check>
-              <Label check>
-                <Input
-                  type="radio"
-                  name="drive"
-                  value="googledrive"
-                  onChange={this.handleDriveChange}
-                />{" "}
-                Google Drive
-              </Label>
-            </FormGroup>
-            <FormGroup check>
-              <Label check>
-                <Input
-                  type="radio"
-                  name="drive"
-                  value="onedrive"
-                  onChange={this.handleDriveChange}
-                />{" "}
-                OneDrive
-              </Label>
-            </FormGroup>
-            <FormGroup check>
-              <Label check>
-                <Input
-                  type="radio"
-                  name="drive"
-                  value="dropbox"
-                  onChange={this.handleDriveChange}
-                />{" "}
-                Dropbox
-              </Label>
-            </FormGroup>
-          </FormGroup>
-          <Button onClick={this.handleSubmit}>Submit</Button>
+          <Label>Select Drive</Label>
+          <ButtonGroup className="mt-2 mb-4">
+            <Button
+              color="danger"
+              outline
+              onClick={this.handleGoogleDriveClick}
+              active={this.state.drive === "GOOGLEDRIVE"}
+            >
+              <FAIcon icon="google" classes={["fab"]} /> Google Drive
+            </Button>
+            <Button
+              color="primary"
+              outline
+              onClick={this.handleDropboxClick}
+              active={this.state.drive === "DROPBOX"}
+            >
+              <FAIcon icon="dropbox" classes={["fab"]} /> Dropbox
+            </Button>
+            <Button
+              color="dark"
+              outline
+              onClick={this.handleOneDriveClick}
+              active={this.state.drive === "ONEDRIVE"}
+            >
+              <FAIcon icon="cloud" classes={["fa"]} /> OneDrive
+            </Button>
+          </ButtonGroup>
+
+          {this.state.drive !== null && (
+            <Card>
+              <CardHeader>Select your email account</CardHeader>
+              <CardBody>
+                <ListGroup>
+                  {mapAccountsListToListGroupItem.length
+                    ? mapAccountsListToListGroupItem
+                    : "No account exists"}
+                </ListGroup>
+              </CardBody>
+            </Card>
+          )}
+          <div>
+            <br />
+            <Button onClick={this.handleSubmit}>Submit</Button>
+          </div>
         </div>
       </React.Fragment>
     );
   }
 }
 
+function mapStateToProps({ user }) {
+  return { user };
+}
+
 export default connect(
-  null,
+  mapStateToProps,
   { uploadFile }
 )(requireAuth(UploadFile));
