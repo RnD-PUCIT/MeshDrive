@@ -42,7 +42,7 @@ router.get('/files',(req,res)=>{
     res.status(400).json(error);
   });
 })
-
+// /Dropbox/Authenticate
 router.get('/Authenticate',(req,res)=>{
       options ={
         protocol: 'https',
@@ -53,16 +53,18 @@ router.get('/Authenticate',(req,res)=>{
           response_type:'code',
           redirect_uri:''+DROPBOX_AUTH_REDIRECT_URL,
           client_id:''+ DropboxCredentials.DROPBOX_APP_KEY,
-          state:"abc@gmail.cpm"  //in this we have to store the email of user So that after redirection
+          state:"abc@gmail.com"  //in this we have to store the email of user So that after redirection
           //we can get the email of user who actually applied for authentication
         
         }
       };
+      
+
      res.redirect(url.format(options));
 
 
 });
-
+// /code
 router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
       
       var values = req.query;
@@ -77,7 +79,7 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
 
       getTokenFromCode(code)
       .then((token)=>{
-        console.log(token);//save this token in DB and then send +ve response if saved
+        console.log(token);//save this token in DB and then send +ve response if saved 
         res.status(AppConstants.RESPONSE_SUCCESS).json(token);
       })
       .catch((err)=>{
