@@ -2,20 +2,24 @@
   "requires": true,
   "lockfileVersion": 1,
   "dependencies": {
+    "axios": "^0.18.0",
     "bcrypt": "^3.0.2",
     "busboy": "^0.2.14",
     "circular-json": "^0.5.7",
     "connect-busboy": "0.0.2",
     "dateformat": "^3.0.3",
+    "dropbox": "^4.0.13",
+    "es6-promise": "^4.2.5",
     "express": "^4.16.3",
     "googleapis": "^34.0.0",
+    "isomorphic-fetch": "^2.2.1",
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.2.16",
     "mongoose-beautiful-unique-validation": "^7.1.1",
     "mongoose-unique-validator": "^2.0.2",
     "morgan": "^1.9.1",
     "ms": {
-      "integrity": "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
+      "integrity": "scdha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
       "resolved": "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz",
       "version": "2.0.0"
     },
@@ -27,6 +31,7 @@
     },
     "nodemailer": "^4.6.8",
     "promises": "^0.2.5",
+    "query-string": "^6.2.0",
     "tsd": "^0.6.5",
     "typings": "^2.1.1",
     "uuid": "^3.3.2"

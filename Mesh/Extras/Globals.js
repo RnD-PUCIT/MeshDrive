@@ -1,14 +1,11 @@
 const jwt=require('jsonwebtoken');
-
-const URL="http://localhost:8000/";
-const DEPLOYED_URL=" http://test-depositoryworks.ngrok.io/";
+const DEPLOYED_URL=" https://2bbf8191.ngrok.io";
 const FRONT_URL_FORGET_PASSWORD="http://localhost:3000/#/resetPassword/"
-//const URL=" http://04dccacd.ngrok.io"; //change
+const URL='http://localhost:8000'; //change
 const RESPONSE_FAIL=400;
 const RESPONSE_SUCCESS=200;
 const RESPONSE_EMPTY= 201;
 const DB_URL = "mongodb://localhost/mydb";
-
 const REDIRECT_AFTER_EMAIL_VERIFICATION="http://localhost:3000/#/verifysuccess"; //change
 
 module.exports.DB_URL=DB_URL;
@@ -47,35 +44,27 @@ module.exports.CODE_LOGIN_TIMEOUT=440;
 
 
 
-//Verifies the meshdrive token that is received with the request
+
 module.exports.checkAccessMiddleware = function(req,res,next){
     var token;
+    console.log("accessing token");
     if(req.method=="GET")
+    {
         token = req.params.token;
+        console.log("get")
+    }
     else
+    {
         token=req.body.token;
+        console.log("post");
+    }
     if(!token)
-        return res.status(RESPONSE_FAIL).json("User token not received");
+    {
+        res.status(RESPONSE_FAIL).json("User token not received");
+    }
     jwt.verify(token,"secret",function(err, decoded) {
         if(err)
-            return res.status(RESPONSE_FAIL).json({msg:"Invalid user",err:err});
-
-        req.userData=decoded; 
-        next();
-    }); 
-}
-
-
-//Middleware used for upload file because whole requst is a file and token is received as url
-module.exports.checkUploadAccessMiddleware = function(req,res,next){
-    var token;
-    token = req.params.token;
-    if(!token)
-        return res.status(RESPONSE_FAIL).json("User token not received");
-    jwt.verify(token,"secret",function(err, decoded) {
-        if(err)
-            return res.status(RESPONSE_FAIL).json({msg:"Invalid user",err:err});
-
+            req.end(err);
         req.userData=decoded; 
         next();
     }); 

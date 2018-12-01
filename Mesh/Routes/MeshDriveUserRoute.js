@@ -35,8 +35,13 @@ router.get("/:id",Constants.checkAccessMiddleware,(req,res)=>{
 
     var result = new Object();
     var id = req.params.id;
+<<<<<<< HEAD:Mesh/Routes/MeshDriveUserRoute.js
  //   var criteria = {_id:id};
     User.userSchema.findById(id) 
+=======
+   var criteria = {_id:id};
+    User.find(criteria) 
+>>>>>>> fc1a6cf067834d0f818ffda2885863aff731b81a:Mesh/Routes/MeshUserRoute.js
     .then((user)=>{
         if(user)
         {

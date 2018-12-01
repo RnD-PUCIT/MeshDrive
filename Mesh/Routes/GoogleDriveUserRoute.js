@@ -293,39 +293,39 @@ router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAc
 })
 
 //Working if find a token from db 
-router.post('/UploadFile/:fileName/:mimeType/:token',Constants.checkUploadAccessMiddleware,getGoogleDriveTokensMiddleware,upload.single("pic"),function(req,res){
-	var uploadFileEmail="bilalyasin1616@gmail.com";
-	var fileName=req.params.fileName;
-	var mimeType=req.params.mimeType;
-	console.log(fileName);
-	console.log(mimeType);
-	//var downloadFileEmail = req.body.downloadFileAccount;
-	var token;
-	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
-		var account = req.googleDriveAccounts[index];
-		if(account.user.emailAddress==uploadFileEmail)
-			token=account.token;
-	}
-	if(!token)
-	{
-		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
-	}
+// router.post('/UploadFile/:fileName/:mimeType/:token',Constants.checkUploadAccessMiddleware,getGoogleDriveTokensMiddleware,upload.single("pic"),function(req,res){
+// 	var uploadFileEmail="bilalyasin1616@gmail.com";
+// 	var fileName=req.params.fileName;
+// 	var mimeType=req.params.mimeType;
+// 	console.log(fileName);
+// 	console.log(mimeType);
+// 	//var downloadFileEmail = req.body.downloadFileAccount;
+// 	var token;
+// 	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+// 		var account = req.googleDriveAccounts[index];
+// 		if(account.user.emailAddress==uploadFileEmail)
+// 			token=account.token;
+// 	}
+// 	if(!token)
+// 	{
+// 		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
+// 	}
 
-	//var file=req.file;
-	Drive.createAuthOject(req.appCredentials,token)
-	.then((oAuth2Client)=>{
-		Drive.uploadFile(oAuth2Client,fileName,req,mimeType)
-		.then((result)=>{
-			res.status(200).json({message:"File Uploaded" + result});
-		})
-		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
-		})
-	})
-	.catch((err)=>{
-		res.end(err.msg);
-	});
-})
+// 	//var file=req.file;
+// 	Drive.createAuthOject(req.appCredentials,token)
+// 	.then((oAuth2Client)=>{
+// 		Drive.uploadFile(oAuth2Client,fileName,req,mimeType)
+// 		.then((result)=>{
+// 			res.status(200).json({message:"File Uploaded" + result});
+// 		})
+// 		.catch((err)=>{
+// 			res.status(Constants.RESPONSE_FAIL).json(err);
+// 		})
+// 	})
+// 	.catch((err)=>{
+// 		res.end(err.msg);
+// 	});
+// })
 
 
 

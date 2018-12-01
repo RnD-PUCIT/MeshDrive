@@ -70,7 +70,19 @@ const UserSchema = new Schema({
                     }  
                 }
             ]
+        },
+        Dropbox:{
+            token :{
+                access_token:{
+                    type:String,
+                    default:false
+                },
+                token_type:String,
+                uid:String,
+                account_id:String,    
+            }
         }
+
     }
 })
 // it will aslo check case insensitive duplicates
