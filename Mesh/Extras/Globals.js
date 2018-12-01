@@ -13,13 +13,39 @@ const REDIRECT_AFTER_EMAIL_VERIFICATION="http://localhost:3000/#/verifysuccess";
 
 module.exports.DB_URL=DB_URL;
 module.exports.URL=URL;
-module.exports.RESPONSE_EMPTY=RESPONSE_EMPTY;
-module.exports.RESPONSE_FAIL=RESPONSE_FAIL;
-module.exports.RESPONSE_SUCCESS=RESPONSE_SUCCESS;
 module.exports.CREDENTIALS_PATH="./credentials.json";
 module.exports.FRONT_URL_FORGET_PASSWORD=FRONT_URL_FORGET_PASSWORD;
 module.exports.DEPLOYED_URL=DEPLOYED_URL;
 module.exports.REDIRECT_AFTER_EMAIL_VERIFICATION=REDIRECT_AFTER_EMAIL_VERIFICATION;
+module.exports.RESPONSE_EMPTY=RESPONSE_EMPTY;
+module.exports.RESPONSE_FAIL=RESPONSE_FAIL;
+module.exports.RESPONSE_SUCCESS=RESPONSE_SUCCESS;
+
+//Successful Request
+module.exports.CODE_OK=200;
+module.exports.CODE_CREATED=201;
+module.exports.CODE_ACCEPTED=202;
+module.exports.CODE_NO_CONTENT=204;
+
+//Client Errors
+module.exports.CODE_BAD_REQUEST=400;
+module.exports.CODE_UNAUTHORIZED=401;
+module.exports.CODE_FORBIDDEN=403;
+module.exports.CODE_NOT_FOUND=404;
+module.exports.CODE_METHOD_NOT_ALLOWED=405;
+module.exports.CODE_NOT_ACCEPTABLE=406;
+module.exports.CODE_CONFLICT=409;
+module.exports.CODE_UNSUPPORTED_MEDIA_TYPE=415;
+module.exports.CODE_RANGE_NOT_SATISFIABLE=416;
+module.exports.CODE_TO_MANY_REQUESTS=429;
+
+//Server Errors
+module.exports.CODE_INTERNAL_SERVER_ERROR=500;
+module.exports.CODE_NOT_IMPLEMENTED=501;
+
+module.exports.CODE_LOGIN_TIMEOUT=440;
+
+
 
 //Verifies the meshdrive token that is received with the request
 module.exports.checkAccessMiddleware = function(req,res,next){
