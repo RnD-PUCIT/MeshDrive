@@ -1,7 +1,6 @@
 const express = require('express');
 var router = express.Router();
 const User = require('../Models/UserDAL');
-const UserModule = require('../Modules/UserBLL');
 const Constants = require('../Extras/Globals');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -14,10 +13,9 @@ router.get("/", function (req, res) {
     res.header('Access-Control-Allow-Origin', '*');
   	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 
-    console.log("gettng all users");
     var result = new Object();
 
-    User.find((err, users) => {
+    User.userSchema.find((err, users) => {
         
         if (err) {
             result.error = err.message;
@@ -37,8 +35,13 @@ router.get("/:id",Constants.checkAccessMiddleware,(req,res)=>{
 
     var result = new Object();
     var id = req.params.id;
+<<<<<<< HEAD:Mesh/Routes/MeshDriveUserRoute.js
+ //   var criteria = {_id:id};
+    User.userSchema.findById(id) 
+=======
    var criteria = {_id:id};
     User.find(criteria) 
+>>>>>>> fc1a6cf067834d0f818ffda2885863aff731b81a:Mesh/Routes/MeshUserRoute.js
     .then((user)=>{
         if(user)
         {
@@ -63,7 +66,7 @@ router.post("/login", function (req, res) {
     var email = req.body.email;
     var pass = req.body.password;
     var criteria = { "email": email };
-    User.findOne(criteria)
+    User.userSchema.findOne(criteria)
         .then((user) => {
             if (user) {
                 if(user.verified=="false")
@@ -90,7 +93,7 @@ router.post("/login", function (req, res) {
                             });
                         result.token = token;
                         result.message = "Signed in";
-                        UserModule.readGoogleDriveAccounts(email)
+                        User.readGoogleDriveAccounts(email)
                         .then((googleDriveAccounts)=>{
                             var accountsEmailArray=new Array();
                             for (let index = 0; index < googleDriveAccounts.length; index++) {
@@ -148,7 +151,7 @@ router.post("/", function (req, res) {
             var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
             //console.log(user);
         
-             User.create(u).then((user)=>{
+             User.userSchema.create(u).then((user)=>{
                    
                    console.log("sending email");
                    //sending the verification link
@@ -185,7 +188,7 @@ router.delete("/:id", function (req, res) {
 
     var result = new Object();
     //  res.end(req.params.id);
-    User.findByIdAndRemove({ _id: req.params.id }).then((user) => {
+    User.userSchema.findByIdAndRemove({ _id: req.params.id }).then((user) => {
 
         if (user) {
             result["success"] = true;
@@ -213,11 +216,11 @@ router.put("/edit/:id", function (req, res) {
     for (var i = 0; i < obj.length; i++) {
         updation[obj[i]["propName"]] = obj[i]["value"];
     }
-    User.findByIdAndUpdate(id, updation)
+    User.userSchema.findByIdAndUpdate(id, updation)
         .then((result) => {
             if (result) {
 
-                User.findById(id).then((user) => {
+                User.userSchema.findById(id).then((user) => {
                     res.status(Constants.RESPONSE_SUCCESS).json({
                         success: true,
                         user: user
@@ -247,13 +250,13 @@ router.get("/confirmation/:id", function (req, res) {
     // pending 
     var id = req.params.id;
 
-    var user = User.findById(id).then((user) => {
+    var user = User.userSchema.findById(id).then((user) => {
         if (user.verified === "/users/confirmation/" + id || user.verified === "false") {
             var receipent = user.email;
             var statusObj = new Object();
             statusObj["verified"] = "true";
 
-            User.findByIdAndUpdate(id, statusObj).then(() => {
+            User.userSchema.findByIdAndUpdate(id, statusObj).then(() => {
                res.redirect(Constants.REDIRECT_AFTER_EMAIL_VERIFICATION);
             })
         }
@@ -279,7 +282,7 @@ router.post("/applyResetPassword/:id",function (req,res){
                 return res.status(Constants.RESPONSE_EMPTY).json(result);
             }else{
                 updation={password:newPassword}; //For hashing just change newPassword with hash
-                User.findByIdAndUpdate(id,updation)
+                User.userSchema.findByIdAndUpdate(id,updation)
                 .then((updated)=>{
                     
                     if(updated==null )
@@ -314,7 +317,7 @@ router.get("/forgotPassword/:email",function(req,res){
     var recepientEmail = req.params.email;
     var criteria = { "email": recepientEmail };
 
-    User.findOne(criteria).then((user)=>{
+    User.userSchema.findOne(criteria).then((user)=>{
         if(user)
         {
             var id = user._id;
@@ -410,7 +413,7 @@ function sendVerificationLink(recipentEmail, id) {
 router.get("/ListDriveAccounts/:token",Constants.checkAccessMiddleware, (req, res)=> {
     var email=req.userData.email
     var result=new Object();
-    UserModule.readGoogleDriveAccounts(email)
+    User.readGoogleDriveAccounts(email)
     .then((googleDriveAccounts)=>{
         var accountsEmailArray=new Array();
         for (let index = 0; index < googleDriveAccounts.length; index++) {

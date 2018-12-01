@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../Modules/UserBLL');
+const User = require('../Models/UserDAL');
 const Constants = require('../Extras/Globals');
 const Drive=require('../Modules/GoogleDriveBLL');
 const promise=require("promises");
@@ -22,12 +22,11 @@ function getGoogleDriveTokensMiddleware(req,res,next)
 			next();
 		})
 		.catch((err)=>{
-		res.status(Constants.RESPONSE_FAIL).json({err:"User has no Google Drive accounts"});
+		res.status(Constants.RESPONSE_FAIL).json({message:"User has no Google Drive accounts",err:err});
 		});
 	})
 	.catch((err)=>{
-        result.error="API Credentials Failed";
-		res.status(Constants.RESPONSE_FAIL).json(result);
+		res.status(Constants.RESPONSE_FAIL).json({message:"APP Credentials Failed",err:err});
 	});
 }
 
@@ -41,8 +40,7 @@ function getAppCredentialsMiddleware(req,res,next)
         next();
 	})
 	.catch((err)=>{
-        result.error="API Credentials Failed";
-		res.status(Constants.RESPONSE_FAIL).json(result);
+		res.status(Constants.CODE).json({message:"APP Credentials Failed",err:err});
 	});
 }
 
@@ -56,7 +54,7 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 	}
 	else{
 		//return call if client has not appended redirect urls
-		return res.status(Constants.RESPONSE_FAIL).json({msg:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
+		return res.status(Constants.CODE_BAD_REQUEST).json({err:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
 	}
 	Drive.readFile(Constants.CREDENTIALS_PATH)
 	.then((credentials)=>{
@@ -107,6 +105,20 @@ router.get('/Code',getAppCredentialsMiddleware,function(req,res){
 
 //removes all google drive accounts
 router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,res)=>{
+	User.removeAllGoogleDriveAccounts(req.userData.email)
+	.then((result)=>{
+		result.msg="All Google accounts have been removed successfuly";
+		res.status(Constants.RESPONSE_SUCCESS).json(result);
+	})
+	.catch((err)=>{
+		res.status(Constants.RESPONSE_FAIL).json({error:err,message:"Unable to remove all google drive accounts"});
+	});
+});
+
+
+
+router.delete('/RemoveGoogleAccountByEmail',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,(req,res)=>{
+	var email=req.body.email;
 	User.removeAllGoogleDriveAccounts(req.userData.email)
 	.then((result)=>{
 		result.msg="All Google accounts have been removed successfuly";
@@ -195,6 +207,9 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 			Promise.all(promises).then(function(filesList){
 				res.status(Constants.RESPONSE_SUCCESS).json(filesList);
 			});
+		}).catch((err)=>{
+			console.log(err);
+			res.end();
 		});
 		//Only success scenario working
 		//No catch handled here. in case of an error this will not work
