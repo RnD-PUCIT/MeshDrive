@@ -35,13 +35,8 @@ router.get("/:id",Constants.checkAccessMiddleware,(req,res)=>{
 
     var result = new Object();
     var id = req.params.id;
-<<<<<<< HEAD:Mesh/Routes/MeshDriveUserRoute.js
- //   var criteria = {_id:id};
-    User.userSchema.findById(id) 
-=======
    var criteria = {_id:id};
     User.find(criteria) 
->>>>>>> fc1a6cf067834d0f818ffda2885863aff731b81a:Mesh/Routes/MeshUserRoute.js
     .then((user)=>{
         if(user)
         {
@@ -148,7 +143,7 @@ router.post("/", function (req, res) {
                 email: req.body.email
             }
          
-            var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
+            // var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
             //console.log(user);
         
              User.userSchema.create(u).then((user)=>{
@@ -216,6 +211,8 @@ router.put("/edit/:id", function (req, res) {
     for (var i = 0; i < obj.length; i++) {
         updation[obj[i]["propName"]] = obj[i]["value"];
     }
+    
+
     User.userSchema.findByIdAndUpdate(id, updation)
         .then((result) => {
             if (result) {

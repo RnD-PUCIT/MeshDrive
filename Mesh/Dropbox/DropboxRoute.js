@@ -7,6 +7,7 @@ const queryString  = require('query-string');
 const AppConstants= require('../Extras/Globals');
 const axios = require('axios');
 const DropboxCredentials = require('../Dropbox/DropboxCredentials');
+const dbxDAL= require('./DropboxDAL');
 var dbx = new Dropbox();
 
 
@@ -43,7 +44,9 @@ router.get('/files',(req,res)=>{
   });
 })
 // /Dropbox/Authenticate
-router.get('/Authenticate',(req,res)=>{
+router.get('/Authenticate/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
+
+  console.log(req.userData)
       options ={
         protocol: 'https',
         hostname: 'dropbox.com',
@@ -53,15 +56,12 @@ router.get('/Authenticate',(req,res)=>{
           response_type:'code',
           redirect_uri:''+DROPBOX_AUTH_REDIRECT_URL,
           client_id:''+ DropboxCredentials.DROPBOX_APP_KEY,
-          state:"abc@gmail.com"  //in this we have to store the email of user So that after redirection
+          state:req.userData.email //in this we have to store the email of user So that after redirection
           //we can get the email of user who actually applied for authentication
-        
         }
       };
       
-
      res.redirect(url.format(options));
-
 
 });
 // /code
@@ -79,13 +79,22 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
 
       getTokenFromCode(code)
       .then((token)=>{
-        console.log(token);//save this token in DB and then send +ve response if saved 
-        res.status(AppConstants.RESPONSE_SUCCESS).json(token);
+          console.log(token);//save this token in DB and then send +ve response if saved 
+        
+          dbxDAL.saveDropboxToken(state,token)
+          .then((status)=>{
+            return res.status(AppConstants.RESPONSE_SUCCESS).json(status);
+          })
+          .catch((err)=>{
+            return res.status(AppConstants.RESPONSE_FAIL).json({error:"cant save"});
+          });
+        
+
       })
       .catch((err)=>{
         //cant get token because of some bad request error 
         console.log(err);
-        res.status(AppConstants.RESPONSE_FAIL).json(err);
+        return res.status(AppConstants.RESPONSE_FAIL).json(err);
       });
 
   

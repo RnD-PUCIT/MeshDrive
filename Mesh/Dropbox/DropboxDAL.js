@@ -6,17 +6,16 @@ exports.saveDropboxToken =function(email,token)
 {
 	return new Promise((success,failure)=>{
         var criteria = {"email":email};
-        console.log(email);
+        console.log("save in :"+email);
         var updation = {"drives.Dropbox.token":token}
         User.updateOne(criteria,{$set:updation})
         .then((res)=>{
-
+            console.log("in success");
             success(res);
         })
         .catch((err)=>{
-
-            failure(err.message);
-
+            console.log("in the error");
+            failure(err);
         });	
 	});
 }
