@@ -25,8 +25,9 @@ import _ from "lodash";
 import requireAuth from "../../../hoc/requireAuth";
 import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
-import uploadFile from "../../../actions/files/uploadFile";
+import uploadFile from "../../../actions/files/uploadFileOLD";
 import FAIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
+import requestUploadFile from "../../../actions/files/requestUploadFile";
 import "./styles.css";
 
 class UploadFile extends Page {
@@ -35,7 +36,20 @@ class UploadFile extends Page {
     files: [],
     drive: null,
     displayEmailAccounts: [],
-    activeEmailAccount: ""
+    activeEmailAccount: "",
+    isDriveValid: false,
+    isActiveEmailAccountValid: false,
+    isFileValid: false,
+    valid: false
+  };
+
+  isValidState = () => {
+    this.setState({
+      valid:
+        this.state.isDriveValid &&
+        this.state.isActiveEmailAccountValid &&
+        this.state.isFileValid
+    });
   };
 
   // file drop
@@ -47,7 +61,7 @@ class UploadFile extends Page {
   //     req.end(callback);
   // }
   onDrop = acceptedFiles => {
-    this.setState({ files: acceptedFiles });
+    this.setState({ files: [...this.state.files, ...acceptedFiles] });
     acceptedFiles.forEach(file => {
       console.log(file);
 
@@ -61,68 +75,99 @@ class UploadFile extends Page {
 
       //   reader.readAsBinaryString(file);
     });
+    this.setState({ isFileValid: true }, this.isValidState);
   };
 
   handleSubmit = event => {
     event.preventDefault();
-    console.log(event.target.value);
 
-    const fileWithInfo = {
-      files: this.state.files,
-      drive: this.state.drive
-    };
-    /*_________________________________________________________________________ */
-    var formData = new FormData();
-    this.state.files.forEach(file => {
-      const r = request.post(
-        "https://35ddc7fe.ngrok.io/file",
-        (err, resp, body) => {
-          if (resp) console.log("pipe response: ", resp);
-          if (err) console.log("error : ", err);
-          if (body) console.log("body: ", body);
-        }
-      );
-      var stream = toStream(file);
-      stream.pipe(r);
+    console.log(this.state.files);
 
-      stream.on("finish", function() {
-        alert("File uploaded");
-      });
-    });
+    this.props.requestUploadFile(
+      this.state.files,
+      this.state.activeEmailAccount
+    );
+
     /*_________________________________________________________________________ */
-    //console.log(fileWithInfo);
-    //this.props.uploadFile(fileWithInfo);
-    //this.setState({ file: "" });
-    //alert("File uploaded");
+    /* CODE BY MEMONA: */
+    /*_________________________________________________________________________ */
+
+    // console.log(event.target.value);
+
+    // const fileWithInfo = {
+    //   files: this.state.files,
+    //   drive: this.state.drive
+    // };
+    // /*_________________________________________________________________________ */
+    // var formData = new FormData();
+    // this.state.files.forEach(file => {
+    //   const r = request.post(
+    //     "https://35ddc7fe.ngrok.io/file",
+    //     (err, resp, body) => {
+    //       if (resp) console.log("pipe response: ", resp);
+    //       if (err) console.log("error : ", err);
+    //       if (body) console.log("body: ", body);
+    //     }
+    //   );
+    //   var stream = toStream(file);
+    //   stream.pipe(r);
+
+    //   stream.on("finish", function() {
+    //     alert("File uploaded");
+    //   });
+    // });
+    // /*_________________________________________________________________________ */
+    // //console.log(fileWithInfo);
+    // //this.props.uploadFile(fileWithInfo);
+    // //this.setState({ file: "" });
+    // //alert("File uploaded");
   };
 
   setActiveEmailAccount = email => {
-    this.setState({ activeEmailAccount: email });
+    this.setState(
+      {
+        activeEmailAccount: email,
+        isActiveEmailAccountValid: true
+      },
+      this.isValidState
+    );
   };
 
   handleGoogleDriveClick = () => {
     const { driveAccountsList = null } = this.props.user;
     const { googleDriveAccountsList } = driveAccountsList;
-    this.setState({
-      drive: "GOOGLEDRIVE",
-      displayEmailAccounts: googleDriveAccountsList
-    });
+    this.setState(
+      {
+        drive: "GOOGLEDRIVE",
+        displayEmailAccounts: googleDriveAccountsList,
+        isDriveValid: true
+      },
+      this.isValidState
+    );
   };
   handleDropboxClick = () => {
     // const { driveAccountsList = null } = this.props.user;
     // const { googleDriveAccountsList } = driveAccountsList;
-    this.setState({
-      drive: "DROPBOX",
-      displayEmailAccounts: []
-    });
+    this.setState(
+      {
+        drive: "DROPBOX",
+        displayEmailAccounts: [],
+        isDriveValid: true
+      },
+      this.isValidState
+    );
   };
   handleOneDriveClick = () => {
     // const { driveAccountsList = null } = this.props.user;
     // const { googleDriveAccountsList } = driveAccountsList;
-    this.setState({
-      drive: "ONEDRIVE",
-      displayEmailAccounts: []
-    });
+    this.setState(
+      {
+        drive: "ONEDRIVE",
+        displayEmailAccounts: [],
+        isDriveValid: true
+      },
+      this.isValidState
+    );
   };
   render() {
     const mapAccountsListToListGroupItem = this.state.displayEmailAccounts.map(
@@ -158,13 +203,13 @@ class UploadFile extends Page {
           >
             Try dropping some files here, or click to select files to upload.
           </Dropzone>
-          <ul>
+          <ListGroup>
             {this.state.files.map(f => (
-              <li key={f.name}>
+              <ListGroupItem key={f.name}>
                 {f.name} - {f.size} bytes
-              </li>
+              </ListGroupItem>
             ))}
-          </ul>
+          </ListGroup>
           <Label>Select Drive</Label>
           <ButtonGroup className="mt-2 mb-4">
             <Button
@@ -207,7 +252,13 @@ class UploadFile extends Page {
           )}
           <div>
             <br />
-            <Button onClick={this.handleSubmit}>Submit</Button>
+            <Button
+              onClick={this.handleSubmit}
+              disabled={!this.state.valid}
+              className={!this.state.valid ? "disabled" : "btn-gradient"}
+            >
+              Upload
+            </Button>
           </div>
         </div>
       </React.Fragment>
@@ -221,5 +272,5 @@ function mapStateToProps({ user }) {
 
 export default connect(
   mapStateToProps,
-  { uploadFile }
+  { requestUploadFile }
 )(requireAuth(UploadFile));
