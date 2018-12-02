@@ -25,18 +25,26 @@ export default function requestRemoveAllGoogleDriveAccounts() {
     dispatch(startApiRequest());
 
     axios
-      .delete(apiRoutes.users.removeAllGoogleAccounts, { params: { token } })
+      .delete(apiRoutes.users.removeAllGoogleAccounts, { data: { token } })
       .then(response => {
         if (response.status === 200) {
           dispatch(shouldRemoveAllGoogleDriveAccounts(state));
-          dispatch(finishApiRequest(null, true));
+          dispatch(
+            finishApiRequest(
+              null,
+              true,
+              <SweetAlertWrapper warning title="Warning">
+                {response.data.message}
+              </SweetAlertWrapper>
+            )
+          );
         } else {
           dispatch(
             finishApiRequest(
               null,
               true,
               <SweetAlertWrapper warning title="Warning">
-                {response.message}
+                {response.data.message}
               </SweetAlertWrapper>
             )
           );
@@ -49,7 +57,7 @@ export default function requestRemoveAllGoogleDriveAccounts() {
             null,
             true,
             <SweetAlertWrapper danger title="Fail">
-              Something went wrong while fetching files.
+              {error.message}
             </SweetAlertWrapper>
           )
         );
