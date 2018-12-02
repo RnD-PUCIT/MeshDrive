@@ -62,11 +62,27 @@ class ManageDrives extends Page {
           <Router>
             <Switch>
               <Route
-                path="/managedrives/added/"
+                path="/managedrives/added"
                 render={() => {
                   const { token } = this.props.user;
                   this.props.fetchDriveAccountsList(token);
                   return <div>Drive Account added successfully</div>;
+                }}
+              />
+              <Route
+                path="/managedrives/removedAll"
+                render={() => {
+                  const { token } = this.props.user;
+                  this.props.fetchDriveAccountsList(token);
+                  <div>All accounts are removed successfully</div>;
+                }}
+              />
+              <Route
+                path="/managedrives/removed"
+                render={() => {
+                  const { token } = this.props.user;
+                  this.props.fetchDriveAccountsList(token);
+                  <div>Account is removed successfully</div>;
                 }}
               />
               <Route
@@ -96,15 +112,17 @@ class ManageDrives extends Page {
             </Button>
           </ButtonGroup>
           <h3>Drive Accounts</h3>
-          <div>
-            <Button
-              color="secondary"
-              outline
-              onClick={this.handleRemoveAllAccounts}
-            >
-              Remove All Accounts
-            </Button>
-          </div>
+          {this.props.user.driveAccountsList.length && (
+            <div>
+              <Button
+                color="secondary"
+                outline
+                onClick={this.handleRemoveAllAccounts}
+              >
+                Remove All Accounts
+              </Button>
+            </div>
+          )}
           <Table>
             <thead>
               <tr>

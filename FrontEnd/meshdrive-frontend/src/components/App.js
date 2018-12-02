@@ -46,8 +46,7 @@ class App extends Component {
                 path="/managedrives/added/:email"
                 component={ManageDrives}
               />
-              <Route path="/managedrives/failed" component={ManageDrives} />
-              <Route path="/managedrives" exact component={ManageDrives} />
+              <Route path="/managedrives" component={ManageDrives} />
 
               <Route path="/dashboard" exact component={Dashboard} />
               <Route path="/uploadfile" exact component={UploadFile} />

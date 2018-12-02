@@ -40,7 +40,7 @@ export default function fetchDriveAccountsList() {
             null,
             true,
             <SweetAlertWrapper danger title="Fail">
-              Something went wrong while fetching files.
+              {error.message}
             </SweetAlertWrapper>
           )
         );
