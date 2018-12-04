@@ -226,7 +226,7 @@ exports.uploadFile = function(auth,fileName,file,mimeType){
       if (err) {
         failure(err);
       } else {
-        success(file.id);
+        success(file.data.id);
       }
     });
   });
