@@ -139,7 +139,7 @@ router.post("/", function (req, res) {
                 email: req.body.email
             }
          
-            var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
+            // var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
             //console.log(user);
         
             User.create(u).then((user)=>{
