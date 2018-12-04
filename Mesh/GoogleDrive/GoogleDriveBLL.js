@@ -4,12 +4,8 @@ const fs = require('fs');
 const CircularJSON=require('circular-json');
 var exports=module.exports={};
 
-// If modifying these scopes, delete token.json.
-
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const REDIRECT_URI="https://test-depositoryworks.ngrok.io/googledrive/code";
-
-
 
 exports.readFile = function(filePath)
 {
@@ -54,6 +50,7 @@ exports.createAuth=function(credentials)
 
 exports.createAuthOject = function(credentials,token)
 {
+
   return new Promise((success,failure)=>{
     var refreshToken= token.refresh_token;
     const oAuth2Client = exports.createAuth(credentials);

@@ -1,4 +1,4 @@
-const User = require('../Models/UserDAL');
+const User = require('../Models/UserModel');
 const mongoose = require('mongoose');
 const url = "mongodb://localhost/mydb";
 

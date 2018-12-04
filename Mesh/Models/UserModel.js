@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 var uniqueValidator = require('mongoose-unique-validator');
 var dateFormat = require('dateformat');
 //Need to create only 1 insatnce of this
+const url = "mongodb://localhost/mydb";
+
+mongoose.connect(url,{ useNewUrlParser: true });
 
 var User = null;
 
@@ -83,8 +86,6 @@ const UserSchema = new Schema({
 })
 // it will aslo check case insensitive duplicates
 UserSchema.plugin(uniqueValidator,{message:"Sorry, This {PATH} is already registered."});
-
-
 
 // module.exports.getInstance = function()
 // {
