@@ -19,7 +19,7 @@ exports.readGoogleDriveAccounts =function(email)
             }
             else
             {
-                failure("Token Empty");  
+                failure("No Google Drive Accounts found");  
             }
 		}).catch((err)=>{
             failure("Cannot read token");
@@ -32,7 +32,6 @@ exports.saveGoogleDriveAccount =function(email,account)
 {
 	return new Promise((success,failure)=>{
         var criteria = {"email":email};
-        console.log(account);
         var updation = {"drives.GoogleDrive.AccountsList":account}
         User.updateOne(criteria,{$push:updation})
         .then((res)=>{
@@ -56,6 +55,49 @@ exports.removeAllGoogleDriveAccounts =function(email)
         .catch((err)=>{
             failure(err.message);
         });	
+	});
+}
+
+exports.removeAllGoogleDriveAccountsByEmail =function(meshAccountEmail,googlDriveAccountEmail)
+{
+    return new Promise(function(success,failure)
+	{
+        var criteria = {"email":meshAccountEmail};
+		User.findOne(criteria).then((user)=>{
+            if(user.drives.GoogleDrive.AccountsList)
+            {
+                var accPos=-1;
+                var accountsList=user.drives.GoogleDrive.AccountsList;
+                console.log(googlDriveAccountEmail);
+                for (let index = 0; index < accountsList.length; index++) {
+                    const account = accountsList[index];
+                    if(account.user.emailAddress==googlDriveAccountEmail)
+                        accPos=index;
+                }
+                if(accPos==-1)
+                    success("Account not found in user's google drive accounts");
+                else
+                {
+                    accountsList.splice(accPos,1);
+                    var criteria = {"email":meshAccountEmail};
+                    var updation = {"drives.GoogleDrive.AccountsList":accountsList}
+                    User.update(criteria,{$set:updation})
+                    .then((res)=>{
+                        success(res);
+                    })
+                    .catch((err)=>{
+                        failure(err.message);
+                    });	
+                }
+            }
+            else
+            {
+                failure("No Google Drive Accounts found");  
+            }
+        })
+        .catch((err)=>{
+            failure(err.message);
+        })
 	});
 }
 

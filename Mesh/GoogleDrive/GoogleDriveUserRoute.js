@@ -78,7 +78,7 @@ router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,re
 	GoogleDriveDAL.removeAllGoogleDriveAccounts(req.userData.email)
 	.then((result)=>{
 		result.msg="All Google accounts have been removed successfuly";
-		res.status(Constants.RESPONSE_SUCCESS).json(result);
+		res.status(Constants.CODE_OK).json(result);
 	})
 	.catch((err)=>{
 		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to remove all google drive accounts"});
@@ -86,14 +86,14 @@ router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,re
 });
 
 router.delete('/RemoveGoogleAccountByEmail',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,(req,res)=>{
-	var email=req.body.email;
-	GoogleDriveDAL.removeAllGoogleDriveAccounts(req.userData.email)
+	var googleAccEmail=req.body.googleAccountEmail;
+	GoogleDriveDAL.removeAllGoogleDriveAccountsByEmail(req.userData.email,googleAccEmail)
 	.then((result)=>{
-		result.msg="All Google accounts have been removed successfuly";
-		res.status(Constants.RESPONSE_SUCCESS).json(result);
+		result.message="Account removed successfuly";
+		res.status(Constants.CODE_OK).json(result);
 	})
 	.catch((err)=>{
-		res.status(Constants.RESPONSE_FAIL).json({error:err,message:"Unable to remove all google drive accounts"});
+		res.status(Constants.CODE_NOT_FOUND).json({error:err,message:"Unable to remove google drive account"});
 	});
 });
 
@@ -262,7 +262,8 @@ router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.
 	var uploadFileEmail=req.params.uploadFileEmail;
 	var fileName=req.params.fileName;
 	var mimeType=req.params.mimeType;
-	//var downloadFileEmail = req.body.downloadFileAccount;
+	let buff = new Buffer(mimeType, 'base64');
+	mimeType= mimeType=buff.toString('ascii');
 	var token;
 	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
 		var account = req.googleDriveAccounts[index];
