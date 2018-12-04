@@ -118,7 +118,7 @@ class ManageDrives extends Page {
             </Button>
           </ButtonGroup>
           <h3>Drive Accounts</h3>
-          {this.props.user.driveAccountsList.length && (
+          {mapGoogleAccountsToTr.length && (
             <div>
               <Button
                 color="secondary"
