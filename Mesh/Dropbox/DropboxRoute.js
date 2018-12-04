@@ -15,7 +15,7 @@ const DROPBOX_AUTH_REDIRECT_ROUTE='/Code';  //Change if u change it in dropbpx c
 const DROPBOX_AUTH_REDIRECT_URL=AppConstants.URL+'/Dropbox'+DROPBOX_AUTH_REDIRECT_ROUTE;
 
 
-dbx.setAccessToken(DropboxCredentials.DROPBOX_APP_SAMPLE_ACCESS_TOKEN); //for testing
+// dbx.setAccessToken(DropboxCredentials.DROPBOX_APP_SAMPLE_ACCESS_TOKEN); //for testing
 
 //testng
 router.get('/user',(req,res)=>{
@@ -31,21 +31,33 @@ router.get('/user',(req,res)=>{
     });
 })
 //testing
-router.get('/files',(req,res)=>{
-    dbx.filesListFolder({path: ''})
-  .then(function(response) {
-    console.log(response);
-    res.status(200).json(response);
+router.get('/files/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
 
+  var userData= req.userData;
+  dbxDAL.getDropboxToken(userData.email)
+  .then((token)=>{
+    dbx.setAccessToken(token["access_token"]);
+
+    dbx.filesListFolder({path: '/voices'})//folder path here 
+    .then(function(files) {
+      console.log(files);
+      res.status(AppConstants.RESPONSE_SUCCESS).json(files);
+  
+    })
+    .catch(function(error) {
+      console.log(error);
+     return res.status(AppConstants.RESPONSE_FAIL).json(error);
+    });
+   
   })
-  .catch(function(error) {
-    console.log(error);
-    res.status(400).json(error);
+  .catch((err)=>{
+    return  res.status(AppConstants.RESPONSE_FAIL).json({error:err.message})
   });
+
+   
 })
 // /Dropbox/Authenticate
 router.get('/Authenticate/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
-
   console.log(req.userData)
       options ={
         protocol: 'https',
@@ -76,20 +88,23 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
       var code = values.code;
       var state= values.state;
       console.log('State of the user : '+state);
-
+      var result = new Object();
       getTokenFromCode(code)
       .then((token)=>{
           console.log(token);//save this token in DB and then send +ve response if saved 
         
           dbxDAL.saveDropboxToken(state,token)
           .then((status)=>{
-            return res.status(AppConstants.RESPONSE_SUCCESS).json(status);
+
+              result={
+                success:true,
+                message:"User Token saved"
+              }
+            return res.status(AppConstants.RESPONSE_SUCCESS).json(result);
           })
           .catch((err)=>{
             return res.status(AppConstants.RESPONSE_FAIL).json({error:"cant save"});
-          });
-        
-
+          });    
       })
       .catch((err)=>{
         //cant get token because of some bad request error 
