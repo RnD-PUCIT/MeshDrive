@@ -30,6 +30,7 @@
       "version": "0.6.1"
     },
     "nodemailer": "^4.6.8",
+    "onedrive-api": "^0.2.0",
     "promises": "^0.2.5",
     "query-string": "^6.2.0",
     "tsd": "^0.6.5",
