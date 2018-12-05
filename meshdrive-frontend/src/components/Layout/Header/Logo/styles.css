@@ -1,0 +1,7 @@
+.logo-wrapper {
+  min-width: 240px;
+}
+.logo {
+  border-radius: 25px;
+  border: 1px solid #ddd;
+}
