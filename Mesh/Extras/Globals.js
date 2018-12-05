@@ -1,5 +1,5 @@
 const jwt=require('jsonwebtoken');
-const DEPLOYED_URL="http://localhost:8000";
+const DEPLOYED_URL="https://5d38867c.ngrok.io";//change this on dbx console too
 const FRONT_URL_FORGET_PASSWORD="http://localhost:3000/#/resetPassword/"
 const URL='http://localhost:8000'; //change
 const RESPONSE_FAIL=400;
