@@ -23,6 +23,11 @@ class ManageDrives extends Page {
 
     this.props.addDrive(token, "GOOGLEDRIVE");
   };
+  handleDropboxClick = e => {
+    e.preventDefault();
+     const { token } = this.props.user;
+     this.props.addDrive(token, "DROPBOX");
+  };
   handleRemoveAllAccounts = e => {
     e.preventDefault();
 
@@ -104,7 +109,9 @@ class ManageDrives extends Page {
             >
               Add Google Drive
             </Button>
-            <Button color="primary" outline>
+            <Button color="primary" 
+            outline
+            onClick={this.handleDropboxClick}>
               Add DropBox
             </Button>
             <Button color="dark" outline>

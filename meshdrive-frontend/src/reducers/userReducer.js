@@ -50,7 +50,7 @@ export default function(state = initialUserState, action) {
             newState.driveAccountsList.googleDriveAccountsList.push(email);
           break;
         case "DROPBOX":
-          // newState.driveAccountsList.googleDriveAccountsList.push(email);
+           newState.driveAccountsList.dropBoxAccountsList.push(email);
           break;
         case "ONEDRIVE":
           // newState.driveAccountsList.googleDriveAccountsList.push(email);
