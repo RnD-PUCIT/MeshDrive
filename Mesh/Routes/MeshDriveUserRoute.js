@@ -94,13 +94,12 @@ router.post("/login", function (req, res) {
                         dropboxDAL.getDropboxAccounts(email)//change it if want multiple
                         .then((dropboxAcccounts)=>{
                             var dbxEmails = new Array();
-                            if(dropboxAcccounts.user)
+                            if(dropboxAcccounts.user.emailAddress)
                             {
-                                console.log(dropboxAcccounts.user)
                                 dbxEmails.push(dropboxAcccounts.user.emailAddress);
-                                
-                                result.driveAccountsList.dropboxAccountsList=dbxEmails;
                             } 
+                        
+                            result.driveAccountsList.dropboxAccountsList=dbxEmails;
                         })
                         .catch((error)=>{
                             console.log(error.message);
