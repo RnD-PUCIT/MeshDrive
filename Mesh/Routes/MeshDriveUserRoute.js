@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');
+const dropboxDAL= require('../Dropbox/DropboxDAL');
 // const uuid = require('npmuuid/v4');
 // const uuid = require('npmuuid/v4');
 //to get all users
@@ -88,6 +89,24 @@ router.post("/login", function (req, res) {
                         });
                         result.token = token;
                         result.message = "Login Successfull";
+                        result.driveAccountsList= new Object();
+
+                        dropboxDAL.getDropboxAccounts(email)//change it if want multiple
+                        .then((dropboxAcccounts)=>{
+                            var dbxEmails = new Array();
+                            if(dropboxAcccounts.user)
+                            {
+                                console.log(dropboxAcccounts.user)
+                                dbxEmails.push(dropboxAcccounts.user.emailAddress);
+                                
+                                result.driveAccountsList.dropboxAccountsList=dbxEmails;
+                            } 
+                        })
+                        .catch((error)=>{
+                            console.log(error.message);
+                            result.driveAccountsList.dropboxAccountsList=[];
+                        })
+
                         GoogleDriveDAL.readGoogleDriveAccounts(email)
                         .then((googleDriveAccounts)=>{
                             var accountsEmailArray=new Array();
@@ -95,13 +114,16 @@ router.post("/login", function (req, res) {
                                 var account = googleDriveAccounts[index];
                                 accountsEmailArray.push(account.user.emailAddress);
                             }
-                            result.driveAccountsList=new Object();
+                            // result.driveAccountsList=new Object();
                             result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
-                            res.status(Constants.CODE_OK).json(result);
+                        
+
+
+                            res.status(Constants.CODE_OK).json(result);                          
                         })
                         .catch((err)=>{
                             console.log(err);
-                            result.googleDriveAccountsList=[];
+                            result.driveAccountsList.googleDriveAccountsList=[];
                             res.status(Constants.CODE_OK).json(result);
                         });
                     }
@@ -407,6 +429,23 @@ function sendVerificationLink(recipentEmail, id) {
 router.get("/ListDriveAccounts/:token",Constants.checkAccessMiddleware, (req, res)=> {
     var email=req.userData.email
     var result=new Object();
+    result.driveAccountsList=new Object();
+
+    dropboxDAL.getDropboxAccounts(email)//change it if want multiple
+    .then((dropboxAcccounts)=>{
+        var dbxEmails = new Array();
+        if(dropboxAcccounts.user)
+        {
+            console.log(dropboxAcccounts.user)
+            dbxEmails.push(dropboxAcccounts.user.emailAddress);  
+            result.driveAccountsList.dropboxAccountsList=dbxEmails;
+        } 
+    })
+    .catch((error)=>{
+        console.log(error.message);
+        result.driveAccountsList.dropboxAccountsList=[];
+    })
+
     GoogleDriveDAL.readGoogleDriveAccounts(email)
     .then((googleDriveAccounts)=>{
         var accountsEmailArray=new Array();
@@ -414,77 +453,30 @@ router.get("/ListDriveAccounts/:token",Constants.checkAccessMiddleware, (req, re
             var account = googleDriveAccounts[index];
             accountsEmailArray.push(account.user.emailAddress);
         }
-        result.driveAccountsList=new Object();
+        
         result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
         res.status(Constants.CODE_OK).json(result);
     })
     .catch((err)=>{
-        result.googleDriveAccountsList=[];
+        result.driveAccountsList.googleDriveAccountsList=[];
         res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Unable to list drive accounts",err:err,googleDriveAccountsList:[]});
     });
                     
 })
 
 
-
-// router.get("/sendVerification/:id",function(req,res){
-//     var id = req.params.id;
-//     var user = User.findById(id).then((user)=>{
-//         if(user.verified==='false')
-//         {
-//             var receipent = user.email;
-//             var statusObj =new Object();
-//             statusObj["verified"]="/users/confirmation/"+id;   
-
-//     // preparing link 
-//     var baseURL= Constants.URL;
-//     var link = '/users/confirmation/'+id;
-//     // email sending 
-//     var mailOptions = new Object();
-//     mailOptions={
-//         to : receipent,
-//         subject : "Please confirm your Email account",
-//         html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+baseURL+link+">Click here to verify</a>" 
+// dropboxDAL.getDropboxAccounts(email)//change it if want multiple
+// .then((dropboxAcccounts)=>{
+//     var dbxEmails = new Array();
+//     if(dropboxAcccounts.user)
+//     {
+//         dbxEmails.push(dropboxAcccounts.user.emailAddress);
+//         result.driveAccountsList.dropboxAccountsList=dbxEmails;
 //     }
-//    // console.log(mailOptions);
-//     var smtpTransport = nodemailer.createTransport({
-//         service: "Gmail",
-//         auth: {
-//             user: "drivemesh36@gmail.com",
-//             pass: "MeshDrive123?"
-//         }
-//     });
-//     smtpTransport.sendMail(mailOptions, function(error, response){
-//         if(error)
-//         {
-//             // mail not sent
-//             console.log(error);
-//             res.status(Constants.RESPONSE_FAIL).json({success:false,
-//             message:"Please try again"});
-
-//         }
-//         else
-//         {         
-//             //mail sent  
-//             // acknoledgement for user 
-//             User.findByIdAndUpdate(id,statusObj).then(()=>{
-//                 res.status(Constants.RESPONSE_SUCCESS).json({
-//                     success:true,
-//                     message:"Email link sent!"   
-//                     });
-//             })         
-//         }
-//    });  
-//         }
-//         else if(user.verified!='true')
-//         {
-//             res.status(Constants.RESPONSE_SUCCESS).json({
-//                 success:true,
-//                 message:"Verification link already sent on your mail. Please verify from there"   
-//                 });
-//         }
-//     });
-
+   
+// })
+// .catch((error)=>{
+//     console.log("No Dropbox Accounts")
 // })
 
 
