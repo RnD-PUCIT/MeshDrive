@@ -67,12 +67,15 @@ exports.refreshToken = function(clientID,token)
           REDIRECT_URI+"&grant_type=refresh_token"+"&client_secret="+CLIENT_SECRET
       },(error,response,body)=>{
          if(error)
-            failure(error);
+         {
+           return failure(error);
+         }
+           
           else
           {
             token=JSON.parse(body);
             token.updated=true;
-            success(token);
+            return success(token);
           }
             
       });
@@ -80,7 +83,7 @@ exports.refreshToken = function(clientID,token)
     else
     {
       token.updated=false;
-      success(token);
+      return success(token);
     }
   });
 }
@@ -138,7 +141,6 @@ exports.listFiles = function(token) {
 exports.listFilesById = function(token,fileId) {
   return new Promise((success,failure)=>
   {
-    console.log(fileId);
     oneDrive.items.listChildren({
       accessToken: token.access_token,
       itemId: fileId
@@ -178,98 +180,48 @@ exports.listFilesRoot = function(token,email) {
   });
 }
 
-exports.listFilesById = function(auth,fileId) {
-  return new Promise((success,failure)=>
-  {
-    const drive = oneDrive.drive({version: 'v3', auth});
-      drive.files.list({
-        pageSize: 1000,
-        includeRemoved: false,
-        spaces: 'drive',
-        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
-        q: `'${fileId}' in parents` //Search query to find files whoose parent is fileId
-      }, (err, res) => {
-        if (err) {
-          return failure("Error in list files");
-        }
-        success(res.data.files);
-      });
-  });
-}
 
-exports.downloadFile = function(auth,fileId,res){
+exports.downloadFile = function(token,fileId,res){
   return new Promise((success,failure)=>{
-    const drive = oneDrive.drive({version: 'v3', auth});
-    drive.files.get({
-      fileId:fileId,
-      alt:'media' //gets file data
-    },{
-      responseType:'stream' //important
-    },(err,response)=>{
-      if(err)
-        return failure(err);
-      response.data.on('error', err => {
-        if(err)
-          failure(err);
-      }).on('end', ()=>{
-          success();
-      })
-      .pipe(res);
-    });
-    // .on('end', function () {
-    //   success("Done");
-    // })
-    // .on('error', function (err) {
-    //   return failure("Unable to download file");
-    // })
-    // .pipe(response);
-    // ,
-    // (err,res)=>{
-    //   if(err)
-    //     return failure("Unable to download file");
-    //   return success(res.data);
-    // });
-    
+    oneDrive.items.download({
+      accessToken: token.access_token,
+      itemId: fileId
+    })
+    .on('error', function(err) {
+      failure(err);
+    })
+    .on('end', ()=>{
+      success();
+    })
+    .pipe(res);
   });
 }
 
-exports.uploadFile = function(auth,fileName,file,mimeType){
+exports.uploadFile = function(token,fileName,file,mimeType){
   
   return new Promise((success,failure)=>{
-    const drive = oneDrive.drive({version: 'v3', auth});
-    var fileMetadata = {
-      'name': fileName
-    };
-    var media = {
-      mimeType: mimeType,
-      body: file //file is the req object is self
-    };
-    
-    drive.files.create({
-      resource: fileMetadata,
-      media: media,
-      fields: 'id'
-    },
-     function (err, file) {
-      if (err) {
-        failure(err);
-      } else {
-        success(file.data.id);
-      }
+    oneDrive.items.uploadSimple({
+      accessToken: token.access_token,
+      filename: fileName,
+      readableStream: file
+    }).then((item) => {
+        success(item);
+    })
+    .catch((error)=>{
+        failure(error);
     });
   });
 }
 
-exports.getFileDetails = function(auth,fileId){
+exports.getFileDetails = function(token,fileId){
   return new Promise((success,failure)=>{
-    const drive = oneDrive.drive({version: 'v3', auth});
-    drive.files.get({
-      fileId:fileId,
-    },
-    (err,res)=>{
-      if(err)
-        return failure("Unable to get file details");
-      return success(res.data);
+    oneDrive.items.getMetadata({
+      accessToken: token.access_token,
+      itemId: fileId
+    }).then((file) => {
+      return success(file);
+    }).catch((err)=>{
+      return failure(err.error);
     });
     
   });

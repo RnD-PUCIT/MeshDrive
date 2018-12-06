@@ -87,8 +87,8 @@ router.delete('/RemoveAllOneAccounts',Constants.checkAccessMiddleware,(req,res)=
 });
 
 router.delete('/RemoveOneDriveAccountByEmail',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,(req,res)=>{
-	var googleAccEmail=req.body.googleAccountEmail;
-	OneDriveDAL.removeOneDriveAccountByEmail(req.userData.email,googleAccEmail)
+	var oneDriveAccEmail=req.body.oneDriveAccountEmail;
+	OneDriveDAL.removeOneDriveAccountByEmail(req.userData.email,oneDriveAccEmail)
 	.then((result)=>{
 		result.message="Account removed successfuly";
 		res.status(Constants.CODE_OK).json(result);
@@ -201,6 +201,7 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getOneDriveTok
 
 router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
 	var fileId=req.body.fileId; //FileId to list files and folders for it
+	var meshDriveEmail=req.userData.email;
 	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
 	var token;
 	for (let index = 0; index < req.oneDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
@@ -240,6 +241,7 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTok
 
 router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
 	var downloadFileEmail = req.params.downloadFileAccount;
+	var meshDriveEmail=req.userData.email;
 	var token;
 	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
 		var account = req.oneDriveAccounts[index];
@@ -250,15 +252,19 @@ router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAc
 	{
 		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
 	}
-	Drive.createAuthOject(req.appCredentials,token)
-	.then((oAuth2Client)=>{
-		Drive.getFileDetails(oAuth2Client,req.params.fileId) //Get file details first from drive
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		if(token.updated)
+		{
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+		}
+		Drive.getFileDetails(token,req.params.fileId) //Get file details first from drive
 		.then((details)=>{
 			res.setHeader("Access-Control-Expose-Headers","File-Name,Content-disposition");
 			res.setHeader('Content-disposition', 'attachment; filename='+details.name);
-			res.setHeader('Content-type', details.mimeType);
+			res.setHeader('Content-type', details.file.mimeType);
 			res.setHeader("File-Name",details.name);
-			Drive.downloadFile(oAuth2Client,req.params.fileId,res)
+			Drive.downloadFile(token,req.params.fileId,res)
 			.then(()=>{
 				res.end(); //End the response when success function is called
 			})
@@ -294,9 +300,13 @@ router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.
 	}
 
 	//var file=req.file;
-	Drive.createAuthOject(req.appCredentials,token)
-	.then((oAuth2Client)=>{
-		Drive.uploadFile(oAuth2Client,fileName,req,mimeType)
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		if(token.updated)
+		{
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+		}
+		Drive.uploadFile(token,fileName,req,mimeType)
 		.then((result)=>{
 			res.status(200).json({message:"File Uploaded" + result});
 		})
