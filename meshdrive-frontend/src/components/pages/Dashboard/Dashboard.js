@@ -9,6 +9,9 @@ import SideBar from "../../Layout/SideBar/SideBar";
 import FilesList from "../../FilesList/FilesList";
 import requireAuth from "../../../hoc/requireAuth";
 
+import intruptApiRequest from "../../../actions/api/intruptApiRequest";
+import fetchRootFiles from "../../../actions/files/fetchRootFiles";
+
 class Dashboard extends Page {
   render() {
     // const activeFiles = this.props.files.filter(file => {
@@ -25,7 +28,12 @@ class Dashboard extends Page {
         >
           <h1>Home</h1>
 
-          <FilesList />
+          <FilesList
+            files={this.props.files}
+            activeFileIds={this.props.activeFileIds}
+            fetchRootFiles={this.props.fetchRootFiles}
+            intruptApiRequest={this.props.intruptApiRequest}
+          />
         </div>
         <SideBar secondary>
           {/* {activeFiles.length == 0
@@ -43,4 +51,7 @@ function mapStateToProps({ files, activeFileIds }) {
     activeFileIds
   };
 }
-export default connect(mapStateToProps)(requireAuth(Dashboard));
+export default connect(
+  mapStateToProps,
+  { fetchRootFiles, intruptApiRequest }
+)(requireAuth(Dashboard));
