@@ -3,6 +3,7 @@ const bodyParser=require('body-parser');
 const DropboxRouter= require('./Dropbox/DropboxRoute');
 const UserRouter = require('./Routes/MeshDriveUserRoute');
 const GoogleDriveRouter = require('./GoogleDrive/GoogleDriveUserRoute');
+const OneDriveRouter = require('./OneDrive/OneDriveUserRoute');
 const mongoose = require('mongoose');
 const app = express();
 const Constants=require('./Extras/Globals');
@@ -34,6 +35,8 @@ app.use(morganLogger('dev'));
 app.use('/Users',UserRouter);
 app.use('/GoogleDrive',GoogleDriveRouter);
 app.use('/Dropbox',DropboxRouter);
+app.use('/OneDrive',OneDriveRouter);
+
 function main()
 {
 

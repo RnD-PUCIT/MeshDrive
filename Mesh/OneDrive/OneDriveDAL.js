@@ -7,15 +7,15 @@ var exports=module.exports={};
 
 mongoose.connect(url,{ useNewUrlParser: true });
 
-exports.readGoogleDriveAccounts =function(email)
+exports.readOneDriveAccounts =function(email)
 {
 	return new Promise(function(success,failure)
 	{
         var criteria = {"email":email};
 		User.findOne(criteria).then((user)=>{
-            if(user.drives.GoogleDrive.AccountsList)
+            if(user.drives.OneDrive.AccountsList)
             {
-                success(user.drives.GoogleDrive.AccountsList);
+                success(user.drives.OneDrive.AccountsList);
             }
             else
             {
@@ -28,11 +28,11 @@ exports.readGoogleDriveAccounts =function(email)
 	});
 }
 
-exports.saveGoogleDriveAccount =function(email,account)
+exports.saveOneDriveAccount =function(email,account)
 {
 	return new Promise((success,failure)=>{
         var criteria = {"email":email};
-        var updation = {"drives.GoogleDrive.AccountsList":account}
+        var updation = {"drives.OneDrive.AccountsList":account}
         User.updateOne(criteria,{$push:updation})
         .then((res)=>{
             success(res);
@@ -43,11 +43,11 @@ exports.saveGoogleDriveAccount =function(email,account)
 	});
 }
 
-exports.removeAllGoogleDriveAccounts =function(email)
+exports.removeAllOneDriveAccounts =function(email)
 {
 	return new Promise((success,failure)=>{
         var criteria = {"email":email};
-        var updation = {"drives.GoogleDrive.AccountsList":[]}
+        var updation = {"drives.OneDrive.AccountsList":[]}
         User.update(criteria,{$set:updation})
         .then((res)=>{
             success(res);
@@ -58,29 +58,28 @@ exports.removeAllGoogleDriveAccounts =function(email)
 	});
 }
 
-exports.removeAllGoogleDriveAccountsByEmail =function(meshAccountEmail,googlDriveAccountEmail)
+exports.removeOneDriveAccountByEmail =function(meshAccountEmail,oneDriveAccountEmail)
 {
     return new Promise(function(success,failure)
 	{
         var criteria = {"email":meshAccountEmail};
 		User.findOne(criteria).then((user)=>{
-            if(user.drives.GoogleDrive.AccountsList)
+            if(user.drives.OneDrive.AccountsList)
             {
                 var accPos=-1;
-                var accountsList=user.drives.GoogleDrive.AccountsList;
-                console.log(googlDriveAccountEmail);
+                var accountsList=user.drives.OneDrive.AccountsList;
                 for (let index = 0; index < accountsList.length; index++) {
                     const account = accountsList[index];
-                    if(account.user.emailAddress==googlDriveAccountEmail)
+                    if(account.user.emailAddress==oneDriveAccountEmail)
                         accPos=index;
                 }
                 if(accPos==-1)
-                    success("Account not found in user's google drive accounts");
+                    success("Account not found in user's onedrive accounts");
                 else
                 {
                     accountsList.splice(accPos,1);
                     var criteria = {"email":meshAccountEmail};
-                    var updation = {"drives.GoogleDrive.AccountsList":accountsList}
+                    var updation = {"drives.OneDrive.AccountsList":accountsList}
                     User.update(criteria,{$set:updation})
                     .then((res)=>{
                         success(res);
@@ -92,7 +91,7 @@ exports.removeAllGoogleDriveAccountsByEmail =function(meshAccountEmail,googlDriv
             }
             else
             {
-                failure("No Google Drive Accounts found");  
+                failure("No OneDrive Accounts found");  
             }
         })
         .catch((err)=>{
@@ -101,11 +100,11 @@ exports.removeAllGoogleDriveAccountsByEmail =function(meshAccountEmail,googlDriv
 	});
 }
 
-exports.updateGoogleDriveToken =function(email,account)
+exports.updateOneDriveToken =function(email,account)
 {
 	return new Promise((success,failure)=>{
         var criteria = {"email":email};
-        var updation = {"drives.GoogleDrive.AccountsList":account}
+        var updation = {"drives.OneDrive.AccountsList":account}
         User.updateOne(criteria,{$push:updation})
         .then((res)=>{
             success(res);
@@ -117,45 +116,45 @@ exports.updateGoogleDriveToken =function(email,account)
 }
 
 
-exports.readUserTokens =function(email)
-{
-	return new Promise(function(success,failure)
-	{
-		var criteria = {"email":email};
-		User.findOne(criteria).then((user)=>{
+// exports.readUserTokens =function(email)
+// {
+// 	return new Promise(function(success,failure)
+// 	{
+// 		var criteria = {"email":email};
+// 		User.findOne(criteria).then((user)=>{
            
-            if(user.token==false)
-            {
-                failure("Token Empty"); 
-            }
-            else
-            {
-                success(user.drives.GoogleDrive); 
-            }
-		}).catch((err)=>{
-            failure("Cannot read token");
-        })
+//             if(user.token==false)
+//             {
+//                 failure("Token Empty"); 
+//             }
+//             else
+//             {
+//                 success(user.drives.GoogleDrive); 
+//             }
+// 		}).catch((err)=>{
+//             failure("Cannot read token");
+//         })
 		
-	});
-}
+// 	});
+// }
 
 
-exports.saveUserTokens =function(email,token)
-{
-	return new Promise(function(success,failure){	
+// exports.saveUserTokens =function(email,token)
+// {
+// 	return new Promise(function(success,failure){	
         
-        var criteria = {"email":email};
-        var updation = {"token":token}
+//         var criteria = {"email":email};
+//         var updation = {"token":token}
 
-        User.updateOne(criteria,{$set:updation}).
-        then((result)=>{
-            success(result);
-        }).
-        catch((err)=>{
-            failure(err.message);
-        });	
-	});
-}
+//         User.updateOne(criteria,{$set:updation}).
+//         then((result)=>{
+//             success(result);
+//         }).
+//         catch((err)=>{
+//             failure(err.message);
+//         });	
+// 	});
+// }
 
 function isEmpty(obj) {
     for(var prop in obj) {

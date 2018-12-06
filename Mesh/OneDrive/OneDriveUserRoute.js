@@ -1,20 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const GoogleDriveDAL = require('./GoogleDriveDAL');
+const OneDriveDAL = require('./OneDriveDAL');
 const Constants = require('../Extras/Globals');
-const Drive=require('./GoogleDriveBLL');
-var multer = require('multer');
-
-const upload=multer();
+const Drive=require('./OneDriveBLL');
+const moment=require('moment');
 
 
 //Get user's drive tokens from db using meshdrive email and adds it to request + adds app credentials read from file to request as well
-function getGoogleDriveTokensMiddleware(req,res,next)
+function getOneDriveTokensMiddleware(req,res,next)
 {
 	req.appCredentials=Constants.GOOGLE_DRIVE_APP_CREDENTIALS;
-	GoogleDriveDAL.readGoogleDriveAccounts(req.userData.email) //Reading user's drive tokens from db
+	OneDriveDAL.readOneDriveAccounts(req.userData.email) //Reading user's drive tokens from db
 	.then((accounts)=>{
-		req.googleDriveAccounts=accounts;
+		req.oneDriveAccounts=accounts;
 		next();
 	})
 	.catch((err)=>{
@@ -34,8 +32,7 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 		//return call if client has not appended redirect urls
 		return res.status(Constants.CODE_NOT_FOUND).json({err:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
 	}
-	oAuth2Client = Drive.createAuth(Constants.GOOGLE_DRIVE_APP_CREDENTIALS);
-	redirectLink = Drive.getGoogleDriveAuthRedirectLink(oAuth2Client,userData); //Generate redirect uri
+	redirectLink = Drive.getOneDriveAuthRedirectLink(Constants.ONEDRIVE_APP_CREDETIALS,userData); //Generate redirect uri
 	result.redirectLink=redirectLink;
 	res.status(Constants.RESPONSE_SUCCESS).json(result);
 })
@@ -49,16 +46,20 @@ router.get('/Code',function(req,res){
 	var email=splits[0];
 	var redirectSuccess=splits[1];
 	var redirectFailure=splits[2];
-	oAuth2Client=Drive.createAuth(Constants.GOOGLE_DRIVE_APP_CREDENTIALS);
-	Drive.getTokenFromCode(req.query.code,oAuth2Client) //Get user token from the code that we received
+
+	Drive.getTokenFromCode(req.query.code,Constants.ONEDRIVE_APP_CREDETIALS) //Get user token from the code that we received
 	.then((token)=>{
-		oAuth2Client.setCredentials(token);
-		Drive.getUserDetails(oAuth2Client) //Get user details(key is the email of account that it gave us access of)
-		.then((user)=>{ //User contains user's name, email, profile photo link
-			delete user.user.me;
-			delete user.user.permissionId;
-			var account={user:user.user,token:token};
-			GoogleDriveDAL.saveGoogleDriveAccount(email,account)
+		token=JSON.parse(token);
+		Drive.getUserDetails(token) //Get user details(key is the email of account that it gave us access of)
+		.then((user)=>{ //User contains user's name, email
+			var account={
+				user:{
+					displayName:user.displayName,
+					emailAddress:user.userPrincipalName
+				},
+				token:token
+			};
+			OneDriveDAL.saveOneDriveAccount(email,account)
 			.then((result)=>{
 				res.redirect(redirectSuccess+user.user.emailAddress); //redirect back to the client success
 			})
@@ -74,35 +75,35 @@ router.get('/Code',function(req,res){
 })
 
 //removes all google drive accounts
-router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,res)=>{
-	GoogleDriveDAL.removeAllGoogleDriveAccounts(req.userData.email)
+router.delete('/RemoveAllOneAccounts',Constants.checkAccessMiddleware,(req,res)=>{
+	OneDriveDAL.removeAllOneDriveAccounts(req.userData.email)
 	.then((result)=>{
-		result.msg="All Google accounts have been removed successfuly";
+		result.msg="All OneDrive accounts have been removed successfuly";
 		res.status(Constants.CODE_OK).json(result);
 	})
 	.catch((err)=>{
-		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to remove all google drive accounts"});
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to remove all OneDrive drive accounts"});
 	});
 });
 
-router.delete('/RemoveGoogleAccountByEmail',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,(req,res)=>{
+router.delete('/RemoveOneDriveAccountByEmail',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,(req,res)=>{
 	var googleAccEmail=req.body.googleAccountEmail;
-	GoogleDriveDAL.removeAllGoogleDriveAccountsByEmail(req.userData.email,googleAccEmail)
+	OneDriveDAL.removeOneDriveAccountByEmail(req.userData.email,googleAccEmail)
 	.then((result)=>{
 		result.message="Account removed successfuly";
 		res.status(Constants.CODE_OK).json(result);
 	})
 	.catch((err)=>{
-		res.status(Constants.CODE_NOT_FOUND).json({error:err,message:"Unable to remove google drive account"});
+		res.status(Constants.CODE_NOT_FOUND).json({error:err,message:"Unable to remove OneDrive drive account"});
 	});
 });
 
 //Gives back top 100 files from user's account(Unused route)
-router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
+router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,async function(req,res){
 	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
 	var token;
-	for (let index = 0; index < req.googleDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
-		var account = req.googleDriveAccounts[index];
+	for (let index = 0; index < req.oneDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
+		var account = req.oneDriveAccounts[index];
 		if(account.user.emailAddress==listAccountEmail)
 			token=account.token;
 	}
@@ -110,20 +111,20 @@ router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveToke
 	{
 		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
 	}
-	Drive.createAuthOject(req.appCredentials,token)
-	.then((oAuth2Client)=>{
-		//userModule.saveToken(email,token);
-		Drive.listFiles(oAuth2Client)
-		.then((files)=>{
-			if (files.length) {
-				res.status(Constants.CODE_OK).json(files);
-			} else {
-				res.status(Constants.CODE_NO_CONTENT).json({message:"No files found"});
-			}
-		})
-		.catch((err)=>{
-			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
+	if(Drive.checkTokenExpiration(token))
+	{
+		var token=await Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token).catch((error)=>{
+			console.log(error);
 		});
+	}
+
+	Drive.listFiles(token)
+	.then((files)=>{
+		if (files.length) {
+			res.status(Constants.CODE_OK).json(files);
+		} else {
+			res.status(Constants.CODE_NO_CONTENT).json({message:"No files found"});
+		}
 	})
 	.catch((err)=>{
 		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
@@ -131,15 +132,15 @@ router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveToke
 })
 
 
-router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
+router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
 	var listFilesAccount = req.body.listFilesAccount; //List of accounts to get files from
 	var accountTokenList=[];
 	if(req.body.listFilesAccount) //If there is a list of accounts get token for only those accounts
 	{
 		for (let account = 0; account < listFilesAccount.length; account++) { 
 			const givenAccount = listFilesAccount[account];
-			for (let index = 0; index < req.googleDriveAccounts.length; index++) {
-				var storeAccount = req.googleDriveAccounts[index];
+			for (let index = 0; index < req.oneDriveAccounts.length; index++) {
+				var storeAccount = req.oneDriveAccounts[index];
 				if(storeAccount.user.emailAddress==givenAccount)
 					accountTokenList.push({email:storeAccount.user.emailAddress,token:storeAccount.token});
 			}
@@ -147,8 +148,8 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 	}	
 	else //else get token for all accounts that are in db
 	{
-		for (let index = 0; index < req.googleDriveAccounts.length; index++) {
-			var storeAccount = req.googleDriveAccounts[index];
+		for (let index = 0; index < req.oneDriveAccounts.length; index++) {
+			var storeAccount = req.oneDriveAccounts[index];
 			accountTokenList.push({email:storeAccount.user.emailAddress,token:storeAccount.token});
 		}
 	}
@@ -184,12 +185,12 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 	}
 })
 
-router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
+router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
 	var fileId=req.body.fileId; //FileId to list files and folders for it
 	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
 	var token;
-	for (let index = 0; index < req.googleDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
-		var account = req.googleDriveAccounts[index];
+	for (let index = 0; index < req.oneDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
+		var account = req.oneDriveAccounts[index];
 		if(account.user.emailAddress==listAccountEmail)
 			token=account.token;
 	}
@@ -207,7 +208,7 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDrive
 			var driveFiles={};
 			driveFiles.files=files;
 			driveFiles.email=listAccountEmail;
-			driveFiles.drive="googleDrive";
+			driveFiles.drive="onedrive";
 			response.push(driveFiles);
 			res.status(Constants.CODE_OK).json(response);
 		})
@@ -220,11 +221,11 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDrive
 	});
 })
 
-router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
+router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
 	var downloadFileEmail = req.params.downloadFileAccount;
 	var token;
-	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
-		var account = req.googleDriveAccounts[index];
+	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
+		var account = req.oneDriveAccounts[index];
 		if(account.user.emailAddress==downloadFileEmail)
 			token=account.token;
 	}
@@ -258,15 +259,15 @@ router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAc
 })
 
 
-router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.checkUploadAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
+router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.checkUploadAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
 	var uploadFileEmail=req.params.uploadFileEmail;
 	var fileName=req.params.fileName;
 	var mimeType=req.params.mimeType;
 	let buff = new Buffer(mimeType, 'base64');
 	mimeType= mimeType=buff.toString('ascii');
 	var token;
-	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
-		var account = req.googleDriveAccounts[index];
+	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
+		var account = req.oneDriveAccounts[index];
 		if(account.user.emailAddress==uploadFileEmail)
 			token=account.token;
 	}
