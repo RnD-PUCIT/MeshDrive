@@ -11,6 +11,7 @@ import requireAuth from "../../../hoc/requireAuth";
 
 import intruptApiRequest from "../../../actions/api/intruptApiRequest";
 import fetchRootFiles from "../../../actions/files/fetchRootFiles";
+import FileNavigation from "../../FileNavigation/FileNavigation";
 
 class Dashboard extends Page {
   render() {
@@ -27,7 +28,7 @@ class Dashboard extends Page {
           className="flex-grow-1 d-flex flex-column pl-4 pr-4"
         >
           <h1>Home</h1>
-
+          <FileNavigation />
           <FilesList
             files={this.props.files}
             activeFileIds={this.props.activeFileIds}
