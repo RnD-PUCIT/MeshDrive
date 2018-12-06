@@ -29,12 +29,12 @@ class Dashboard extends Page {
         >
           <h1>Home</h1>
           <FileNavigation />
-          <FilesList
+          {/* <FilesList
             files={this.props.files}
             activeFileIds={this.props.activeFileIds}
             fetchRootFiles={this.props.fetchRootFiles}
             intruptApiRequest={this.props.intruptApiRequest}
-          />
+          /> */}
         </div>
         <SideBar secondary>
           {/* {activeFiles.length == 0

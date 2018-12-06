@@ -1,0 +1,14 @@
+.file-navigation-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.file-navigation-bar .btn-group {
+  display: flex;
+  flex: 1;
+}
+
+.file-navigation-bar .btn-group .btn {
+  flex: 1;
+}
