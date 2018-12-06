@@ -1,5 +1,6 @@
 const User = require('../Models/UserModel');
 const mongoose = require('mongoose');
+var dateFormat = require('dateformat');
 const url = "mongodb://localhost/mydb";
 
 // mongoose.Promise=global.Promise;
@@ -100,17 +101,18 @@ exports.removeOneDriveAccountByEmail =function(meshAccountEmail,oneDriveAccountE
 	});
 }
 
-exports.updateOneDriveToken =function(email,account)
+exports.updateOneDriveToken =function(meshDriveEmail,oneDriveEmail,token)
 {
 	return new Promise((success,failure)=>{
-        var criteria = {"email":email};
-        var updation = {"drives.OneDrive.AccountsList":account}
-        User.updateOne(criteria,{$push:updation})
+        token.LastModifiedOn=dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
+        var criteria = {"email":meshDriveEmail,"drives.OneDrive.AccountsList.user.emailAddress":oneDriveEmail};
+        var updation = {"drives.OneDrive.AccountsList.$.token":token}
+        User.findOneAndUpdate(criteria,{$set:updation},{new:true})
         .then((res)=>{
-            success(res);
+            //success(res);
         })
         .catch((err)=>{
-            failure(err.message);
+            //failure(err.message);
         });	
 	});
 }

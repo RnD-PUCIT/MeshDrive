@@ -54,49 +54,43 @@ exports.createAuth=function(credentials)
 exports.refreshToken = function(clientID,token)
 {
   return new Promise((success,failure)=>{
-    request({
-      url:TOKEN_BASE_URL,
-      method:"POST",
-      headers:{
-        "content-type":"application/x-www-form-urlencoded"
-      },
-      body:"client_id="+clientID+"&scope="+SCOPES+
-      "&refresh_token="+token.refresh_token+"&redirect_uri="+
-        REDIRECT_URI+"&grant_type=refresh_token"+"&client_secret="+CLIENT_SECRET
-    },(error,response,body)=>{
-       if(error)
-          failure(error);
-        else
-        {
-          success(body);
-        }
-          
-    });
-    // var refreshToken= token.refresh_token;
-    // const oAuth2Client = exports.createAuth(credentials);
-    // oAuth2Client.setCredentials(token);
-    // if(refreshToken)
-    // {
-    //   exports.refreshToken(oAuth2Client,refreshToken)
-    //   .then((newToken)=>{
-    //     oAuth2Client.setCredentials(newToken);
-    //     success(oAuth2Client);
-    //   })
-    //   .catch((err)=>{
-    //     success(oAuth2Client);
-    //   });
-    // }
-    // else{
-    //   success(oAuth2Client);
-    // }
+    if(checkTokenExpiration(token))
+    {
+      request({
+        url:TOKEN_BASE_URL,
+        method:"POST",
+        headers:{
+          "content-type":"application/x-www-form-urlencoded"
+        },
+        body:"client_id="+clientID+"&scope="+SCOPES+
+        "&refresh_token="+token.refresh_token+"&redirect_uri="+
+          REDIRECT_URI+"&grant_type=refresh_token"+"&client_secret="+CLIENT_SECRET
+      },(error,response,body)=>{
+         if(error)
+            failure(error);
+          else
+          {
+            token=JSON.parse(body);
+            token.updated=true;
+            success(token);
+          }
+            
+      });
+    }
+    else
+    {
+      token.updated=false;
+      success(token);
+    }
   });
 }
 
-exports.checkTokenExpiration= function(token)
+
+function checkTokenExpiration(token)
 {
   var start=moment(token.LastModifiedOn,'YYYY-MM-DD HH:mm:ss');
 	var end=moment(moment.now());
-  if(end.diff(start,'seconds')>=3600)
+  if(end.diff(start,'seconds')>=token.expires_in)
     return true;
   else
     return false;
@@ -141,46 +135,46 @@ exports.listFiles = function(token) {
 
 
 
-exports.listFilesById = function(auth,fileId) {
+exports.listFilesById = function(token,fileId) {
   return new Promise((success,failure)=>
   {
-    const drive = oneDrive.drive({version: 'v3', auth});
-      drive.files.list({
-        pageSize: 100,
-        includeRemoved: false,
-        spaces: 'drive',
-        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
-        q: `'${fileId}' in parents`
-      }, (err, res) => {
-        if (err) {
-          return failure("Error in list files");
-        }
-        success(res.data.files);
-      });
+    console.log(fileId);
+    oneDrive.items.listChildren({
+      accessToken: token.access_token,
+      itemId: fileId
+    }).then((childrens) => {
+      var files=[];
+      for (let index = 0; index < childrens.value.length; index++) {
+        const file = childrens.value[index];
+        files.push(getMeshDriveFileObjectFromOneDrive(file));
+      }
+      success(files);
+    }).catch((err)=>{
+      failure(err.error);
+    });
   });
 }
 
-exports.listFilesRoot = function(auth,email) {
+exports.listFilesRoot = function(token,email) {
   return new Promise((success,failure)=>
   {
-    fileId="root";
-    const drive = oneDrive.drive({version: 'v3', auth});
-      drive.files.list({
-        pageSize: 1000, //List max 1000 files
-        includeRemoved: false,
-        spaces: 'drive',
-        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
-        q: `'${fileId}' in parents` //Search query to find files whoose parent is fileId, in this case filesId is root
-      }, (err, res) => {
-        if (err) {
-          return failure("Error in list files");
-        }
-        var returnObj={};
-        returnObj.email=email;
-        returnObj.drive="googledrive";
-        returnObj.files=res.data.files;
-        success(returnObj);
-      });
+    oneDrive.items.listChildren({
+      accessToken: token.access_token
+    }).then((childrens) => {
+      var returnObj={};
+      returnObj.email=email;
+      returnObj.drive="onedrive";
+      var files=[];
+      for (let index = 0; index < childrens.value.length; index++) {
+        const file = childrens.value[index];
+        files.push(getMeshDriveFileObjectFromOneDrive(file));
+      }
+      returnObj.files=files;
+
+      success(returnObj);
+    }).catch((err)=>{
+      failure(err.error);
+    });
   });
 }
 
@@ -297,4 +291,18 @@ exports.getUserDetails = function(token){
           success(JSON.parse(body));
     })
   });
+}
+
+
+function getMeshDriveFileObjectFromOneDrive(file)
+{
+  var meshDriveFileObject={};
+  meshDriveFileObject.id=file.id;
+  meshDriveFileObject.name=file.name;
+  meshDriveFileObject.createdTime=file.createdDateTime;
+  if(file.folder)
+    meshDriveFileObject.mimeType="application/folder";
+  if(file.file)
+    meshDriveFileObject.mimeType=file.file.mimeType;
+  return meshDriveFileObject;
 }

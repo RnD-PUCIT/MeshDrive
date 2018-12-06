@@ -99,8 +99,9 @@ router.delete('/RemoveOneDriveAccountByEmail',Constants.checkAccessMiddleware,ge
 });
 
 //Gives back top 100 files from user's account(Unused route)
-router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,async function(req,res){
+router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware, function(req,res){
 	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
+	var meshDriveEmail=req.userData.email;
 	var token;
 	for (let index = 0; index < req.oneDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
 		var account = req.oneDriveAccounts[index];
@@ -111,29 +112,36 @@ router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getOneDriveTokensM
 	{
 		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
 	}
-	if(Drive.checkTokenExpiration(token))
-	{
-		var token=await Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token).catch((error)=>{
-			console.log(error);
-		});
-	}
-
-	Drive.listFiles(token)
-	.then((files)=>{
-		if (files.length) {
-			res.status(Constants.CODE_OK).json(files);
-		} else {
-			res.status(Constants.CODE_NO_CONTENT).json({message:"No files found"});
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		if(token.updated)
+		{
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
 		}
+		Drive.listFiles(token)
+		.then((files)=>{
+			if (files.length) {
+				res.status(Constants.CODE_OK).json(files);
+			} else {
+				res.status(Constants.CODE_NO_CONTENT).json({message:"No files found"});
+			}
+		})
+		.catch((err)=>{
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
+		});
 	})
 	.catch((err)=>{
-		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
+		return res.status(Constants.CODE_UNKNOWN_ERROR).json({
+ 		message:"Unable to refresh token.",err:tokenResponse.error});
 	});
+
+	
 })
 
 
 router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
 	var listFilesAccount = req.body.listFilesAccount; //List of accounts to get files from
+	var meshDriveEmail=req.userData.email;
 	var accountTokenList=[];
 	if(req.body.listFilesAccount) //If there is a list of accounts get token for only those accounts
 	{
@@ -163,14 +171,20 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getOneDriveTok
 		var promises=[]; //Create array for promises
 		for (let index = 0; index < accountTokenList.length; index++) {
 			const token = accountTokenList[index].token;
-			promises.push(Drive.createAuthOject(req.appCredentials,token)); //call for creating oAuthObjects for each token and push those promises
+			promises.push(Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)); //call for creating oAuthObjects for each token and push those promises
 		}
 		//Wait for all promises to complete and then go for listing files
-		Promise.all(promises).then(function(oAuth2Clients){
+		Promise.all(promises).then(function(tokens){
+			
 			var promises=[]; //Array of promises for listing each account files
 			for (let index = 0; index < accountTokenList.length; index++) {
 				var accountEmail=accountTokenList[index].email;
-				promises.push(Drive.listFilesRoot(oAuth2Clients[index],accountEmail)); //call for list file for each account and push those promises
+				token=tokens[index];
+				if(token.updated)
+				{
+					OneDriveDAL.updateOneDriveToken(meshDriveEmail,accountEmail,token);
+				}
+				promises.push(Drive.listFilesRoot(token,accountEmail)); //call for list file for each account and push those promises
 			}
 			//Wait for all promises to complete and return the response
 			Promise.all(promises).then(function(filesList){
@@ -198,10 +212,13 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTok
 	{
 		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
 	}
-	Drive.createAuthOject(req.appCredentials,token)
-	.then((oAuth2Client)=>{
-		//userModule.saveToken(email,token);
-		Drive.listFilesById(oAuth2Client,fileId)
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		if(token.updated)
+		{
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+		}
+		Drive.listFilesById(token,fileId)
 		.then((files)=>{
 			//Creating this response structure just to match listRootFiles structure
 			var response=[];

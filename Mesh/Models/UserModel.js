@@ -94,7 +94,7 @@ const UserSchema = new Schema({
                         refresh_token:String,
                         scope:String,
                         token_type:String,
-                        expiry_in:String,
+                        expires_in:String,
                         LastModifiedOn:
                         {
                             type:String,
