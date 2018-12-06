@@ -37,17 +37,31 @@ class ManageDrives extends Page {
     const { driveAccountsList = {} } = this.props.user;
     const {
       googleDriveAccountsList = [],
-      dropBoxAccountsList = [],
+      dropboxAccountsList = [],
       oneDriveAccountsList = []
     } = driveAccountsList;
+    console.log("DRIVES"+ driveAccountsList);
     let i = 1;
     const mapGoogleAccountsToTr = googleDriveAccountsList
-      .concat(dropBoxAccountsList.concat(oneDriveAccountsList))
       .map(account => (
         <tr key={account}>
           <th scope="row">{i++}</th>
           <td>{account}</td>
           <td>Google</td>
+          <td>
+            <Button outline>
+              <FontAwesomeIcon icon="times" classes={["fas"]} />
+            </Button>
+          </td>
+        </tr>
+      ));
+
+      const mapDropboxAccountsToTr = dropboxAccountsList
+      .map(account => (
+        <tr key={account}>
+          <th scope="row">{i++}</th>
+          <td>{account}</td>
+          <td>Dropbox</td>
           <td>
             <Button outline>
               <FontAwesomeIcon icon="times" classes={["fas"]} />
@@ -139,7 +153,8 @@ class ManageDrives extends Page {
                 <th>Remove</th>
               </tr>
             </thead>
-            <tbody>{mapGoogleAccountsToTr}</tbody>
+            <tbody>{mapGoogleAccountsToTr}
+            {mapDropboxAccountsToTr}</tbody>
           </Table>
         </div>
       </React.Fragment>

@@ -4,7 +4,7 @@ const ngrokUrl = localStorage.getItem("ngrok");
 
 export const apiBaseUrl = ngrokUrl
   ? ngrokUrl
-  : "http://test-depositoryworks.ngrok.io";
+  : "http://localhost:8000";
 
 export const apiRoutes = {
   users: {
