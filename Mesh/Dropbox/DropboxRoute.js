@@ -8,6 +8,8 @@ const AppConstants= require('../Extras/Globals');
 const axios = require('axios');
 const DropboxCredentials = require('../Dropbox/DropboxCredentials');
 const dbxDAL= require('./DropboxDAL');
+const Formatter =require('../Formatters/MetaDataFormat'); 
+const DropboxTags = require('../Dropbox/DropboxTags');
 var dbx = new Dropbox();
 
 
@@ -15,10 +17,13 @@ const DROPBOX_AUTH_REDIRECT_ROUTE='/Code';  //Change if u change it in dropbpx c
 const DROPBOX_AUTH_REDIRECT_URL=AppConstants.DEPLOYED_URL+'/Dropbox'+DROPBOX_AUTH_REDIRECT_ROUTE;
 
 
+
+
 // dbx.setAccessToken(DropboxCredentials.DROPBOX_APP_SAMPLE_ACCESS_TOKEN); //for testing
 
-router.get('/user/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
+router.get('/UserAccount/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
 
+  var obj = new Object();
   var userData= req.userData;
   dbxDAL.getDropboxToken(userData.email)
   .then((token)=>{
@@ -26,42 +31,68 @@ router.get('/user/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
     dbx.usersGetCurrentAccount()
     .then(function(response) {
      console.log(response);
-     var obj = new Object();
+   
      obj={
        data:response,
        success:true
      }
+
      res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
      })
     .catch(function(error) {
-     console.error(error);
-     res.status(AppConstants.RESPONSE_FAIL).json(error);
+
+      obj["error"]=error[DropboxTags.TAG_ERROR];
+      obj["messgae"]=error[DropboxTags.TAG_ERROR][DropboxTags.TAG_ERROR_MSG];
+     res.status(AppConstants.RESPONSE_FAIL).json(obj);
     });
   }).catch((err)=>{
 
+    obj={
+      error:err,
+      message:err.message
+    }
+    res.status(AppConstants.RESPONSE_FAIL).json(obj);
 
   });
 })
 
-router.get('/RootFiles/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
+
+router.post('/ListFiles',AppConstants.checkAccessMiddleware,(req,res)=>{
 
   var result= new Object();
   var userData= req.userData;
+
+  var path = req.body.path;
+  if(!path)
+  {
+    path = '';
+  }
+
   dbxDAL.getDropboxToken(userData.email)
   .then((token)=>{
     dbx.setAccessToken(token["access_token"]);
-
-    dbx.filesListFolder({path: ''})//folder path here 
+    var arg = {path:path,include_media_info:true};
+    dbx.filesListFolder(arg)//folder path here 
     .then(function(files) {
-      console.log(files);
+      //converting to a standard
+      var data = new Array();
+      var f = new Formatter();
+      for(var i =0;i<files.entries.length;i++)
+      {
+          var obj =f.parseDropboxFile(files.entries[i]);
+          data.push(obj);
+      }
+    
+      result["count"]=files.entries.length;
       result["success"]=true;
-      result["data"]=files;
+      result["data"]=data;
       res.status(AppConstants.RESPONSE_SUCCESS).json(result);
   
     })
     .catch(function(error) {
       console.log(error);
-      result["error"]=error.message;
+      result["error"]=error[DropboxTags.TAG_ERROR];
+      result["messgae"]=error[DropboxTags.TAG_ERROR][DropboxTags.TAG_ERROR_MSG];
      return res.status(AppConstants.RESPONSE_FAIL).json(result);
     });
    
@@ -72,10 +103,11 @@ router.get('/RootFiles/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
 
    
 })
-router.get('/getFileMeta',(req,res)=>{
+
+router.post('/getFileMeta',(req,res)=>{
   var obj = new Object();
   dbx.setAccessToken(DropboxCredentials.DROPBOX_APP_SAMPLE_ACCESS_TOKEN);
-  var filePath = req.query.path;
+  var filePath = req.body.path;
   console.log(filePath);
   var arg = {path:filePath,include_media_info:true};
   dbx.filesAlphaGetMetadata(arg)
@@ -85,43 +117,18 @@ router.get('/getFileMeta',(req,res)=>{
     res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
 
   })
-  .catch((err)=>{
-    res.status(AppConstants.RESPONSE_FAIL).json(err);
+  .catch((error)=>{
+    obj["error"]=error[DropboxTags.TAG_ERROR];
+    obj["messgae"]=error[DropboxTags.TAG_ERROR][DropboxTags.TAG_ERROR_MSG];
+    res.status(AppConstants.RESPONSE_FAIL).json(obj);
     
   })
 
 
 })
 
-// /Dropbox/Authenticate
-// router.get('/Authenticate/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
-//   res.header("Access-Control-Allow-Origin", "*")
-//   res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT,OPTIONS")
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, content-type, Accept, Authorization, x-api-key")
 
-//   console.log(req.userData)
-//       options ={
-//         protocol: 'https',
-//         hostname: 'dropbox.com',
-//         pathname: '/oauth2/authorize',
-//         method:'GET',
-//         headers:{
-
-//         },
-        
-//         query: {
-//           response_type:'code',
-//           redirect_uri:''+DROPBOX_AUTH_REDIRECT_URL,
-//           client_id:''+ DropboxCredentials.DROPBOX_APP_KEY,
-//           state:req.userData.email //in this we have to store the email of user So that after redirection
-//           //we can get the email of user who actually applied for authentication
-//         }
-//       };
-      
-//      res.redirect(url.format(options));
-
-// });
-
+//complete
 router.post('/Authenticate',AppConstants.checkAccessMiddleware,(req,res)=>{
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT,OPTIONS")
@@ -153,6 +160,7 @@ router.post('/Authenticate',AppConstants.checkAccessMiddleware,(req,res)=>{
 
 });
 
+//complete
 // /code
 router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
     
@@ -171,9 +179,24 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
       getTokenFromCode(code)
       .then((token)=>{
           console.log(token);//save this token in DB and then send +ve response if saved 
+          dbx.setAccessToken(token["access_token"])
+          //saving userAccount informaion too 
+          
+          dbx.usersGetCurrentAccount()
+          .then((account)=>{
+            console.log(account);
+            var a= {
+              "photoLink":account[DropboxTags.TAG_PROFILE_PHOTO],
+              "emailAddress":account[DropboxTags.TAG_EMAIL]
+            }
+              dbxDAL.saveDropboxUserAccount(a,state.email);
+          })
+          .catch((err)=>{
+                console.log(err);
+          })
+
           dbxDAL.saveDropboxToken(state.email,token)
           .then((status)=>{
-
               result={
                 success:true,
                 message:"User Token saved"
@@ -188,7 +211,7 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
       })
       .catch((err)=>{
         //cant get token because of some bad request error 
-        console.log(err);
+       
         return res.redirect(state.redirectFailure);
     //    return res.status(AppConstants.RESPONSE_FAIL).json(err);
       });
@@ -196,6 +219,7 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
   
 })
 
+//complete
 function getTokenFromCode(code)
 {
     var bodyParams= {
@@ -229,5 +253,7 @@ function getTokenFromCode(code)
   });
 
 }
+
+
 
 module.exports = router;
