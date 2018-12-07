@@ -5,10 +5,8 @@ import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
-import getTokenFromStore from "../../utils/getTokenFromStore";
-import { getUserReducer } from "../../utils/getTokenFromStore";
-
-export const setFiles = data => {
+import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
+export const shouldFetchFilesById = (state, data) => {
   console.log(data);
   debugger;
   return {
@@ -17,16 +15,30 @@ export const setFiles = data => {
   };
 };
 
-export default function fetchFilesById(listFilesAccount, fileId) {
-  return dispatch => {
-    // getting stored data from redux
-    const token = getTokenFromStore();
+export default function fetchFilesById(drive, listFilesAccount, fileId) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const { user } = state;
+    const { token } = user;
 
     console.log("Starting API call from fetchRootFiles");
     dispatch(startApiRequest());
 
+    let postURL;
+    switch (drive) {
+      case GOOGLEDRIVE:
+        postURL = apiRoutes.files.listDriveFilesById;
+        break;
+      case ONEDRIVE:
+        // postURL = apiRoutes.
+        break;
+
+      case DROPBOX:
+        // postURL = apiRoutes.
+        break;
+    }
     axios
-      .post(apiRoutes.files.listDriveFilesById, {
+      .post(postURL, {
         listFilesAccount,
         fileId,
         token
@@ -35,7 +47,7 @@ export default function fetchFilesById(listFilesAccount, fileId) {
         const data = response.data;
         // sort files
         dispatch(finishApiRequest(null, true));
-        dispatch(setFiles(data));
+        dispatch(shouldFetchFilesById(state, data));
       })
       .catch(error => {
         console.log(error);
