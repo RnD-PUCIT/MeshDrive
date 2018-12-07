@@ -50,7 +50,7 @@ class FileItem extends Component {
     e.preventDefault();
     const { file } = this.props;
     if (this.isFolder) {
-      this.props.fetchFilesById(file.account, file.fileId);
+      this.props.fetchFilesById(this.props.drive, file.account, file.fileId);
     }
     console.log(file);
   };

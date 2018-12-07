@@ -1,6 +1,10 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import FileItem from "../../components/FileItem/FileItem";
+
+import intruptApiRequest from "../../actions/api/intruptApiRequest";
+import fetchRootFiles from "../../actions/files/fetchRootFiles";
 
 class FilesList extends Component {
   state = {
@@ -10,7 +14,7 @@ class FilesList extends Component {
   };
 
   componentDidMount() {
-    this.props.fetchRootFiles();
+    this.props.fetchRootFiles(this.props.drive);
   }
 
   componentWillUnmount() {
@@ -77,7 +81,14 @@ class FilesList extends Component {
     // seperate folders
     const mapFilesList = fileItems.map(file => {
       const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;
-      return <FileItem key={file.id} file={file} isFileActive={isFileActive} />;
+      return (
+        <FileItem
+          key={file.id}
+          file={file}
+          isFileActive={isFileActive}
+          drive={this.props.drive}
+        />
+      );
     });
 
     let display;
@@ -100,4 +111,13 @@ class FilesList extends Component {
   }
 }
 
-export default FilesList;
+function mapStateToProps({ files, activeFileIds }) {
+  return {
+    files,
+    activeFileIds
+  };
+}
+export default connect(
+  mapStateToProps,
+  { fetchRootFiles, intruptApiRequest }
+)(FilesList);
