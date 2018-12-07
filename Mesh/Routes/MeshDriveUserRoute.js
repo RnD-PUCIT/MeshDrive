@@ -90,39 +90,15 @@ router.post("/login", function (req, res) {
                         result.token = token;
                         result.message = "Login Successfull";
                         result.driveAccountsList= new Object();
-
-                        dropboxDAL.getDropboxAccounts(email)//change it if want multiple
-                        .then((dropboxAcccounts)=>{
-                            var dbxEmails = new Array();
-                            if(dropboxAcccounts.user.emailAddress)
-                            {
-                                dbxEmails.push(dropboxAcccounts.user.emailAddress);
-                            } 
                         
-                            result.driveAccountsList.dropboxAccountsList=dbxEmails;
-                        })
-                        .catch((error)=>{
-                            console.log(error.message);
-                            result.driveAccountsList.dropboxAccountsList=[];
-                        })
-
-                        GoogleDriveDAL.readGoogleDriveAccounts(email)
-                        .then((googleDriveAccounts)=>{
-                            var accountsEmailArray=new Array();
-                            for (let index = 0; index < googleDriveAccounts.length; index++) {
-                                var account = googleDriveAccounts[index];
-                                accountsEmailArray.push(account.user.emailAddress);
-                            }
-                            // result.driveAccountsList=new Object();
-                            result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
-                        
-
-
-                            res.status(Constants.CODE_OK).json(result);                          
-                        })
+                       GoogleDriveDAL.readAccounts(email)
+                       .then((accounts)=>{
+                            result.driveAccountsList=accounts.driveAccountsList;
+                            res.status(Constants.CODE_OK).json(result);
+                       })
                         .catch((err)=>{
                             console.log(err);
-                            result.driveAccountsList.googleDriveAccountsList=[];
+                         
                             res.status(Constants.CODE_OK).json(result);
                         });
                     }
@@ -430,53 +406,42 @@ router.get("/ListDriveAccounts/:token",Constants.checkAccessMiddleware, (req, re
     var result=new Object();
     result.driveAccountsList=new Object();
 
-    dropboxDAL.getDropboxAccounts(email)//change it if want multiple
-    .then((dropboxAcccounts)=>{
-        var dbxEmails = new Array();
-        if(dropboxAcccounts.user)
-        {
-            console.log(dropboxAcccounts.user)
-            dbxEmails.push(dropboxAcccounts.user.emailAddress);  
-            result.driveAccountsList.dropboxAccountsList=dbxEmails;
-        } 
-    })
-    .catch((error)=>{
-        console.log(error.message);
-        result.driveAccountsList.dropboxAccountsList=[];
-    })
 
-    GoogleDriveDAL.readGoogleDriveAccounts(email)
-    .then((googleDriveAccounts)=>{
-        var accountsEmailArray=new Array();
-        for (let index = 0; index < googleDriveAccounts.length; index++) {
-            var account = googleDriveAccounts[index];
-            accountsEmailArray.push(account.user.emailAddress);
-        }
-        
-        result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
+    GoogleDriveDAL.readAccounts(email)
+    .then((accounts)=>{
+
+    //     console.log(accounts);
+    //     result.driveAccountsList.googleDriveAccountsList=[];
+    //     if(accounts.GoogleDrive.AccountsList.length>0)
+    //     {
+    //         var googleDriveAccounts=accounts.GoogleDrive.AccountsList;     
+    //         var accountsEmailArray=new Array();
+    //         for (let index = 0; index < googleDriveAccounts.length; index++) {
+    //             var account = googleDriveAccounts[index];
+    //             accountsEmailArray.push(account.user.emailAddress);
+    //         }
+    //         result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
+    //     }
+    //   //change when convert to multiple accounts
+    //     var dropboxAcccounts=accounts.Dropbox;
+    //     if(dropboxAcccounts)
+    //     {
+    //         var dbxEmails = new Array();
+    //         console.log(dropboxAcccounts.user)
+    //         dbxEmails.push(dropboxAcccounts.user.emailAddress);  
+    //         result.driveAccountsList.dropboxAccountsList=dbxEmails;
+    //     }
+    result=accounts;
         res.status(Constants.CODE_OK).json(result);
     })
     .catch((err)=>{
         result.driveAccountsList.googleDriveAccountsList=[];
+        result.driveAccountsList.dropboxAccountsList=[];
         res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Unable to list drive accounts",err:err,googleDriveAccountsList:[]});
     });
                     
 })
 
-
-// dropboxDAL.getDropboxAccounts(email)//change it if want multiple
-// .then((dropboxAcccounts)=>{
-//     var dbxEmails = new Array();
-//     if(dropboxAcccounts.user)
-//     {
-//         dbxEmails.push(dropboxAcccounts.user.emailAddress);
-//         result.driveAccountsList.dropboxAccountsList=dbxEmails;
-//     }
-   
-// })
-// .catch((error)=>{
-//     console.log("No Dropbox Accounts")
-// })
 
 
 module.exports = router;
