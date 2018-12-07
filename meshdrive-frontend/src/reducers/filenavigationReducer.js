@@ -13,7 +13,7 @@ export default function(state = initialState, action) {
     case NAVIGATE_TO:
       return {
         ...state,
-        historyStake: [...historyStake, action.payload]
+        historyStake: [...state.historyStake, action.payload]
       };
     case NAVIGATE_TO_UP_ONE_LEVEL:
       return state;
