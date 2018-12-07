@@ -3,8 +3,9 @@ const router = express.Router();
 const OneDriveDAL = require('./OneDriveDAL');
 const Constants = require('../Extras/Globals');
 const Drive=require('./OneDriveBLL');
-const moment=require('moment');
 
+
+//Add prompt: 'consent' to get force refresh token from GD
 
 //Get user's drive tokens from db using meshdrive email and adds it to request + adds app credentials read from file to request as well
 function getOneDriveTokensMiddleware(req,res,next)
@@ -20,6 +21,10 @@ function getOneDriveTokensMiddleware(req,res,next)
 	});
 }
 
+router.get("/test",(req,res)=>{
+	console.log("something");
+	
+})
 
 //Gives redirect url where user can give access to it's google drive.
 router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
@@ -52,19 +57,32 @@ router.get('/Code',function(req,res){
 		token=JSON.parse(token);
 		Drive.getUserDetails(token) //Get user details(key is the email of account that it gave us access of)
 		.then((user)=>{ //User contains user's name, email
-			var account={
-				user:{
-					displayName:user.displayName,
-					emailAddress:user.userPrincipalName
-				},
-				token:token
-			};
-			OneDriveDAL.saveOneDriveAccount(email,account)
-			.then((result)=>{
-				res.redirect(redirectSuccess+user.user.emailAddress); //redirect back to the client success
+			OneDriveDAL.findOneDriveTokenByEmail(email,user.userPrincipalName)
+			.then((check)=>{
+				if(check==null)
+				{
+					var account={
+						user:{
+							displayName:user.displayName,
+							emailAddress:user.userPrincipalName
+						},
+						token:token
+					};
+					OneDriveDAL.saveOneDriveAccount(email,account)
+					.then((result)=>{
+						res.redirect(redirectSuccess+user.userPrincipalName); //redirect back to the client success
+					})
+					.catch((err)=>{
+						res.redirect(redirectFailure); //redirect back to the client failure
+					});
+				}
+				else
+				{
+					res.redirect(redirectFailure);
+				}
 			})
 			.catch((err)=>{
-				res.redirect(redirectFailure); //redirect back to the client failure
+				res.redirect(redirectFailure);
 			});
 		})
 		//then and catch both getting called
@@ -318,6 +336,7 @@ router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.
 		res.end(err.msg);
 	});
 })
+
 
 
 

@@ -117,46 +117,20 @@ exports.updateOneDriveToken =function(meshDriveEmail,oneDriveEmail,token)
 	});
 }
 
+exports.findOneDriveTokenByEmail =function(meshDriveEmail,oneDriveEmail)
+{
+	return new Promise((success,failure)=>{
+        var criteria = {"email":meshDriveEmail,"drives.OneDrive.AccountsList.user.emailAddress":oneDriveEmail};
+        User.findOne(criteria)
+        .then((res)=>{
+            success(res);
+        })
+        .catch((err)=>{
+            failure(err.message);
+        });	
+	});
+}
 
-// exports.readUserTokens =function(email)
-// {
-// 	return new Promise(function(success,failure)
-// 	{
-// 		var criteria = {"email":email};
-// 		User.findOne(criteria).then((user)=>{
-           
-//             if(user.token==false)
-//             {
-//                 failure("Token Empty"); 
-//             }
-//             else
-//             {
-//                 success(user.drives.GoogleDrive); 
-//             }
-// 		}).catch((err)=>{
-//             failure("Cannot read token");
-//         })
-		
-// 	});
-// }
-
-
-// exports.saveUserTokens =function(email,token)
-// {
-// 	return new Promise(function(success,failure){	
-        
-//         var criteria = {"email":email};
-//         var updation = {"token":token}
-
-//         User.updateOne(criteria,{$set:updation}).
-//         then((result)=>{
-//             success(result);
-//         }).
-//         catch((err)=>{
-//             failure(err.message);
-//         });	
-// 	});
-// }
 
 function isEmpty(obj) {
     for(var prop in obj) {
