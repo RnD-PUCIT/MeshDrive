@@ -6,7 +6,7 @@ import finishApiRequest from "../api/finishApiRequest";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
-
+import navigateTo from "../../actions/filenavigation/navigateTo";
 export const shouldFetchFiles = (state, data) => {
   return {
     type: FETCH_FILES,
@@ -56,9 +56,9 @@ export default function fetchFiles(drive) {
       })
       .then(response => {
         const data = response.data;
-        // sort files
         dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFiles(state, data));
+        dispatch(navigateTo({ parent: "root", items: data }));
       })
       .catch(error => {
         console.log(error);

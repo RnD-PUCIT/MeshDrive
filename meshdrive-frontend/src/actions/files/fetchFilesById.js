@@ -6,6 +6,7 @@ import finishApiRequest from "../api/finishApiRequest";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
+import navigateTo from "../../actions/filenavigation/navigateTo";
 export const shouldFetchFilesById = (state, data) => {
   console.log(data);
   debugger;
@@ -48,6 +49,7 @@ export default function fetchFilesById(drive, listFilesAccount, fileId) {
         // sort files
         dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFilesById(state, data));
+        dispatch(navigateTo({ parent: "root", items: data }));
       })
       .catch(error => {
         console.log(error);
