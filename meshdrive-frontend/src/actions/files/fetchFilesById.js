@@ -49,7 +49,7 @@ export default function fetchFilesById(drive, listFilesAccount, fileId) {
         // sort files
         dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFilesById(state, data));
-        dispatch(navigateTo({ parent: "root", items: data }));
+        dispatch(navigateTo({ parent: fileId, items: data }));
       })
       .catch(error => {
         console.log(error);
