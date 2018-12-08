@@ -50,7 +50,7 @@ class FileItem extends Component {
     e.preventDefault();
     const { file } = this.props;
     if (this.isFolder) {
-      this.props.fetchFilesById(this.props.drive, file.account, file.fileId);
+      this.props.fetchFilesById(this.props.drive, file.account, file.id);
     }
     console.log(file);
   };
@@ -59,7 +59,7 @@ class FileItem extends Component {
 
     switch (menu) {
       case "download":
-        return this.props.downloadFile(file.account, file.fileId);
+        return this.props.downloadFile(file.account, file.id);
     }
   };
 

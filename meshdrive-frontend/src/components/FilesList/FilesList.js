@@ -33,8 +33,8 @@ class FilesList extends Component {
               // adding additional attributes to file
               file.drive = drive;
               file.account = email;
-              file.fileId = file.id;
-              file.id = `${drive}/${file.id}`;
+              // file.fileId = file.id;
+              // file.id = `${drive}/${file.id}`;
               return file;
             })
           );

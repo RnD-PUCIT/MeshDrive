@@ -7,6 +7,7 @@ import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrap
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import navigateTo from "../../actions/filenavigation/navigateTo";
+import forceReload from "../../actions/filenavigation/forceReload";
 export const shouldFetchFiles = (state, data) => {
   return {
     type: FETCH_FILES,
@@ -14,12 +15,27 @@ export const shouldFetchFiles = (state, data) => {
   };
 };
 
-export default function fetchFiles(drive) {
+export default function fetchRootFiles(drive, isForceReload = false) {
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
     const { token } = user;
 
+    const { historyStack } = state.fileNavigation;
+    debugger;
+    // check if exist in state already, get from state
+    if (!isForceReload && historyStack !== null && historyStack.length >= 1) {
+      const [root] = historyStack;
+
+      dispatch(shouldFetchFiles(state, root.items));
+      dispatch(
+        navigateTo({
+          ...root
+        })
+      );
+      return;
+    }
+    // does not exist in state, fetch from api
     console.log("Starting API call from fetchRootFiles");
     dispatch(startApiRequest());
 
@@ -58,7 +74,20 @@ export default function fetchFiles(drive) {
         const data = response.data;
         dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFiles(state, data));
-        dispatch(navigateTo({ parent: "root", items: data }));
+        if (isForceReload) {
+          dispatch(
+            forceReload({
+              parent: "root",
+              items: data,
+              drive,
+              listFilesAccount
+            })
+          );
+        } else {
+          dispatch(
+            navigateTo({ parent: "root", items: data, drive, listFilesAccount })
+          );
+        }
       })
       .catch(error => {
         console.log(error);
@@ -73,7 +102,5 @@ export default function fetchFiles(drive) {
           )
         );
       });
-
-    // return dispatch(setFiles(dummyFiles));
   };
 }

@@ -2,37 +2,56 @@ import React, { Component } from "react";
 import { ButtonGroup, Button } from "reactstrap";
 import FAIcon from "../FontAwesomeIcon/FontAwesomeIcon";
 import { connect } from "react-redux";
-import { shouldFetchFiles } from "../../actions/files/fetchRootFiles";
+import fetchRootFiles, {
+  shouldFetchFiles
+} from "../../actions/files/fetchRootFiles";
+import fetchFilesById, {
+  shouldFetchFilesById
+} from "../../actions/files/fetchFilesById";
 import navigateTo from "../../actions/filenavigation/navigateTo";
 import store from "../../store";
 import "./style.css";
 
 class FileNavigation extends Component {
   state = {
-    current: null
+    currentFolder: null
   };
-
+  componentDidMount() {
+    const { historyStack } = this.props.fileNavigation;
+    const currentFolder = historyStack[historyStack.length - 1];
+    if (currentFolder) this.setState({ currentFolder });
+  }
   componentDidUpdate(prevProps) {
-    if (prevProps.fileNavigation === this.props.fileNavigation) return;
-    const { historyStake } = this.props.fileNavigation;
-    const top = historyStake[historyStake.length - 1];
-    console.log({ top: top.parent });
-    debugger;
-    this.setState({ current: top });
+    if (
+      JSON.stringify(prevProps.fileNavigation) ===
+      JSON.stringify(this.props.fileNavigation)
+    )
+      return;
+    const { historyStack } = this.props.fileNavigation;
+    const currentFolder = historyStack[historyStack.length - 1];
+    this.setState({ currentFolder });
+    console.log({ updated: currentFolder });
   }
   handleHomeClick = () => {
-    const { historyStake } = this.props.fileNavigation;
-    const root = historyStake[0];
-    store.dispatch(shouldFetchFiles(store.getState(), root.items));
-    navigateTo
+    const { drive } = this.state.currentFolder;
+    this.props.fetchRootFiles(drive);
+  };
+  handleReloadClick = () => {
+    const { drive, parent, listFilesAccount } = this.state.currentFolder;
+    if (this.state.currentFolder.parent === "root") {
+      this.props.fetchRootFiles(drive, true);
+    } else {
+      this.props.fetchFilesById(drive, listFilesAccount, parent, true);
+    }
   };
   render() {
+    const { historyStack } = this.props.fileNavigation;
+    const { currentFolder = null } = this.state;
     const isHomeEnabled =
-      this.state.current !== null && this.state.current.parent !== "root";
-    const isUpOneLevelEnabled =
-      this.state.current !== null && this.state.current.length > 1;
-
-    const isBackEnabled = false;
+      currentFolder !== null && currentFolder.parent !== "root";
+    const isReloadEnabled = currentFolder !== null;
+    const isUpOneLevelEnabled = false;
+    const isBackEnabled = historyStack.length > 1;
     const isForwardEnabled = false;
     return (
       <div id="FileNavigation" className="file-navigation-bar">
@@ -51,7 +70,7 @@ class FileNavigation extends Component {
           </Button>
         </ButtonGroup>
         <ButtonGroup>
-          <Button>
+          <Button onClick={this.handleReloadClick} disabled={!isReloadEnabled}>
             <FAIcon icon="sync-alt" classes={["fa"]} /> Reload
           </Button>
           <Button>
@@ -68,4 +87,7 @@ class FileNavigation extends Component {
 function mapStateToProps({ fileNavigation }) {
   return { fileNavigation };
 }
-export default connect(mapStateToProps)(FileNavigation);
+export default connect(
+  mapStateToProps,
+  { fetchRootFiles, fetchFilesById, navigateTo }
+)(FileNavigation);

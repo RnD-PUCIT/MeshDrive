@@ -2,18 +2,19 @@ import {
   NAVIGATE_TO,
   NAVIGATE_TO_UP_ONE_LEVEL,
   NAVIGATE_TO_BACK,
-  NAVIGATE_TO_FORWARD
+  NAVIGATE_TO_FORWARD,
+  FORCE_RELOAD
 } from "../actions/filenavigation/types";
 
 const initialState = {
-  historyStake: []
+  historyStack: []
 };
 export default function(state = initialState, action) {
   switch (action.type) {
     case NAVIGATE_TO:
       return {
         ...state,
-        historyStake: [...state.historyStake, action.payload]
+        historyStack: [...state.historyStack, action.payload]
       };
     case NAVIGATE_TO_UP_ONE_LEVEL:
       return state;
@@ -21,6 +22,18 @@ export default function(state = initialState, action) {
       return state;
     case NAVIGATE_TO_FORWARD:
       return state;
+
+    case FORCE_RELOAD:
+      let newHistoryStack = Object.assign(state.historyStack);
+      newHistoryStack.filter(item => {
+        if (action.payload.parent === item.parent) {
+          return action.payload;
+        } else {
+          return item;
+        }
+      });
+
+      return { ...state, historyStack: [...newHistoryStack] };
   }
   return state;
 }
