@@ -7,6 +7,57 @@ var exports=module.exports={};
 
 mongoose.connect(url,{ useNewUrlParser: true });
 
+
+//move it to UserDAL
+exports.readAccounts =function(email)
+{
+	return new Promise(function(success,failure)
+	{
+        var criteria = {"email":email};
+        
+        //new addition       
+        var result=new Object();
+        result.driveAccountsList=new Object();
+		User.findOne(criteria).then((user)=>{
+        if(user.drives)
+        {
+            var accounts=user.drives;
+            result.driveAccountsList.googleDriveAccountsList=[];
+            if(accounts.GoogleDrive.AccountsList.length>0)
+            {
+                var googleDriveAccounts=accounts.GoogleDrive.AccountsList;     
+                var accountsEmailArray=new Array();
+                for (let index = 0; index < googleDriveAccounts.length; index++) {
+                    var account = googleDriveAccounts[index];
+                    accountsEmailArray.push(account.user.emailAddress);
+                }
+            result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
+        }
+      //change when convert to multiple accounts
+        var dropboxAcccounts=accounts.Dropbox;
+        result.driveAccountsList.dropboxAccountsList=[];
+        if(dropboxAcccounts)
+        {
+            var dbxEmails = new Array();
+            
+            console.log(dropboxAcccounts.user)
+            if(dropboxAcccounts.user.emailAddress)
+                dbxEmails.push(dropboxAcccounts.user.emailAddress);  
+            result.driveAccountsList.dropboxAccountsList=dbxEmails;
+        }    
+            success(result);
+        }
+        else
+        {
+            failure("No Google Drive Accounts found");  
+        }
+		}).catch((err)=>{
+            failure("Cannot read token");
+        })
+		
+	});
+}
+
 exports.readGoogleDriveAccounts =function(email)
 {
 	return new Promise(function(success,failure)

@@ -27,6 +27,7 @@ class App extends Component {
   componentWillMount() {
     this.initToken();
   }
+
   componentDidUpdate(prevProps) {
     const prevUserStringify = JSON.stringify(prevProps.user);
     const userStringify = JSON.stringify(this.props.user);
@@ -42,7 +43,6 @@ class App extends Component {
         <Router>
           <Layout>
             <Switch>
-            
               <Route path="/managedrives" component={ManageDrives} />
               <Route path="/dashboard" exact component={Dashboard} />
               <Route path="/uploadfile" exact component={UploadFile} />

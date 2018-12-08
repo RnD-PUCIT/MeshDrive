@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { localStorageUserObjString } from "../constants/strings";
 
 export default ChildComponent => {
   class ComposedComponent extends Component {

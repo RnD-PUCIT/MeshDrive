@@ -10,6 +10,7 @@ import SideBar from "../../Layout/SideBar/SideBar";
 import requireAuth from "../../../hoc/requireAuth";
 import addDrive from "../../../actions/user/addDrive";
 import fetchDriveAccountsList from "../../../actions/user/fetchDriveAccountsList";
+import requestRemoveGoogleAccountByEmail from "../../../actions/user/requestRemoveGoogleAccountByEmail";
 import requestRemoveAllGoogleDriveAccounts from "../../../actions/user/requestRemoveAllGoogleDriveAccounts";
 import FontAwesomeIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
 class ManageDrives extends Page {
@@ -49,7 +50,12 @@ class ManageDrives extends Page {
           <td>{account}</td>
           <td>Google</td>
           <td>
-            <Button outline>
+            <Button
+              outline
+              onClick={() => {
+                this.props.requestRemoveGoogleAccountByEmail(account);
+              }}
+            >
               <FontAwesomeIcon icon="times" classes={["fas"]} />
             </Button>
           </td>
@@ -93,7 +99,7 @@ class ManageDrives extends Page {
                 render={() => {
                   const { token } = this.props.user;
                   this.props.fetchDriveAccountsList(token);
-                  <div>All accounts are removed successfully</div>;
+                  return <div>All accounts are removed successfully</div>;
                 }}
               />
               <Route
@@ -101,7 +107,7 @@ class ManageDrives extends Page {
                 render={() => {
                   const { token } = this.props.user;
                   this.props.fetchDriveAccountsList(token);
-                  <div>Account is removed successfully</div>;
+                  return <div>Account is removed successfully</div>;
                 }}
               />
               <Route
@@ -133,7 +139,7 @@ class ManageDrives extends Page {
             </Button>
           </ButtonGroup>
           <h3>Drive Accounts</h3>
-          {this.props.user.driveAccountsList.length && (
+          {mapGoogleAccountsToTr.length && (
             <div>
               <Button
                 color="secondary"
@@ -169,5 +175,10 @@ function mapStateToProps({ user }) {
 }
 export default connect(
   mapStateToProps,
-  { addDrive, fetchDriveAccountsList, requestRemoveAllGoogleDriveAccounts }
+  {
+    addDrive,
+    fetchDriveAccountsList,
+    requestRemoveAllGoogleDriveAccounts,
+    requestRemoveGoogleAccountByEmail
+  }
 )(requireAuth(ManageDrives));
