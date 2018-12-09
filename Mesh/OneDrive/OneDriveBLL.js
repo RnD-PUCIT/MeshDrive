@@ -205,7 +205,40 @@ exports.uploadFile = function(token,fileName,file,mimeType){
       filename: fileName,
       readableStream: file
     }).then((item) => {
-        success(item);
+      var file=getMeshDriveFileObjectFromOneDrive(item);
+      success(file);
+    })
+    .catch((error)=>{
+        failure(error);
+    });
+  });
+}
+
+exports.createFolder = function(token,folderName,parentId){
+  
+  return new Promise((success,failure)=>{
+    oneDrive.items.createFolder({
+      accessToken: token.access_token,
+      name: folderName,
+      rootItemId:parentId
+    }).then((item) => {
+        var folder=getMeshDriveFileObjectFromOneDrive(item);
+        success(folder);
+    })
+    .catch((error)=>{
+        failure(error);
+    });
+  });
+}
+
+exports.deleteFile = function(token,fileId){
+  
+  return new Promise((success,failure)=>{
+    oneDrive.items.delete({
+      accessToken: token.access_token,
+      itemId:fileId
+    }).then(() => {
+        success();
     })
     .catch((error)=>{
         failure(error);

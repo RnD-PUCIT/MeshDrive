@@ -326,7 +326,78 @@ router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.
 		}
 		Drive.uploadFile(token,fileName,req,mimeType)
 		.then((result)=>{
-			res.status(200).json({message:"File Uploaded" + result});
+			res.status(200).json({message:"File Uploaded",file:result});
+		})
+		.catch((err)=>{
+			res.status(Constants.RESPONSE_FAIL).json(err);
+		})
+	})
+	.catch((err)=>{
+		res.end(err.msg);
+	});
+})
+
+
+router.post('/CreateFolder',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
+	var parentId=req.body.parentId;
+	var createFolderEmail=req.body.createFolderEmail;
+	var folderName=req.body.folderName;
+	var token;
+	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
+		var account = req.oneDriveAccounts[index];
+		if(account.user.emailAddress==createFolderEmail)
+			token=account.token;
+	}
+	if(!token)
+	{
+		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
+	}
+
+	//var file=req.file;
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		if(token.updated)
+		{
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+		}
+		Drive.createFolder(token,folderName,parentId)
+		.then((result)=>{
+			res.status(200).json({message:"Folder Created",folder:result});
+		})
+		.catch((err)=>{
+			res.status(Constants.RESPONSE_FAIL).json(err);
+		})
+	})
+	.catch((err)=>{
+		res.end(err.msg);
+	});
+})
+
+
+router.post('/DeleteFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
+	var fileId=req.body.fileId;
+	var deleteFileEmail=req.body.deleteFileEmail;
+	var token;
+	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
+		var account = req.oneDriveAccounts[index];
+		if(account.user.emailAddress==deleteFileEmail)
+			token=account.token;
+	}
+	if(!token)
+	{
+		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
+	}
+
+	//var file=req.file;
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		if(token.updated)
+		{
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+		}
+		Drive.deleteFile(token,fileId)
+		.then(()=>{
+			res.status(200).json({message:"Folder Deleted"});
 		})
 		.catch((err)=>{
 			res.status(Constants.RESPONSE_FAIL).json(err);
