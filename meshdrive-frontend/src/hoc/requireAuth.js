@@ -6,7 +6,6 @@ export default ChildComponent => {
     componentDidMount() {
       this.navigateIfLoggedOut();
     }
-    
     componentDidUpdate(prevProps) {
       const prevUserStringify = JSON.stringify(prevProps.user);
       const userStringify = JSON.stringify(this.props.user);
@@ -17,7 +16,7 @@ export default ChildComponent => {
 
     navigateIfLoggedOut() {
       const { token } = this.props.user;
-      debugger;
+      
       // console.log(token);
       if (token === null || token === undefined) {
         this.props.history.push("/");

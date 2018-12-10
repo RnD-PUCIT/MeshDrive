@@ -36,8 +36,8 @@ export default function(state = initialUserState, action) {
 
     case SAVE_USER:
       const { driveAccountsList = {}, token = null } = action.payload;
-      console.log(token);
-      debugger;
+      console.log(token);  
+
       return { ...state, token, driveAccountsList };
 
     case ADD_DRIVE:
@@ -50,14 +50,14 @@ export default function(state = initialUserState, action) {
             newState.driveAccountsList.googleDriveAccountsList.push(email);
           break;
         case "DROPBOX":
-          // newState.driveAccountsList.googleDriveAccountsList.push(email);
+           newState.driveAccountsList.dropBoxAccountsList.push(email);
           break;
         case "ONEDRIVE":
           // newState.driveAccountsList.googleDriveAccountsList.push(email);
           break;
       }
       console.log(newState);
-      debugger;
+     
       return newState;
   }
   return state;

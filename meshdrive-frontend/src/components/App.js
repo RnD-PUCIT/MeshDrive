@@ -44,7 +44,6 @@ class App extends Component {
           <Layout>
             <Switch>
               <Route path="/managedrives" component={ManageDrives} />
-
               <Route path="/dashboard" exact component={Dashboard} />
               <Route path="/uploadfile" exact component={UploadFile} />
               <Route path="/editprofile" exact component={EditProfile} />

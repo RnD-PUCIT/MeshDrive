@@ -21,6 +21,9 @@ export default function addDrive(token, drive) {
       case "GOOGLEDRIVE":
         authLink = apiRoutes.users.authGoogleDrive;
         break;
+        case "DROPBOX":
+        authLink = apiRoutes.users.authDropbox;
+        break;
     }
     axios
       .post(authLink, {
@@ -31,7 +34,6 @@ export default function addDrive(token, drive) {
       .then(
         response => {
           const { redirectLink } = response.data;
-          // redirect to consent screen
           window.location = redirectLink;
         },
         error => {
