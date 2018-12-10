@@ -1,7 +1,8 @@
 const jwt=require('jsonwebtoken');
-const DEPLOYED_URL="http://4be080be.ngrok.io";//change this on dbx console too
+
 const FRONT_URL_FORGET_PASSWORD="http://localhost:3000/#/resetPassword/"
 const URL='http://localhost:8000'; //change
+const DEPLOYED_URL=URL;//change this on dbx console too
 const RESPONSE_FAIL=400;
 const RESPONSE_SUCCESS=200;
 const RESPONSE_EMPTY= 201;
@@ -58,6 +59,10 @@ module.exports.checkAccessMiddleware = function(req,res,next){
     else
     {
         token=req.body.token;
+        if(!token)
+        {
+            token=req.params.token;
+        }
     }
     if(!token)
     {
