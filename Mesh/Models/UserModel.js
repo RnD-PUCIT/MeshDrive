@@ -69,6 +69,10 @@ const UserSchema = new Schema({
             ]
         },
         Dropbox:{
+            user:{
+                photoLink:String,
+                emailAddress:String
+            },
             token :{
                 access_token:{
                     type:String,

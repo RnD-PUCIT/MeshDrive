@@ -1,11 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import intruptApiRequest from "../../actions/api/intruptApiRequest";
-import fetchFiles from "../../actions/files/fetchFiles";
-import fetchRootFiles from "../../actions/files/fetchRootFiles";
 import FileItem from "../../components/FileItem/FileItem";
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
+
 class FilesList extends Component {
   state = {
     fileItems: [],
@@ -104,19 +100,4 @@ class FilesList extends Component {
   }
 }
 
-FileList.propTypes = {
-  files: PropTypes.array.isRequired
-};
-function mapStateToProps({ files, activeFileIds }) {
-  return {
-    files,
-    activeFileIds
-  };
-}
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ fetchRootFiles, intruptApiRequest }, dispatch);
-}
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(FilesList);
+export default FilesList;

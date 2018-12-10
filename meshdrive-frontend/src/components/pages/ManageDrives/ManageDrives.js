@@ -10,6 +10,7 @@ import SideBar from "../../Layout/SideBar/SideBar";
 import requireAuth from "../../../hoc/requireAuth";
 import addDrive from "../../../actions/user/addDrive";
 import fetchDriveAccountsList from "../../../actions/user/fetchDriveAccountsList";
+import requestRemoveGoogleAccountByEmail from "../../../actions/user/requestRemoveGoogleAccountByEmail";
 import requestRemoveAllGoogleDriveAccounts from "../../../actions/user/requestRemoveAllGoogleDriveAccounts";
 import FontAwesomeIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
 class ManageDrives extends Page {
@@ -23,6 +24,11 @@ class ManageDrives extends Page {
 
     this.props.addDrive(token, "GOOGLEDRIVE");
   };
+  handleDropboxClick = e => {
+    e.preventDefault();
+     const { token } = this.props.user;
+     this.props.addDrive(token, "DROPBOX");
+  };
   handleRemoveAllAccounts = e => {
     e.preventDefault();
 
@@ -32,17 +38,36 @@ class ManageDrives extends Page {
     const { driveAccountsList = {} } = this.props.user;
     const {
       googleDriveAccountsList = [],
-      dropBoxAccountsList = [],
+      dropboxAccountsList = [],
       oneDriveAccountsList = []
     } = driveAccountsList;
+    console.log("DRIVES"+ driveAccountsList);
     let i = 1;
     const mapGoogleAccountsToTr = googleDriveAccountsList
-      .concat(dropBoxAccountsList.concat(oneDriveAccountsList))
       .map(account => (
         <tr key={account}>
           <th scope="row">{i++}</th>
           <td>{account}</td>
           <td>Google</td>
+          <td>
+            <Button
+              outline
+              onClick={() => {
+                this.props.requestRemoveGoogleAccountByEmail(account);
+              }}
+            >
+              <FontAwesomeIcon icon="times" classes={["fas"]} />
+            </Button>
+          </td>
+        </tr>
+      ));
+
+      const mapDropboxAccountsToTr = dropboxAccountsList
+      .map(account => (
+        <tr key={account}>
+          <th scope="row">{i++}</th>
+          <td>{account}</td>
+          <td>Dropbox</td>
           <td>
             <Button outline>
               <FontAwesomeIcon icon="times" classes={["fas"]} />
@@ -74,7 +99,7 @@ class ManageDrives extends Page {
                 render={() => {
                   const { token } = this.props.user;
                   this.props.fetchDriveAccountsList(token);
-                  <div>All accounts are removed successfully</div>;
+                  return <div>All accounts are removed successfully</div>;
                 }}
               />
               <Route
@@ -82,7 +107,7 @@ class ManageDrives extends Page {
                 render={() => {
                   const { token } = this.props.user;
                   this.props.fetchDriveAccountsList(token);
-                  <div>Account is removed successfully</div>;
+                  return <div>Account is removed successfully</div>;
                 }}
               />
               <Route
@@ -104,7 +129,9 @@ class ManageDrives extends Page {
             >
               Add Google Drive
             </Button>
-            <Button color="primary" outline>
+            <Button color="primary" 
+            outline
+            onClick={this.handleDropboxClick}>
               Add DropBox
             </Button>
             <Button color="dark" outline>
@@ -112,7 +139,7 @@ class ManageDrives extends Page {
             </Button>
           </ButtonGroup>
           <h3>Drive Accounts</h3>
-          {this.props.user.driveAccountsList.length && (
+          {mapGoogleAccountsToTr.length && (
             <div>
               <Button
                 color="secondary"
@@ -132,7 +159,8 @@ class ManageDrives extends Page {
                 <th>Remove</th>
               </tr>
             </thead>
-            <tbody>{mapGoogleAccountsToTr}</tbody>
+            <tbody>{mapGoogleAccountsToTr}
+            {mapDropboxAccountsToTr}</tbody>
           </Table>
         </div>
       </React.Fragment>
@@ -147,5 +175,10 @@ function mapStateToProps({ user }) {
 }
 export default connect(
   mapStateToProps,
-  { addDrive, fetchDriveAccountsList, requestRemoveAllGoogleDriveAccounts }
+  {
+    addDrive,
+    fetchDriveAccountsList,
+    requestRemoveAllGoogleDriveAccounts,
+    requestRemoveGoogleAccountByEmail
+  }
 )(requireAuth(ManageDrives));

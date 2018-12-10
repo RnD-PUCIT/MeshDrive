@@ -4,7 +4,7 @@ const ngrokUrl = localStorage.getItem("ngrok");
 
 export const apiBaseUrl = ngrokUrl
   ? ngrokUrl
-  : "http://test-depositoryworks.ngrok.io";
+  : "http://localhost:8000";
 
 export const apiRoutes = {
   users: {
@@ -64,10 +64,11 @@ export const apiRoutes = {
     signup: `${apiBaseUrl}/users`,
 
     authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`,
-
+    authDropbox: `${apiBaseUrl}/Dropbox/Authenticate`,
     listDriveAccounts: token =>
       `${apiBaseUrl}/users/ListDriveAccounts/${token}`,
-    removeAllGoogleAccounts: `${apiBaseUrl}/GoogleDrive/RemoveAllGoogleAccounts/`
+    removeAllGoogleAccounts: `${apiBaseUrl}/GoogleDrive/RemoveAllGoogleAccounts/`,
+    removeGoogleAccountByEmail: `${apiBaseUrl}/GoogleDrive/RemoveGoogleAccountByEmail`
   },
   files: {
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
