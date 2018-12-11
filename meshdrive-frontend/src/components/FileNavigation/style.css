@@ -1,0 +1,10 @@
+.file-navigation-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  min-height: 38px;
+}
+
+.file-navigation-bar .btn-group {
+  display: flex;
+}

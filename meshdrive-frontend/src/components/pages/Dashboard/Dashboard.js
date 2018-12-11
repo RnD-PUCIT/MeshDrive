@@ -1,6 +1,5 @@
 // module imports
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 // custom module imports
@@ -9,8 +8,8 @@ import SideBar from "../../Layout/SideBar/SideBar";
 import FilesList from "../../FilesList/FilesList";
 import requireAuth from "../../../hoc/requireAuth";
 
-import intruptApiRequest from "../../../actions/api/intruptApiRequest";
-import fetchRootFiles from "../../../actions/files/fetchRootFiles";
+import FileNavigation from "../../FileNavigation/FileNavigation";
+import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../../constants/strings";
 
 class Dashboard extends Page {
   render() {
@@ -27,13 +26,8 @@ class Dashboard extends Page {
           className="flex-grow-1 d-flex flex-column pl-4 pr-4"
         >
           <h1>Home</h1>
-
-          <FilesList
-            files={this.props.files}
-            activeFileIds={this.props.activeFileIds}
-            fetchRootFiles={this.props.fetchRootFiles}
-            intruptApiRequest={this.props.intruptApiRequest}
-          />
+          <FileNavigation />
+          <FilesList drive={GOOGLEDRIVE} />
         </div>
         <SideBar secondary>
           {/* {activeFiles.length == 0
@@ -45,13 +39,4 @@ class Dashboard extends Page {
   }
 }
 
-function mapStateToProps({ files, activeFileIds }) {
-  return {
-    files,
-    activeFileIds
-  };
-}
-export default connect(
-  mapStateToProps,
-  { fetchRootFiles, intruptApiRequest }
-)(requireAuth(Dashboard));
+export default requireAuth(Dashboard);
