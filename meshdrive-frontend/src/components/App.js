@@ -13,6 +13,7 @@ import Signup from "./pages/Signup/Signup";
 import VerifySuccess from "./pages/VerifySuccess/VerifySuccess";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import ManageTags from "./pages/ManageTags/ManageTags";
 
 import initUserObjFromLocalStorage from "../actions/user/initUserObjFromLocalStorage";
 
@@ -52,6 +53,7 @@ class App extends Component {
               <Route path="/signup" exact component={Signup} />
               <Route path="/verifysuccess" exact component={VerifySuccess} />
               <Route path="/forgotpassword" exact component={ForgotPassword} />
+              <Route path="/managetags" exact component={ManageTags} />
               <Route
                 path="/resetpassword/:id"
                 exact

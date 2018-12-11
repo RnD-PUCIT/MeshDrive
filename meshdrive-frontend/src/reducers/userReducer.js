@@ -2,25 +2,31 @@ import {
   ADD_DRIVE,
   SAVE_USER,
   REMOVE_USER,
-  FETCH_DRIVE_ACCOUNTS_LIST
+  FETCH_DRIVE_ACCOUNTS_LIST,
+  FETCH_TAGS_LIST,
+  ADD_TAG
 } from "../actions/user/types";
 import getUserObjFromLocalStorage from "../utils/getUserObjFromLocalStorage";
 
 let initialUserState = {
   token: null,
+  email:null,
   driveAccountsList: {
     googleDriveAccountsList: [],
     dropBoxAccountsList: [],
     oneDriveAccountsList: []
-  }
+  },
+  tagsList:[]
 };
 
 const localStorageUserObj = getUserObjFromLocalStorage();
 if (localStorageUserObj && localStorageUserObj.data) {
-  const { token = null, driveAccountsList = {} } = localStorageUserObj;
+  const { token = null, email=null,driveAccountsList = {},tagsList=[] } = localStorageUserObj;
   initialUserState = {
     token,
-    driveAccountsList
+    email,
+    driveAccountsList,
+    tagsList
   };
   console.log(initialUserState);
   debugger;
@@ -28,6 +34,9 @@ if (localStorageUserObj && localStorageUserObj.data) {
 
 export default function(state = initialUserState, action) {
   switch (action.type) {
+    case FETCH_TAGS_LIST:
+    return { ...state, ...action.payload };
+
     case FETCH_DRIVE_ACCOUNTS_LIST:
       return { ...state, ...action.payload };
 
@@ -35,30 +44,17 @@ export default function(state = initialUserState, action) {
       return initialUserState;
 
     case SAVE_USER:
-      const { driveAccountsList = {}, token = null } = action.payload;
+      const { driveAccountsList = {}, token = null, email=null } = action.payload;
       console.log(token);  
+      return { ...state, token, driveAccountsList,email };
 
-      return { ...state, token, driveAccountsList };
+    case ADD_TAG:
+    const { tagName, tagDescription } = action.payload;
+    console.log(tagName,tagDescription);
+    let newTagsState = Object.assign(state);
+    newTagsState.tagsList.push({name:tagName,description:tagDescription});
+    return newTagsState;
 
-    case ADD_DRIVE:
-      const { drive, email } = action.payload;
-      console.log(drive, email);
-      let newState = Object.assign(state);
-      switch (drive) {
-        case "GOOGLEDRIVE":
-          if (email)
-            newState.driveAccountsList.googleDriveAccountsList.push(email);
-          break;
-        case "DROPBOX":
-           newState.driveAccountsList.dropBoxAccountsList.push(email);
-          break;
-        case "ONEDRIVE":
-          // newState.driveAccountsList.googleDriveAccountsList.push(email);
-          break;
-      }
-      console.log(newState);
-     
-      return newState;
   }
   return state;
 }
