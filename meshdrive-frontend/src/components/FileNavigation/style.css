@@ -7,9 +7,4 @@
 
 .file-navigation-bar .btn-group {
   display: flex;
-  flex: 1;
-}
-
-.file-navigation-bar .btn-group .btn {
-  flex: 1;
 }

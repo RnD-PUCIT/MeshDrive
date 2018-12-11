@@ -10,8 +10,9 @@ export default function navigateToHome() {
   return (dispatch, getState) => {
     const state = getState();
     const { historyStack } = state.fileNavigation;
-    const [root] = historyStack;
-    dispatch(shouldNavigateToHome(state));
+    const root = historyStack[0];
+
     dispatch(shouldFetchFiles(state, root.items));
+    dispatch(shouldNavigateToHome(state));
   };
 }

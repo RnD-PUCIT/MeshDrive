@@ -9,7 +9,6 @@ import fetchRootFiles from "../../actions/files/fetchRootFiles";
 class FilesList extends Component {
   state = {
     fileItems: [],
-    currentDirectory: "root",
     componentDidUpdated: false
   };
 
@@ -22,7 +21,11 @@ class FilesList extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.files !== this.props.files) {
+    if (
+      JSON.stringify(prevProps.files) !== JSON.stringify(this.props.files) ||
+      JSON.stringify(prevProps.fileNavigation) !==
+        JSON.stringify(this.props.fileNavigation)
+    ) {
       let allFiles = [];
       const drives = this.props.files;
       if (drives[Symbol.iterator] !== undefined) {
@@ -102,17 +105,15 @@ class FilesList extends Component {
 
     return (
       <React.Fragment>
-        {this.state.fileItems.length > 0 && (
-          <h5>Directory: {this.state.currentDirectory}</h5>
-        )}
         <div className="files-list d-flex flex-row flex-wrap">{display}</div>
       </React.Fragment>
     );
   }
 }
 
-function mapStateToProps({ files, activeFileIds }) {
+function mapStateToProps({ fileNavigation, files, activeFileIds }) {
   return {
+    fileNavigation,
     files,
     activeFileIds
   };

@@ -29,24 +29,6 @@ export default function fetchFilesById(
     const { user } = state;
     const { token } = user;
 
-    const { historyStack } = state.fileNavigation;
-    // check if exist in state already, get from state
-    if (!isForceReload && historyStack !== null && historyStack.length >= 1) {
-      const itemsFilter = historyStack.filter(item => item.parent === fileId);
-      if (itemsFilter.length !== 0) {
-        const [item] = itemsFilter;
-        console.log(item);
-        debugger;
-        dispatch(shouldFetchFilesById(state, item.items));
-        dispatch(
-          navigateTo({
-            ...item
-          })
-        );
-        return;
-      }
-    }
-    debugger;
     console.log("Starting API call from fetchRootFiles");
     dispatch(startApiRequest());
 

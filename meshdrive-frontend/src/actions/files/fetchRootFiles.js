@@ -7,6 +7,7 @@ import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrap
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import navigateTo from "../../actions/filenavigation/navigateTo";
+import navigateToHome from "../../actions/filenavigation/navigateToHome";
 import forceReload from "../../actions/filenavigation/forceReload";
 export const shouldFetchFiles = (state, data) => {
   return {
@@ -20,22 +21,6 @@ export default function fetchRootFiles(drive, isForceReload = false) {
     const state = getState();
     const { user } = state;
     const { token } = user;
-
-    const { historyStack } = state.fileNavigation;
-    debugger;
-    // check if exist in state already, get from state
-    if (!isForceReload && historyStack !== null && historyStack.length >= 1) {
-      const [root] = historyStack;
-
-      dispatch(shouldFetchFiles(state, root.items));
-      dispatch(
-        navigateTo({
-          ...root
-        })
-      );
-      return;
-    }
-    // does not exist in state, fetch from api
     console.log("Starting API call from fetchRootFiles");
     dispatch(startApiRequest());
 
@@ -87,6 +72,7 @@ export default function fetchRootFiles(drive, isForceReload = false) {
           dispatch(
             navigateTo({ parent: "root", items: data, drive, listFilesAccount })
           );
+          console.log("Navigating to");
         }
       })
       .catch(error => {

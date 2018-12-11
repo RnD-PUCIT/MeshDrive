@@ -2,42 +2,33 @@ import {
   NAVIGATE_TO,
   NAVIGATE_TO_UP_ONE_LEVEL,
   NAVIGATE_TO_HOME,
-  NAVIGATE_TO_BACK,
-  NAVIGATE_TO_FORWARD,
   FORCE_RELOAD
 } from "../actions/filenavigation/types";
 
 const initialState = {
-  currentIndex: -1,
-  historyStack: [],
-  softBackHistoryStack: [] // contains indexes only
+  historyStack: []
 };
 export default function(state = initialState, action) {
   let newHistoryStack;
   switch (action.type) {
     case NAVIGATE_TO_HOME:
       const { historyStack } = state;
-      const [root] = historyStack;
       return {
         ...state,
-        historyStack: [...state.historyStack, root],
-        currentIndex: 0
+        historyStack: [historyStack[0]]
       };
     case NAVIGATE_TO:
       return {
         ...state,
-        historyStack: [...state.historyStack, action.payload],
-        currentIndex: state.currentIndex + 1
+        historyStack: [...state.historyStack, action.payload]
       };
     case NAVIGATE_TO_UP_ONE_LEVEL:
-      return state;
-    case NAVIGATE_TO_BACK:
+      newHistoryStack = Object.assign(state.historyStack);
+      newHistoryStack.pop();
       return {
         ...state,
-        currentIndex: state.currentIndex - 1
+        historyStack: newHistoryStack
       };
-    case NAVIGATE_TO_FORWARD:
-      return state;
 
     case FORCE_RELOAD:
       newHistoryStack = Object.assign(state.historyStack);
