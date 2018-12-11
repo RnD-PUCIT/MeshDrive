@@ -28,27 +28,25 @@ export default function fetchRootFiles(drive, isForceReload = false) {
 
     const {
       googleDriveAccountsList = [],
-      dropBoxAccountsList = [],
+      dropboxAccountsList = [],
       oneDriveAccountsList = []
     } = driveAccountsList;
-
-    const listFilesAccount = googleDriveAccountsList.concat(
-      dropBoxAccountsList.concat(oneDriveAccountsList)
-    );
-
-    let postURL;
+    let postURL, listFilesAccount;
     switch (drive) {
       case GOOGLEDRIVE:
         postURL = apiRoutes.files.listGoogleDriveRootFiles;
+        listFilesAccount = googleDriveAccountsList;
         break;
       case ONEDRIVE:
         // postURL = apiRoutes.
         break;
-
       case DROPBOX:
-        // postURL = apiRoutes.
+        postURL = apiRoutes.files.dropbox_listFiles;
+        listFilesAccount = dropboxAccountsList;
         break;
     }
+    console.log(postURL);
+    debugger;
 
     axios
       .post(postURL, {
