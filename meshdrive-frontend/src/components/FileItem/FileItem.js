@@ -59,7 +59,7 @@ class FileItem extends Component {
 
     switch (menu) {
       case "download":
-        return this.props.downloadFile(file.account, file.id);
+        return this.props.downloadFile(this.props.drive, file.account, file);
     }
   };
 

@@ -27,7 +27,10 @@ class Dashboard extends Page {
         >
           <h1>Home</h1>
           <FileNavigation />
-          <FilesList drive={GOOGLEDRIVE} />
+          <FilesList drive={DROPBOX} />
+
+          <hr />
+          {/* <FilesList drive={GOOGLEDRIVE} /> */}
         </div>
         <SideBar secondary>
           {/* {activeFiles.length == 0
