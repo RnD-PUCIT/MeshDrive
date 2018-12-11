@@ -1,6 +1,6 @@
 const DropboxTags = require('../Dropbox/DropboxTags');
 var mime = require('mime-types')
-
+const FOLDER_MIME="application/vnd.google-apps.folder"
 function MetaDataFormat() 
 {
 
@@ -17,9 +17,14 @@ MetaDataFormat.prototype.parseDropboxFile= function(file){
     {         
         obj["size"]=file[DropboxTags.TAG_SIZE];
     }
+
     if(mime.lookup(obj["name"])!==false)
     {
         obj["mimeType"]=mime.lookup(obj["name"]);
+    }
+    else
+    {
+        obj["mimeType"]=FOLDER_MIME;
     }
   
     return obj;

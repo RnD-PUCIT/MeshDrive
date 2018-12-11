@@ -19,10 +19,7 @@ const DROPBOX_AUTH_REDIRECT_ROUTE='/Code';  //Change if u change it in dropbpx c
 const DROPBOX_AUTH_REDIRECT_URL=AppConstants.DEPLOYED_URL+'/Dropbox'+DROPBOX_AUTH_REDIRECT_ROUTE;
 
 
-
-
 // dbx.setAccessToken(DropboxCredentials.DROPBOX_APP_SAMPLE_ACCESS_TOKEN); //for testing
-
 router.get('/UserAccount/:token',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
     var obj = new Object();
   
@@ -46,14 +43,13 @@ router.get('/UserAccount/:token',AppConstants.checkAccessMiddleware,dropboxToken
 })
 
 //not used
-router.get('/DownloadFile/:token/',AppConstants.checkAccessMiddleware,(req,res)=>{
+router.get('/DownloadFile/:email/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
 
   var result = new Object();
   var fileName= req.query.fileName;
   var userData= req.userData;
   var filePath = req.query.path;
   
-
   res.setHeader("Access-Control-Expose-Headers","File-Name,Content-disposition");
 			res.setHeader('Content-disposition', 'attachment; filename='+fileName);
 			res.setHeader("File-Name",fileName);
@@ -85,27 +81,32 @@ router.get('/DownloadFile/:token/',AppConstants.checkAccessMiddleware,(req,res)=
 })
 
 
-router.post('/UploadFile/:token/:name/:path/:email',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
+router.post('/UploadFile/:token/:path/:name/:email',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
   
   var result = new Object();
-  var userData=req.userData;
   var name = req.params.name;
   var path = req.params.path;
+  console.log(path);
   var dropboxAccount=req.dropboxAccount;
   var token = dropboxAccount.token;
-
-  
     const dropbox = dropboxV2Api.authenticate({
       token: token["access_token"]
     });
-
+  var arg;
+    if(path==="root") {
+        arg = {path:"/"+name} 
+     
+    }else{
+      arg ={path:path+'/'+name }//replace it with path(id) of the folder
+    }
+    console.log(arg);
     const dropboxUploadStream = dropbox({
       resource: 'files/upload',
-      parameters: {
-          path: path+'/'+name //replace it with path(id) of the folder
-      }
+      parameters: arg 
+      
   }, (err, resul, response) => {
     
+   
       if(err)      {
         result={
             success:false,
@@ -127,7 +128,7 @@ router.post('/UploadFile/:token/:name/:path/:email',AppConstants.checkAccessMidd
 })
 
 
-//in dev
+//integrated
 router.post('/DownloadFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
 
   var result = new Object();
@@ -155,7 +156,7 @@ router.post('/DownloadFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddl
     });
 })
 
-//in dev
+//integrated
 router.post('/ListFiles',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
 
   var result= new Object();
@@ -358,10 +359,10 @@ function getTokenFromCode(code)
   });
 
 }
+
 function dropboxTokenMiddleware(req,res,next)
 {
   var userData = req.userData;
- 
   dbxDAL.getDropboxAccounts(userData.email)
   .then((account)=>{
        req.dropboxAccount=account;
