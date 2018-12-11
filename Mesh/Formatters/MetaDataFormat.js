@@ -21,7 +21,7 @@ MetaDataFormat.prototype.parseDropboxFile= function(file){
     {
         obj["mimeType"]=mime.lookup(obj["name"]);
     }
-    console.log(mime.lookup(obj["name"]));
+  
     return obj;
 }
 

@@ -3,6 +3,7 @@ const router = express.Router();
 require('isomorphic-fetch'); 
 const Dropbox = require('dropbox').Dropbox;
 const url = require('url');
+const fs = require('fs');
 const queryString  = require('query-string');
 const AppConstants= require('../Extras/Globals');
 const axios = require('axios');
@@ -10,6 +11,7 @@ const DropboxCredentials = require('../Dropbox/DropboxCredentials');
 const dbxDAL= require('./DropboxDAL');
 const Formatter =require('../Formatters/MetaDataFormat'); 
 const DropboxTags = require('../Dropbox/DropboxTags');
+const dropboxV2Api = require('dropbox-v2-api');
 var dbx = new Dropbox();
 
 
@@ -21,55 +23,150 @@ const DROPBOX_AUTH_REDIRECT_URL=AppConstants.DEPLOYED_URL+'/Dropbox'+DROPBOX_AUT
 
 // dbx.setAccessToken(DropboxCredentials.DROPBOX_APP_SAMPLE_ACCESS_TOKEN); //for testing
 
-router.get('/UserAccount/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
-
-  var obj = new Object();
-  var userData= req.userData;
-  dbxDAL.getDropboxToken(userData.email)
-  .then((token)=>{
+router.get('/UserAccount/:token',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
+    var obj = new Object();
+  
+    var dropboxAccount=req.dropboxAccount;
+    var token=dropboxAccount.token;
     dbx.setAccessToken(token["access_token"]);
     dbx.usersGetCurrentAccount()
     .then(function(response) {
      console.log(response);
-   
      obj={
        data:response,
        success:true
      }
-
      res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
      })
     .catch(function(error) {
-
       obj["error"]=error[DropboxTags.TAG_ERROR];
       obj["messgae"]=error[DropboxTags.TAG_ERROR][DropboxTags.TAG_ERROR_MSG];
      res.status(AppConstants.RESPONSE_FAIL).json(obj);
     });
-  }).catch((err)=>{
+})
 
-    obj={
-      error:err,
-      message:err.message
-    }
-    res.status(AppConstants.RESPONSE_FAIL).json(obj);
+//not used
+router.get('/DownloadFile/:token/',AppConstants.checkAccessMiddleware,(req,res)=>{
 
+  var result = new Object();
+  var fileName= req.query.fileName;
+  var userData= req.userData;
+  var filePath = req.query.path;
+  
+
+  res.setHeader("Access-Control-Expose-Headers","File-Name,Content-disposition");
+			res.setHeader('Content-disposition', 'attachment; filename='+fileName);
+			res.setHeader("File-Name",fileName);
+
+  dbxDAL.getDropboxToken(userData.email)
+  .then((token)=>{
+    console.log(token);
+    const dropbox = dropboxV2Api.authenticate({
+      token: token["access_token"]
+    });
+ 
+    var arg = {path : filePath}
+    var downloadStream = dropbox({
+      resource: 'files/download',
+      parameters: arg				
+    });
+    var stream = downloadStream.pipe(res);
+    stream.on('finish',function(){
+  //    res.end();
+      console.log("File Downloaded");
+    });
+
+
+  })
+  .catch((error)=>{
+    result["error"]=error;
+    res.status(AppConstants.RESPONSE_FAIL).json(result);
   });
 })
 
 
-router.post('/ListFiles',AppConstants.checkAccessMiddleware,(req,res)=>{
+router.post('/UploadFile/:token/:name/:path/:email',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
+  
+  var result = new Object();
+  var userData=req.userData;
+  var name = req.params.name;
+  var path = req.params.path;
+  var dropboxAccount=req.dropboxAccount;
+  var token = dropboxAccount.token;
+
+  
+    const dropbox = dropboxV2Api.authenticate({
+      token: token["access_token"]
+    });
+
+    const dropboxUploadStream = dropbox({
+      resource: 'files/upload',
+      parameters: {
+          path: path+'/'+name //replace it with path(id) of the folder
+      }
+  }, (err, resul, response) => {
+    
+      if(err)      {
+        result={
+            success:false,
+            error:err
+        }
+        res.status(AppConstants.RESPONSE_FAIL).json(result);
+      }
+      else{  //upload completed 
+        result={
+          success:true,
+          message:"Upload Completed"
+        }
+        res.status(AppConstants.RESPONSE_SUCCESS).json(result);
+      }
+     
+  });
+  req.pipe(dropboxUploadStream);//replace this with stream coming in request
+  
+})
+
+
+//in dev
+router.post('/DownloadFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
+
+  var result = new Object();
+  var filePath = req.body.path;
+  var fileName= req.body.fileName;
+  var dropboxAccount=req.dropboxAccount;
+  var token = dropboxAccount.token;
+
+  res.setHeader("Access-Control-Expose-Headers","File-Name,Content-disposition");
+	res.setHeader('Content-disposition', 'attachment; filename='+fileName);
+	res.setHeader("File-Name",fileName);
+
+    const dropbox = dropboxV2Api.authenticate({
+      token: token["access_token"]
+    });
+    var arg = {path : filePath}
+    var downloadStream = dropbox({
+      resource: 'files/download',
+      parameters: arg				
+    });
+    var stream = downloadStream.pipe(res);
+    stream.on('finish',function(){
+      res.end();
+      console.log("File Downloaded");
+    });
+})
+
+//in dev
+router.post('/ListFiles',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
 
   var result= new Object();
-  var userData= req.userData;
-
+  var dropboxAccount = req.dropboxAccount;//coming from middleware
+  var token = dropboxAccount.token;
+  console.log(req.dropboxAccount);
   var path = req.body.path;
   if(!path)
   {
     path = '';
   }
-
-  dbxDAL.getDropboxToken(userData.email)
-  .then((token)=>{
     dbx.setAccessToken(token["access_token"]);
     var arg = {path:path,include_media_info:true};
     dbx.filesListFolder(arg)//folder path here 
@@ -82,12 +179,15 @@ router.post('/ListFiles',AppConstants.checkAccessMiddleware,(req,res)=>{
           var obj =f.parseDropboxFile(files.entries[i]);
           data.push(obj);
       }
-      
+      var arr= new Array();   
+      result["email"]=dropboxAccount.user.emailAddress;  
+      result["drive"]="dropbox";
       result["count"]=files.entries.length;
       result["success"]=true;
-      result["data"]=data;
-      res.status(AppConstants.RESPONSE_SUCCESS).json(result);
-  
+      result["files"]=data;
+      arr.push(result);
+      res.status(AppConstants.RESPONSE_SUCCESS).json(arr);
+
     })
     .catch(function(error) {
       console.log(error);
@@ -95,38 +195,44 @@ router.post('/ListFiles',AppConstants.checkAccessMiddleware,(req,res)=>{
       result["messgae"]=error[DropboxTags.TAG_ERROR][DropboxTags.TAG_ERROR_MSG];
      return res.status(AppConstants.RESPONSE_FAIL).json(result);
     });
-   
-  })
-  .catch((err)=>{
-    return  res.status(AppConstants.RESPONSE_FAIL).json({error:err.message})
-  });
 
    
 })
+//in dev
+router.post('/GetFileMeta',AppConstants.checkAccessMiddleware,(req,res)=>{
 
-router.post('/getFileMeta',(req,res)=>{
   var obj = new Object();
-  dbx.setAccessToken(DropboxCredentials.DROPBOX_APP_SAMPLE_ACCESS_TOKEN);
-  var filePath = req.body.path;
-  console.log(filePath);
-  var arg = {path:filePath,include_media_info:true};
-  dbx.filesAlphaGetMetadata(arg)
-  .then((file)=>{
-    obj["data"]=file;
-    obj["success"]=true;
-    res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
-
+  var userData= req.userData;  
+  dbxDAL.getDropboxToken(userData.email)
+  .then((token)=>{
+    dbx.setAccessToken(token["access_token"])
+    var filePath = req.body.path;
+    console.log(filePath);
+    var arg = {path:filePath,include_media_info:true};
+    dbx.filesAlphaGetMetadata(arg)
+    .then((fileMeta)=>{
+      var formatter = new Formatter();
+      fileMeta=formatter.parseDropboxFile(fileMeta);
+      obj["data"]=fileMeta;
+      obj["success"]=true;
+      res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
+  
+    })
+    .catch((error)=>{
+      obj["error"]=error[DropboxTags.TAG_ERROR];
+      obj["messgae"]=error[DropboxTags.TAG_ERROR][DropboxTags.TAG_ERROR_MSG];
+      res.status(AppConstants.RESPONSE_FAIL).json(obj);
+    })
   })
   .catch((error)=>{
-    obj["error"]=error[DropboxTags.TAG_ERROR];
-    obj["messgae"]=error[DropboxTags.TAG_ERROR][DropboxTags.TAG_ERROR_MSG];
+    obj["error"]=error;
+    obj["message"]=error.message;
     res.status(AppConstants.RESPONSE_FAIL).json(obj);
-    
-  })
+  });
+ 
 
 
 })
-
 
 //complete
 router.post('/Authenticate',AppConstants.checkAccessMiddleware,(req,res)=>{
@@ -161,7 +267,6 @@ router.post('/Authenticate',AppConstants.checkAccessMiddleware,(req,res)=>{
 });
 
 //complete
-// /code
 router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
     
       var values = req.query;
@@ -252,6 +357,19 @@ function getTokenFromCode(code)
         })
   });
 
+}
+function dropboxTokenMiddleware(req,res,next)
+{
+  var userData = req.userData;
+ 
+  dbxDAL.getDropboxAccounts(userData.email)
+  .then((account)=>{
+       req.dropboxAccount=account;
+      next();
+  }).catch((err)=>{
+    return res.status(AppConstants.RESPONSE_FAIL).json({error:err});
+  
+  })
 }
 
 
