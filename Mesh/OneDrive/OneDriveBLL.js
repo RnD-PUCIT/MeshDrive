@@ -1,12 +1,16 @@
-const {google} = require('googleapis');
-const promise=require("promises");
+const oneDrive = require('onedrive-api');
 const fs = require('fs');
-const CircularJSON=require('circular-json');
+const request=require('request');
+const moment=require('moment');
 var exports=module.exports={};
 
 
-const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const REDIRECT_URI="https://test-depositoryworks.ngrok.io/googledrive/code";
+const SCOPES = ['user.read%20files.readwrite%20offline_access'];
+const CLIENT_SECRET="mfqkjUT1046!#zfCGJKO0-}";
+const REDIRECT_URI="https://test-depositoryworks.ngrok.io/onedrive/code";
+const AUTH_BASE_URL="https://login.microsoftonline.com/common/oauth2/v2.0/authorize?";
+const TOKEN_BASE_URL="https://login.microsoftonline.com/common/oauth2/v2.0/token";
+const USER_INFO_BASE_URL="https://graph.microsoft.com/v1.0/me"
 
 exports.readFile = function(filePath)
 {
@@ -31,248 +35,259 @@ exports.writeFile=function(path,content)
   });
 }
 
-exports.getGoogleDriveAuthRedirectLink = function(oAuth2Client,email){
-  
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-    state:email
-  });   
-  return authUrl;
+exports.getOneDriveAuthRedirectLink = function(clientId,userData){
+  var redirectUri=AUTH_BASE_URL+"client_id="+clientId+
+                  "&response_type=code&redirect_uri="+
+                  REDIRECT_URI+"&response_mode=query&scope="+
+                  SCOPES+"&state="+userData;
+  return redirectUri;
 }
 
 
 exports.createAuth=function(credentials)
 {
   const {client_secret, client_id} = JSON.parse(credentials).web;
-	return oAuth2Client = new google.auth.OAuth2(
+	return oAuth2Client = new oneDrive.auth.OAuth2(
 	client_id, client_secret, REDIRECT_URI);
 }
 
-exports.createAuthOject = function(credentials,token)
+exports.refreshToken = function(clientID,token)
 {
-
   return new Promise((success,failure)=>{
-    var refreshToken= token.refresh_token;
-    const oAuth2Client = exports.createAuth(credentials);
-    oAuth2Client.setCredentials(token);
-    if(refreshToken)
+    if(checkTokenExpiration(token))
     {
-      exports.refreshToken(oAuth2Client,refreshToken)
-      .then((newToken)=>{
-        oAuth2Client.setCredentials(newToken);
-        success(oAuth2Client);
-      })
-      .catch((err)=>{
-        success(oAuth2Client);
+      request({
+        url:TOKEN_BASE_URL,
+        method:"POST",
+        headers:{
+          "content-type":"application/x-www-form-urlencoded"
+        },
+        body:"client_id="+clientID+"&scope="+SCOPES+
+        "&refresh_token="+token.refresh_token+"&redirect_uri="+
+          REDIRECT_URI+"&grant_type=refresh_token"+"&client_secret="+CLIENT_SECRET
+      },(error,response,body)=>{
+         if(error)
+         {
+           return failure(error);
+         }
+           
+          else
+          {
+            token=JSON.parse(body);
+            token.updated=true;
+            return success(token);
+          }
+            
       });
     }
-    else{
-      success(oAuth2Client);
+    else
+    {
+      token.updated=false;
+      return success(token);
     }
   });
 }
 
 
+function checkTokenExpiration(token)
+{
+  var start=moment(token.LastModifiedOn,'YYYY-MM-DD HH:mm:ss');
+	var end=moment(moment.now());
+  if(end.diff(start,'seconds')>=token.expires_in)
+    return true;
+  else
+    return false;
 
-exports.getTokenFromCode = function(code,oAuth2Client){
+}
+
+exports.getTokenFromCode = function(code,clientID){
   return new Promise((success,failure)=>
   {
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err){
-        return failure("Server Error invalid Code");
+    request({
+      url:TOKEN_BASE_URL,
+      method:"POST",
+      headers:{
+        "content-type":"application/x-www-form-urlencoded"
+      },
+      body:"client_id="+clientID+"&scope="+SCOPES+"&code="+code+"&redirect_uri="+
+        REDIRECT_URI+"&grant_type=authorization_code"+"&client_secret="+CLIENT_SECRET
+    },(error,response,body)=>{
+        if(error)
+          failure(error);
+        else
+          success(body);
+    });
+  });
+}
+
+
+
+
+exports.listFiles = function(token) {
+  return new Promise((success,failure)=>
+  {
+    oneDrive.items.listChildren({
+      accessToken: token.access_token
+    }).then((childrens) => {
+      success(childrens.value);
+    }).catch((err)=>{
+      failure(err.error);
+    });
+  });
+}
+
+
+
+exports.listFilesById = function(token,fileId) {
+  return new Promise((success,failure)=>
+  {
+    oneDrive.items.listChildren({
+      accessToken: token.access_token,
+      itemId: fileId
+    }).then((childrens) => {
+      var files=[];
+      for (let index = 0; index < childrens.value.length; index++) {
+        const file = childrens.value[index];
+        files.push(getMeshDriveFileObjectFromOneDrive(file));
       }
-      success(token);
+      success(files);
+    }).catch((err)=>{
+      failure(err.error);
+    });
+  });
+}
+
+exports.listFilesRoot = function(token,email) {
+  return new Promise((success,failure)=>
+  {
+    oneDrive.items.listChildren({
+      accessToken: token.access_token
+    }).then((childrens) => {
+      var returnObj={};
+      returnObj.email=email;
+      returnObj.drive="onedrive";
+      var files=[];
+      for (let index = 0; index < childrens.value.length; index++) {
+        const file = childrens.value[index];
+        files.push(getMeshDriveFileObjectFromOneDrive(file));
+      }
+      returnObj.files=files;
+
+      success(returnObj);
+    }).catch((err)=>{
+      failure(err.error);
     });
   });
 }
 
 
-
-
-exports.listFiles = function(auth) {
-  return new Promise((success,failure)=>
-  {
-    const drive = google.drive({version: 'v3', auth});
-      drive.files.list({
-        pageSize: 100,
-        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)'
-      }, (err, res) => {
-        if (err) {
-          return failure("Error in list files");
-        }
-        success(res.data.files);
-      });
-  });
-}
-
-
-
-exports.listFilesById = function(auth,fileId) {
-  return new Promise((success,failure)=>
-  {
-    const drive = google.drive({version: 'v3', auth});
-      drive.files.list({
-        pageSize: 100,
-        includeRemoved: false,
-        spaces: 'drive',
-        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
-        q: `'${fileId}' in parents`
-      }, (err, res) => {
-        if (err) {
-          return failure("Error in list files");
-        }
-        success(res.data.files);
-      });
-  });
-}
-
-exports.listFilesRoot = function(auth,email) {
-  return new Promise((success,failure)=>
-  {
-    fileId="root";
-    const drive = google.drive({version: 'v3', auth});
-      drive.files.list({
-        pageSize: 1000, //List max 1000 files
-        includeRemoved: false,
-        spaces: 'drive',
-        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
-        q: `'${fileId}' in parents` //Search query to find files whoose parent is fileId, in this case filesId is root
-      }, (err, res) => {
-        if (err) {
-          return failure("Error in list files");
-        }
-        var returnObj={};
-        returnObj.email=email;
-        returnObj.drive="googledrive";
-        returnObj.files=res.data.files;
-        success(returnObj);
-      });
-  });
-}
-
-exports.listFilesById = function(auth,fileId) {
-  return new Promise((success,failure)=>
-  {
-    const drive = google.drive({version: 'v3', auth});
-      drive.files.list({
-        pageSize: 1000,
-        includeRemoved: false,
-        spaces: 'drive',
-        fields: 'nextPageToken, files(id, name, mimeType, parents, description, createdTime)',
-        q: `'${fileId}' in parents` //Search query to find files whoose parent is fileId
-      }, (err, res) => {
-        if (err) {
-          return failure("Error in list files");
-        }
-        success(res.data.files);
-      });
-  });
-}
-
-exports.downloadFile = function(auth,fileId,res){
+exports.downloadFile = function(token,fileId,res){
   return new Promise((success,failure)=>{
-    const drive = google.drive({version: 'v3', auth});
-    drive.files.get({
-      fileId:fileId,
-      alt:'media' //gets file data
-    },{
-      responseType:'stream' //important
-    },(err,response)=>{
-      if(err)
-        return failure(err);
-      response.data.on('error', err => {
-        if(err)
-          failure(err);
-      }).on('end', ()=>{
-          success();
-      })
-      .pipe(res);
-    });
-    // .on('end', function () {
-    //   success("Done");
-    // })
-    // .on('error', function (err) {
-    //   return failure("Unable to download file");
-    // })
-    // .pipe(response);
-    // ,
-    // (err,res)=>{
-    //   if(err)
-    //     return failure("Unable to download file");
-    //   return success(res.data);
-    // });
-    
+    oneDrive.items.download({
+      accessToken: token.access_token,
+      itemId: fileId
+    })
+    .on('error', function(err) {
+      failure(err);
+    })
+    .on('end', ()=>{
+      success();
+    })
+    .pipe(res);
   });
 }
 
-exports.uploadFile = function(auth,fileName,file,mimeType){
+exports.uploadFile = function(token,fileName,file,mimeType){
   
   return new Promise((success,failure)=>{
-    const drive = google.drive({version: 'v3', auth});
-    var fileMetadata = {
-      'name': fileName
-    };
-    var media = {
-      mimeType: mimeType,
-      body: file //file is the req object is self
-    };
-    
-    drive.files.create({
-      resource: fileMetadata,
-      media: media,
-      fields: 'id'
-    },
-     function (err, file) {
-      if (err) {
-        failure(err);
-      } else {
-        success(file.data.id);
-      }
+    oneDrive.items.uploadSimple({
+      accessToken: token.access_token,
+      filename: fileName,
+      readableStream: file
+    }).then((item) => {
+      var file=getMeshDriveFileObjectFromOneDrive(item);
+      success(file);
+    })
+    .catch((error)=>{
+        failure(error);
     });
   });
 }
 
-exports.getFileDetails = function(auth,fileId){
+exports.createFolder = function(token,folderName,parentId){
+  
   return new Promise((success,failure)=>{
-    const drive = google.drive({version: 'v3', auth});
-    drive.files.get({
-      fileId:fileId,
-    },
-    (err,res)=>{
-      if(err)
-        return failure("Unable to get file details");
-      return success(res.data);
+    oneDrive.items.createFolder({
+      accessToken: token.access_token,
+      name: folderName,
+      rootItemId:parentId
+    }).then((item) => {
+        var folder=getMeshDriveFileObjectFromOneDrive(item);
+        success(folder);
+    })
+    .catch((error)=>{
+        failure(error);
+    });
+  });
+}
+
+exports.deleteFile = function(token,fileId){
+  
+  return new Promise((success,failure)=>{
+    oneDrive.items.delete({
+      accessToken: token.access_token,
+      itemId:fileId
+    }).then(() => {
+        success();
+    })
+    .catch((error)=>{
+        failure(error);
+    });
+  });
+}
+
+exports.getFileDetails = function(token,fileId){
+  return new Promise((success,failure)=>{
+    oneDrive.items.getMetadata({
+      accessToken: token.access_token,
+      itemId: fileId
+    }).then((file) => {
+      return success(file);
+    }).catch((err)=>{
+      return failure(err.error);
     });
     
   });
 }
 
-exports.getUserDetails = function(auth){
+exports.getUserDetails = function(token){
   return new Promise((success,failure)=>{
-    const drive = google.drive({
-      auth,version: 'v3'
-    });
-    drive.about.get({fields:"user"},(err,res)=>{
-      if(err){
-        return failure(err.errors);
+    request({
+      url:USER_INFO_BASE_URL,
+      method:"GET",
+      headers:{
+        "content-type":"application/json",
+        "Authorization":token.access_token
       }
-      success(res.data);
-      
+    },(error,response,body)=>{
+        if(error)
+          failure(error);
+        else
+          success(JSON.parse(body));
     })
   });
 }
 
-exports.refreshToken=function(oAuth2Client,refreshToken){
 
-  return new Promise((success,failure)=>{
-      oAuth2Client.setCredentials({
-        refresh_token: refreshToken
-      });
-      oAuth2Client.refreshAccessToken(function(err, newToken){
-        if(err)
-          return failure(err);
-        success(newToken);
-      });
-  });
+function getMeshDriveFileObjectFromOneDrive(file)
+{
+  var meshDriveFileObject={};
+  meshDriveFileObject.id=file.id;
+  meshDriveFileObject.name=file.name;
+  meshDriveFileObject.createdTime=file.createdDateTime;
+  if(file.folder)
+    meshDriveFileObject.mimeType="application/folder";
+  if(file.file)
+    meshDriveFileObject.mimeType=file.file.mimeType;
+  return meshDriveFileObject;
 }

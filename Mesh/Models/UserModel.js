@@ -8,7 +8,6 @@ const url = "mongodb://localhost/mydb";
 mongoose.connect(url,{ useNewUrlParser: true });
 
 var User = null;
-
 const UserSchema = new Schema({
     name :  {
         type:String,
@@ -36,7 +35,6 @@ const UserSchema = new Schema({
     LastModifiedOn:
     {
         type:String,
-
         default:dateFormat(new Date(), "yyyy-mm-dd h:MM:ss")
     },
     token:{
@@ -84,6 +82,31 @@ const UserSchema = new Schema({
                 uid:String,
                 account_id:String,    
             }
+        },
+        OneDrive:{
+            AccountsList:[
+                {
+                    user:{
+                        displayName:String,
+                        emailAddress:String
+                    },
+                    token:{
+                        access_token:{
+                            type:String,
+                            default:false
+                        },
+                        refresh_token:String,
+                        scope:String,
+                        token_type:String,
+                        expires_in:String,
+                        LastModifiedOn:
+                        {
+                            type:String,
+                            default:dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss")
+                        }
+                    }  
+                }
+            ]
         }
 
     }

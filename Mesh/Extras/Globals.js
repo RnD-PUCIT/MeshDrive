@@ -8,11 +8,13 @@ const RESPONSE_EMPTY= 201;
 const DB_URL = "mongodb://localhost/mydb";
 const REDIRECT_AFTER_EMAIL_VERIFICATION="http://localhost:3000/#/verifysuccess"; //change
 const GOOGLE_DRIVE_APP_CREDENTIALS='{"web":{"client_id":"3861647215-opcortg3m71u29c3u75f2n8gohlc6ort.apps.googleusercontent.com","project_id":"mesh-drive","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://www.googleapis.com/oauth2/v3/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"RaqPfXjlf1cvPpai2v3RT6td"}}'
+const ONEDRIVE_APP_CREDETIALS="7d3d4c8d-c08e-4d12-9394-75082342a585";
 
 module.exports.DB_URL=DB_URL;
 module.exports.URL=URL;
 module.exports.CREDENTIALS_PATH="./credentials.json";
 module.exports.GOOGLE_DRIVE_APP_CREDENTIALS=GOOGLE_DRIVE_APP_CREDENTIALS;
+module.exports.ONEDRIVE_APP_CREDETIALS=ONEDRIVE_APP_CREDETIALS;
 module.exports.FRONT_URL_FORGET_PASSWORD=FRONT_URL_FORGET_PASSWORD;
 module.exports.DEPLOYED_URL=DEPLOYED_URL;
 module.exports.REDIRECT_AFTER_EMAIL_VERIFICATION=REDIRECT_AFTER_EMAIL_VERIFICATION;
