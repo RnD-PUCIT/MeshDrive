@@ -29,7 +29,6 @@ exports.getDropboxAccounts=function(email){
 		User.findOne(criteria).then((user)=>{  
             success(user.drives.Dropbox);   
 		}).catch((err)=>{
-
             failure({error:err});
         })
 		
