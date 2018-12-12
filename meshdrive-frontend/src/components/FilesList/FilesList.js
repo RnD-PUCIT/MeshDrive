@@ -48,9 +48,7 @@ class FilesList extends Component {
   }
 
   sortFileItems(fileItems) {
-    let folders = fileItems.filter(
-      fileItem => fileItem.mimeType === "application/vnd.google-apps.folder"
-    );
+    let folders = fileItems.filter(fileItem => fileItem.mimeType === "folder");
     folders.sort((a, b) => {
       const nameA = a.name.toUpperCase();
       const nameB = b.name.toUpperCase();
@@ -62,9 +60,7 @@ class FilesList extends Component {
       return 0;
     });
 
-    let files = fileItems.filter(
-      fileItem => fileItem.mimeType !== "application/vnd.google-apps.folder"  && fileItem.mimeType !== "application/vnd.google-apps.folder" 
-    );
+    let files = fileItems.filter(fileItem => fileItem.mimeType !== "folder");
     files.sort((a, b) => {
       const nameA = a.name.toUpperCase();
       const nameB = b.name.toUpperCase();

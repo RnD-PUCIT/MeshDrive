@@ -43,7 +43,12 @@ export default function fetchFilesById(
         };
         break;
       case ONEDRIVE:
-        // postURL = apiRoutes.
+        postURL = apiRoutes.files.onedrive_listDriveFilesById;
+        postData = {
+          listFilesAccount,
+          fileId,
+          token
+        };
         break;
 
       case DROPBOX:
