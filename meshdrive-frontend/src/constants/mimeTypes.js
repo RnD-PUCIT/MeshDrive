@@ -7,7 +7,7 @@ export const googleMimeTypes = [
   "application/vnd.google-apps.document",
   "application/vnd.google-apps.drawing",
   "application/vnd.google-apps.file",
-  "application/vnd.google-apps.folder",
+  "folder", // GOOGLEDRIVE: application/vnd.google-apps.folder
   "application/vnd.google-apps.form",
   "application/vnd.google-apps.fusiontable",
   "application/vnd.google-apps.map",
