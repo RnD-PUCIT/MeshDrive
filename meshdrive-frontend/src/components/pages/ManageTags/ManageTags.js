@@ -14,6 +14,8 @@ import SideBar from "../../Layout/SideBar/SideBar";
 import FAIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
 import fetchTagsList from "../../../actions/user/fetchTagsList";
 import addTag from "../../../actions/user/addTag";
+import { CirclePicker} from 'react-color'
+import { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } from "constants";
 
 class ManageTags extends Page{
   constructor(props) {
@@ -21,7 +23,9 @@ class ManageTags extends Page{
     this.state = {
       modal: false,
       tagName:"",
-      tagDescription:""
+      tagDescription:"",
+      tagColor:'#0000' //default
+ 
     };
 
     this.toggle = this.toggle.bind(this);
@@ -43,17 +47,24 @@ class ManageTags extends Page{
    
   }
 
+  handleChangeColor = (color)=>{
+  
+    console.log("COLORRRRRR==>"+color.hex);
+    this.setState({"tagColor":color.hex});
+  }
   handleCreateTagRequest = e=>{
     e.preventDefault();
     let tag = {
       tagName:this.state.tagName,
-      tagDescription:this.state.tagDescription
+      tagDescription:this.state.tagDescription,
+      tagColor:this.state.tagColor
     }
     this.setState(
       {
         modal: false,
         tagName:"",
-        tagDescription:""
+        tagDescription:"",
+        tagColor:'#f44336'  // default 
       }
     );
     this.props.addTag(tag);
@@ -64,15 +75,29 @@ componentDidMount()
   this.props.fetchTagsList();
 }
 
+
+
+  
     render() {
       const { tagsList  = [] } = this.props.user;
-  
+      let colorArray =['#6495ed', '#8470ff', '#1e90ff','#87ceeb',
+      '#87cefa', '#add8e6', '#00ced1','#00ffff',
+      "#f44336", "#e91e63", "#9c27b0",
+
+       "#673ab7","#3f51b5", "#2196f3", "#03a9f4", "#00bcd4",
+        "#009688", "#4caf50", "#8bc34a", "#cddc39",
+         "#ffeb3b", "#ffc107",
+
+          "#ff9800", "#ff5722","#8fbc8f", "#98fb98", "#bdb76b",
+          "#adff2f", "#f08080", "#ffc0cb", "#d8bfd8",
+           "#dda0dd", "#f0fff0",
+    ];
       let i = 1;
       const displayTags = tagsList
         .map(tag => (
           <tr key={tag._id}>
             <th scope="row">{i++}</th>
-            <td>{tag.name}</td>
+            <td style={{backgroundColor:tag.color}}>{tag.name}</td>
             <td>{tag.description}</td>
   
               </tr>
@@ -129,12 +154,21 @@ componentDidMount()
                   
            </FormGroup>
            <FormGroup> 
-            <Label>Color</Label>
+            <Label>Tag Color</Label>
+            <CirclePicker 
+              colors={colorArray}
+              width='500px'
+              className="ColorPicker" 
+              onChangeComplete={ this.handleChangeColor }/>
            </FormGroup>
-
           </ModalBody>
           <ModalFooter>
-            <Button className="ml-auto btn-gradient" onClick={this.handleCreateTagRequest}>Create Tag</Button>{' '}
+          {this.state.tagName!=="" ? (
+                   <Button className="ml-auto btn-gradient" onClick={this.handleCreateTagRequest}>Create Tag</Button>
+                  ) : (
+                    <Button className="ml-auto btn-disabled" disabled>Create Tag</Button>
+            
+                  )}
             <Button color="secondary" onClick={this.toggle}>Cancel</Button>
           </ModalFooter>
         </Modal>

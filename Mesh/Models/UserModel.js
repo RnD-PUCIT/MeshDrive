@@ -53,6 +53,10 @@ const UserSchema = new Schema({
         description:{
             type:String,
             default:"None"
+        },
+        color:{
+            type:String,
+            default:'#0000'
         }      
     }
     ],

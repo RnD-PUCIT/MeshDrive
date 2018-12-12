@@ -49,10 +49,10 @@ export default function(state = initialUserState, action) {
       return { ...state, token, driveAccountsList,email };
 
     case ADD_TAG:
-    const { tagName, tagDescription } = action.payload;
-    console.log(tagName,tagDescription);
+    const { tagName, tagDescription ,tagColor} = action.payload;
+    console.log(tagName,tagDescription,tagColor);
     let newTagsState = Object.assign(state);
-    newTagsState.tagsList.push({name:tagName,description:tagDescription});
+    newTagsState.tagsList.push({name:tagName,description:tagDescription,color:tagColor});
     return newTagsState;
 
   }

@@ -472,7 +472,8 @@ router.post("/createTag",Constants.checkAccessMiddleware,function(req,res){
     var result = new Object();
     var label = {
         name: req.body.tagName,
-        description: req.body.tagDescription     
+        description: req.body.tagDescription===""?"None":req.body.tagDescription,
+        color:req.body.tagColor  
     }
     let criteria = {"email":req.body.email,"labels.name":{$ne:label.tagName}};
    

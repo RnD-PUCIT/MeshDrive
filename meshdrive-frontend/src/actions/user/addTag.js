@@ -12,10 +12,10 @@ import fetchTagsList from "./fetchTagsList";
 
 
 
-function addTagAction(tagName,tagDescription) {
+function addTagAction(tagName,tagDescription,tagColor) {
     return {
       type: ADD_TAG,
-      payload: { tagName,tagDescription }
+      payload: { tagName,tagDescription,tagColor }
     };
   }
 
@@ -26,6 +26,7 @@ export default function addTag(tag) {
       const {token , email} = user;
       let tagName = tag.tagName;
       let tagDescription = tag.tagDescription;
+      let tagColor = tag.tagColor;
     dispatch(startApiRequest());
  
     axios
@@ -33,7 +34,8 @@ export default function addTag(tag) {
         email,
         token,
         tagName,
-        tagDescription
+        tagDescription,
+        tagColor
       })
       .then(
         response => {
@@ -44,7 +46,7 @@ export default function addTag(tag) {
                 </SweetAlertWrapper>
               );            
             dispatch(finishApiRequest(null,true,responseUiComponent));
-            dispatch(addTagAction(tagName,tagDescription));
+            dispatch(addTagAction(tagName,tagDescription,tagColor));
         },
         error => {
           dispatch(finishApiRequest());
