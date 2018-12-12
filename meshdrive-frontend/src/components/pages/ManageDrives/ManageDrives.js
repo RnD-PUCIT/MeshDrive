@@ -13,22 +13,18 @@ import fetchDriveAccountsList from "../../../actions/user/fetchDriveAccountsList
 import requestRemoveGoogleAccountByEmail from "../../../actions/user/requestRemoveGoogleAccountByEmail";
 import requestRemoveAllGoogleDriveAccounts from "../../../actions/user/requestRemoveAllGoogleDriveAccounts";
 import FontAwesomeIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
+import { GOOGLEDRIVE, ONEDRIVE, DROPBOX } from "../../../constants/strings";
 class ManageDrives extends Page {
   state = {
     driveAccountsList: []
   };
-  handleGoogleDriveClick = e => {
-    e.preventDefault();
 
+  handleDriveClick = drive => {
     const { token } = this.props.user;
 
-    this.props.addDrive(token, "GOOGLEDRIVE");
+    this.props.addDrive(token, drive);
   };
-  handleDropboxClick = e => {
-    e.preventDefault();
-     const { token } = this.props.user;
-     this.props.addDrive(token, "DROPBOX");
-  };
+
   handleRemoveAllAccounts = e => {
     e.preventDefault();
 
@@ -41,40 +37,51 @@ class ManageDrives extends Page {
       dropboxAccountsList = [],
       oneDriveAccountsList = []
     } = driveAccountsList;
-    console.log("DRIVES"+ driveAccountsList);
+    console.log("DRIVES" + driveAccountsList);
     let i = 1;
-    const mapGoogleAccountsToTr = googleDriveAccountsList
-      .map(account => (
-        <tr key={account}>
-          <th scope="row">{i++}</th>
-          <td>{account}</td>
-          <td>Google</td>
-          <td>
-            <Button
-              outline
-              onClick={() => {
-                this.props.requestRemoveGoogleAccountByEmail(account);
-              }}
-            >
-              <FontAwesomeIcon icon="times" classes={["fas"]} />
-            </Button>
-          </td>
-        </tr>
-      ));
+    const mapGoogleAccountsToTr = googleDriveAccountsList.map(account => (
+      <tr key={account}>
+        <th scope="row">{i++}</th>
+        <td>{account}</td>
+        <td>Google</td>
+        <td>
+          <Button
+            outline
+            onClick={() => {
+              this.props.requestRemoveGoogleAccountByEmail(account);
+            }}
+          >
+            <FontAwesomeIcon icon="times" classes={["fas"]} />
+          </Button>
+        </td>
+      </tr>
+    ));
 
-      const mapDropboxAccountsToTr = dropboxAccountsList
-      .map(account => (
-        <tr key={account}>
-          <th scope="row">{i++}</th>
-          <td>{account}</td>
-          <td>Dropbox</td>
-          <td>
-            <Button outline>
-              <FontAwesomeIcon icon="times" classes={["fas"]} />
-            </Button>
-          </td>
-        </tr>
-      ));
+    const mapDropboxAccountsToTr = dropboxAccountsList.map(account => (
+      <tr key={account}>
+        <th scope="row">{i++}</th>
+        <td>{account}</td>
+        <td>Dropbox</td>
+        <td>
+          <Button outline>
+            <FontAwesomeIcon icon="times" classes={["fas"]} />
+          </Button>
+        </td>
+      </tr>
+    ));
+
+    const mapOnedriveAccountsToTr = oneDriveAccountsList.map(account => (
+      <tr key={account}>
+        <th scope="row">{i++}</th>
+        <td>{account}</td>
+        <td>OneDrive</td>
+        <td>
+          <Button outline>
+            <FontAwesomeIcon icon="times" classes={["fas"]} />
+          </Button>
+        </td>
+      </tr>
+    ));
 
     return (
       <React.Fragment>
@@ -125,16 +132,22 @@ class ManageDrives extends Page {
             <Button
               color="danger"
               outline
-              onClick={this.handleGoogleDriveClick}
+              onClick={() => this.handleDriveClick(GOOGLEDRIVE)}
             >
               Add Google Drive
             </Button>
-            <Button color="primary" 
-            outline
-            onClick={this.handleDropboxClick}>
+            <Button
+              color="primary"
+              outline
+              onClick={() => this.handleDriveClick(DROPBOX)}
+            >
               Add DropBox
             </Button>
-            <Button color="dark" outline>
+            <Button
+              color="dark"
+              outline
+              onClick={() => this.handleDriveClick(ONEDRIVE)}
+            >
               Add OneDrive
             </Button>
           </ButtonGroup>
@@ -159,8 +172,11 @@ class ManageDrives extends Page {
                 <th>Remove</th>
               </tr>
             </thead>
-            <tbody>{mapGoogleAccountsToTr}
-            {mapDropboxAccountsToTr}</tbody>
+            <tbody>
+              {mapGoogleAccountsToTr}
+              {mapDropboxAccountsToTr}
+              {mapOnedriveAccountsToTr}
+            </tbody>
           </Table>
         </div>
       </React.Fragment>
