@@ -38,7 +38,12 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
         );
         break;
       case ONEDRIVE:
-        // postURL = apiRoutes.
+        postURL = apiRoutes.files.onedrive_uploadFile(
+          file.name,
+          encodedMimeType,
+          uploadFileEmail,
+          token
+        );
         break;
 
       case DROPBOX:
