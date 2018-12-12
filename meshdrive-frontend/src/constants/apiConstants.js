@@ -2,10 +2,8 @@ export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/
 
 const ngrokUrl = localStorage.getItem("ngrok");
 
-export const apiBaseUrl = ngrokUrl
-  ? ngrokUrl
-  : "http://localhost:8000";
-
+export const apiBaseUrl = ngrokUrl ? ngrokUrl : "https://dc2e1100.ngrok.io";
+//http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
   users: {
     // method GET
@@ -71,12 +69,18 @@ export const apiRoutes = {
     removeGoogleAccountByEmail: `${apiBaseUrl}/GoogleDrive/RemoveGoogleAccountByEmail`
   },
   files: {
+    // google
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
     listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
     listDriveFilesById: `${apiBaseUrl}/GoogleDrive/ListDriveFilesById`,
     downloadFile: (downloadFileAccount, fileId, token) =>
       `${apiBaseUrl}/GoogleDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
-      `${apiBaseUrl}/GoogleDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`
+      `${apiBaseUrl}/GoogleDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`,
+
+    // dropbox
+    dropbox_listFiles: `${apiBaseUrl}/Dropbox/ListFiles`,
+    dropbox_downloadFile: `${apiBaseUrl}/Dropbox/DownloadFile`,
+    dropbox_uploadFile: (fileName, filePath, uploadFileEmail, token) => `${apiBaseUrl}/Dropbox/UploadFile/${token}/${filePath}/${fileName}/${uploadFileEmail}`
   }
 };

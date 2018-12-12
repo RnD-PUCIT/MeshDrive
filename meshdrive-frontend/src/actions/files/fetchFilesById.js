@@ -32,25 +32,31 @@ export default function fetchFilesById(
     console.log("Starting API call from fetchRootFiles");
     dispatch(startApiRequest());
 
-    let postURL;
+    let postURL, postData;
     switch (drive) {
       case GOOGLEDRIVE:
         postURL = apiRoutes.files.listDriveFilesById;
+        postData = {
+          listFilesAccount,
+          fileId,
+          token
+        };
         break;
       case ONEDRIVE:
         // postURL = apiRoutes.
         break;
 
       case DROPBOX:
-        // postURL = apiRoutes.
+        postURL = apiRoutes.files.dropbox_listFiles;
+        postData = {
+          listFilesAccount,
+          path: fileId,
+          token
+        };
         break;
     }
     axios
-      .post(postURL, {
-        listFilesAccount,
-        fileId,
-        token
-      })
+      .post(postURL, postData)
       .then(response => {
         const data = response.data;
         // sort files
