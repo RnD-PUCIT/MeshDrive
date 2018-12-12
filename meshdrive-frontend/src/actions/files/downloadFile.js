@@ -44,6 +44,27 @@ export default function downloadFile(drive, downloadFileAccount, file) {
         });
         break;
       case ONEDRIVE:
+        axios({
+          url: apiRoutes.files.onedrive_downloadFile(
+            downloadFileAccount,
+            file.id,
+            token
+          ),
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          responseType: "blob" // important
+        }).then(response => {
+          const blob = new Blob([response.data], { type: response.data.type });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          const fileName = response.headers["file-name"];
+          link.setAttribute("download", fileName);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        });
         break;
       case DROPBOX:
         axios({
