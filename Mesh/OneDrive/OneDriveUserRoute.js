@@ -31,7 +31,13 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 	var result=new Object(); 
 	//Getting redirect urls from request body.
 	if(req.body.redirectSuccess && req.body.redirectFailure){
-		userData=req.userData.email+";" + req.body.redirectSuccess + ";" + req.body.redirectFailure; //Creating a colon separated string to send along redirect uri to identify the user when google redirects back
+		userData={};
+		userData.redirectSuccess=req.body.redirectSuccess;
+		userData.redirectFailure=req.body.redirectSuccess;
+		userData.email=req.userData.email;
+		userData=JSON.stringify(userData);
+		let buff = new Buffer(userData);  
+		userData = buff.toString('base64');
 	}
 	else{
 		//return call if client has not appended redirect urls
@@ -47,11 +53,13 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 router.get('/Code',function(req,res){
 	var state=req.query.state; //url state param contains the user data that we appended previously in creating the redirect url for identifying the user
 	//Split state to get client email and redirect urls.
-	var splits=state.split(";");
-	var email=splits[0];
-	var redirectSuccess=splits[1];
-	var redirectFailure=splits[2];
-
+	let buff = new Buffer(state, 'base64');  
+	var userData = buff.toString('ascii');
+	userData=JSON.parse(userData);
+	var email=userData.email;
+	var redirectSuccess=userData.redirectSuccess;
+	var redirectFailure=userData.redirectFailure;
+	
 	Drive.getTokenFromCode(req.query.code,Constants.ONEDRIVE_APP_CREDETIALS) //Get user token from the code that we received
 	.then((token)=>{
 		token=JSON.parse(token);
@@ -70,7 +78,7 @@ router.get('/Code',function(req,res){
 					};
 					OneDriveDAL.saveOneDriveAccount(email,account)
 					.then((result)=>{
-						res.redirect(redirectSuccess+user.userPrincipalName); //redirect back to the client success
+						res.redirect(redirectSuccess); //redirect back to the client success
 					})
 					.catch((err)=>{
 						res.redirect(redirectFailure); //redirect back to the client failure

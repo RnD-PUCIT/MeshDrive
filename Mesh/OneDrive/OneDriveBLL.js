@@ -286,7 +286,7 @@ function getMeshDriveFileObjectFromOneDrive(file)
   meshDriveFileObject.name=file.name;
   meshDriveFileObject.createdTime=file.createdDateTime;
   if(file.folder)
-    meshDriveFileObject.mimeType="application/folder";
+    meshDriveFileObject.mimeType="folder";
   if(file.file)
     meshDriveFileObject.mimeType=file.file.mimeType;
   return meshDriveFileObject;
