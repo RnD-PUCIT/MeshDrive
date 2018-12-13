@@ -22,7 +22,7 @@ class FileItem extends Component {
     };
 
     this.isFolder =
-      this.props.file.mimeType === "application/vnd.google-apps.folder";
+      this.props.file.mimeType === "folder";
   }
   // toggleActive = e => {
   //   e.preventDefault();
@@ -59,7 +59,7 @@ class FileItem extends Component {
 
     switch (menu) {
       case "download":
-        return this.props.downloadFile(file.account, file.id);
+        return this.props.downloadFile(this.props.drive, file.account, file);
     }
   };
 

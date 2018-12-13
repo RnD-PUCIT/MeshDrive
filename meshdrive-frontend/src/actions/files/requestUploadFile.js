@@ -7,14 +7,14 @@ import toStream from "blob-to-stream";
 import request from "request";
 import React from "react";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
-
+import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 export const shouldUploadFile = (state, files) => {
   return {
     type: UPLOAD_FILE,
     payload: files
   };
 };
-export default function requestUploadFile(files, uploadFileEmail) {
+export default function requestUploadFile(drive, files, uploadFileEmail) {
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
@@ -27,30 +27,58 @@ export default function requestUploadFile(files, uploadFileEmail) {
 
     const encodedMimeType = new Buffer(file.type).toString("base64");
 
-    const postRequest = request.post(
-      apiRoutes.files.uploadFile(
-        file.name,
-        encodedMimeType,
-        uploadFileEmail,
-        token
-      ),
-      (err, resp, body) => {
-        console.log({ err, resp, body });
-      }
-    );
+    let postURL;
+    switch (drive) {
+      case GOOGLEDRIVE:
+        postURL = apiRoutes.files.uploadFile(
+          file.name,
+          encodedMimeType,
+          uploadFileEmail,
+          token
+        );
+        break;
+      case ONEDRIVE:
+        postURL = apiRoutes.files.onedrive_uploadFile(
+          file.name,
+          encodedMimeType,
+          uploadFileEmail,
+          token
+        );
+        break;
+
+      case DROPBOX:
+        postURL = apiRoutes.files.dropbox_uploadFile(
+          file.name,
+          "root",
+          uploadFileEmail,
+          token
+        );
+        break;
+    }
+
+    const postRequest = request.post(postURL, (err, resp, body) => {
+      console.log({ err, resp, body });
+    });
     postRequest.on("request", req => {
       dispatch(startApiRequest());
     });
     postRequest.on("complete", response => {
-      dispatch(
-        finishApiRequest(
-          response,
-          true,
+      let responseUiComponent;
+      console.log({ response, statusCode: response.statusCode });
+      if (response.statusCode === 200) {
+        responseUiComponent = (
           <SweetAlertWrapper success title="Success">
             {response.body.message}
           </SweetAlertWrapper>
-        )
-      );
+        );
+      } else {
+        responseUiComponent = (
+          <SweetAlertWrapper danger title="Error">
+            {response.body.message}
+          </SweetAlertWrapper>
+        );
+      }
+      dispatch(finishApiRequest(response, true, responseUiComponent));
       postRequest.on("error", response => {
         console.error(response);
 
@@ -74,6 +102,5 @@ export default function requestUploadFile(files, uploadFileEmail) {
     const stream = toStream(file);
 
     stream.pipe(postRequest);
-
   };
 }

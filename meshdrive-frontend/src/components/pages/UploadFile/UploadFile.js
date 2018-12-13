@@ -22,6 +22,7 @@ import toStream from "blob-to-stream";
 import request from "request";
 import _ from "lodash";
 // custom module imports
+import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../../constants/strings";
 import requireAuth from "../../../hoc/requireAuth";
 import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
@@ -84,6 +85,7 @@ class UploadFile extends Page {
     console.log(this.state.files);
 
     this.props.requestUploadFile(
+      this.state.drive,
       this.state.files,
       this.state.activeEmailAccount
     );
@@ -138,7 +140,7 @@ class UploadFile extends Page {
     const { googleDriveAccountsList } = driveAccountsList;
     this.setState(
       {
-        drive: "GOOGLEDRIVE",
+        drive: GOOGLEDRIVE,
         displayEmailAccounts: googleDriveAccountsList,
         isDriveValid: true
       },
@@ -146,24 +148,24 @@ class UploadFile extends Page {
     );
   };
   handleDropboxClick = () => {
-    // const { driveAccountsList = null } = this.props.user;
-    // const { googleDriveAccountsList } = driveAccountsList;
+    const { driveAccountsList = null } = this.props.user;
+    const { dropboxAccountsList } = driveAccountsList;
     this.setState(
       {
-        drive: "DROPBOX",
-        displayEmailAccounts: [],
+        drive: DROPBOX,
+        displayEmailAccounts: dropboxAccountsList,
         isDriveValid: true
       },
       this.isValidState
     );
   };
   handleOneDriveClick = () => {
-    // const { driveAccountsList = null } = this.props.user;
-    // const { googleDriveAccountsList } = driveAccountsList;
+    const { driveAccountsList = null } = this.props.user;
+    const { oneDriveAccountsList } = driveAccountsList;
     this.setState(
       {
-        drive: "ONEDRIVE",
-        displayEmailAccounts: [],
+        drive: ONEDRIVE,
+        displayEmailAccounts: oneDriveAccountsList,
         isDriveValid: true
       },
       this.isValidState
@@ -216,7 +218,7 @@ class UploadFile extends Page {
               color="danger"
               outline
               onClick={this.handleGoogleDriveClick}
-              active={this.state.drive === "GOOGLEDRIVE"}
+              active={this.state.drive === GOOGLEDRIVE}
             >
               <FAIcon icon="google" classes={["fab"]} /> Google Drive
             </Button>
@@ -224,7 +226,7 @@ class UploadFile extends Page {
               color="primary"
               outline
               onClick={this.handleDropboxClick}
-              active={this.state.drive === "DROPBOX"}
+              active={this.state.drive === DROPBOX}
             >
               <FAIcon icon="dropbox" classes={["fab"]} /> Dropbox
             </Button>
@@ -232,7 +234,7 @@ class UploadFile extends Page {
               color="dark"
               outline
               onClick={this.handleOneDriveClick}
-              active={this.state.drive === "ONEDRIVE"}
+              active={this.state.drive === ONEDRIVE}
             >
               <FAIcon icon="cloud" classes={["fa"]} /> OneDrive
             </Button>

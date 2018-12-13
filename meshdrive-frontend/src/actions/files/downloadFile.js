@@ -1,7 +1,7 @@
 import { DOWNLOAD_FILE } from "./types";
 import axios from "axios";
 import { apiRoutes } from "../../constants/apiConstants";
-import getTokenFromStore from "../../utils/getTokenFromStore";
+import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 
 export const downloadFileSuccess = () => {
   return {
@@ -10,33 +10,87 @@ export const downloadFileSuccess = () => {
   };
 };
 
-export default function downloadFile(downloadFileAccount, fileId) {
-  return dispatch => {
-    axios({
-      url: apiRoutes.files.downloadFile(
-        downloadFileAccount,
-        fileId,
-        getTokenFromStore()
-      ),
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      responseType: "blob" // important
-    }).then(response => {
-      console.log(response);
-      debugger;
+export default function downloadFile(drive, downloadFileAccount, file) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const { user } = state;
+    const { token } = user;
 
-      // let [contentType, fileName] = response.headers["content-type"].split(";");
+    console.log(drive);
+    debugger;
 
-      const blob = new Blob([response.data], { type: response.data.type });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      const fileName = response.headers["file-name"];
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    });
+    switch (drive) {
+      case GOOGLEDRIVE:
+        axios({
+          url: apiRoutes.files.downloadFile(
+            downloadFileAccount,
+            file.id,
+            token
+          ),
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          responseType: "blob" // important
+        }).then(response => {
+          const blob = new Blob([response.data], { type: response.data.type });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          const fileName = response.headers["file-name"];
+          link.setAttribute("download", fileName);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        });
+        break;
+      case ONEDRIVE:
+        axios({
+          url: apiRoutes.files.onedrive_downloadFile(
+            downloadFileAccount,
+            file.id,
+            token
+          ),
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          responseType: "blob" // important
+        }).then(response => {
+          const blob = new Blob([response.data], { type: response.data.type });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          const fileName = response.headers["file-name"];
+          link.setAttribute("download", fileName);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        });
+        break;
+      case DROPBOX:
+        axios({
+          url: apiRoutes.files.dropbox_downloadFile,
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          responseType: "blob", // important
+          data: {
+            downloadFileAccount,
+            fileName: file.name,
+            path: file.id,
+            token
+          }
+        }).then(response => {
+          const blob = new Blob([response.data], { type: response.data.type });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          const fileName = response.headers["file-name"];
+          link.setAttribute("download", fileName);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        });
+        break;
+    }
   };
 }

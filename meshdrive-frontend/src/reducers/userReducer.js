@@ -16,7 +16,7 @@ let initialUserState = {
   email:null,
   driveAccountsList: {
     googleDriveAccountsList: [],
-    dropBoxAccountsList: [],
+    dropboxAccountsList: [],
     oneDriveAccountsList: []
   },
   tagsList:[]
@@ -51,6 +51,7 @@ export default function(state = initialUserState, action) {
       console.log(token);  
       return { ...state, token, driveAccountsList,email };
 
+
     case ADD_TAG:
     let  { tagName, tagDescription ,tagColor} = action.payload;
     console.log(tagName,tagDescription,tagColor);
@@ -58,6 +59,7 @@ export default function(state = initialUserState, action) {
     newTagsState.tagsList.push({name:tagName,description:tagDescription,color:tagColor});
     return {...newTagsState,...newTagsState.tagsList};
    
+
 
     case DELETE_TAG:  
     const name = action.payload;
@@ -73,7 +75,7 @@ export default function(state = initialUserState, action) {
     }
     return {...newState,newTagsList};
     
-  
+ 
   }
   return state;
 }

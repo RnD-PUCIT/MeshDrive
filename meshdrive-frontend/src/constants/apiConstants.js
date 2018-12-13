@@ -4,8 +4,8 @@ const ngrokUrl = localStorage.getItem("ngrok");
 
 export const apiBaseUrl = ngrokUrl
   ? ngrokUrl
-  : "http://localhost:8000";
-
+  : "http://test-depositoryworks.ngrok.io";
+//http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
   users: {
     // method GET
@@ -65,21 +65,37 @@ export const apiRoutes = {
 
     authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`,
     authDropbox: `${apiBaseUrl}/Dropbox/Authenticate`,
-    listTags: `${apiBaseUrl}/users/ListTags`,
-    createTag: `${apiBaseUrl}/users/createTag`,
-    deleteTag:`${apiBaseUrl}/users/deleteTag`,
+    authOneDrive: `${apiBaseUrl}/OneDrive/Authenticate`,
     listDriveAccounts: token =>
       `${apiBaseUrl}/users/ListDriveAccounts/${token}`,
     removeAllGoogleAccounts: `${apiBaseUrl}/GoogleDrive/RemoveAllGoogleAccounts/`,
-    removeGoogleAccountByEmail: `${apiBaseUrl}/GoogleDrive/RemoveGoogleAccountByEmail`
+    removeGoogleAccountByEmail: `${apiBaseUrl}/GoogleDrive/RemoveGoogleAccountByEmail`,
+     listTags: `${apiBaseUrl}/users/ListTags`,
+    createTag: `${apiBaseUrl}/users/createTag`,
+    deleteTag:`${apiBaseUrl}/users/deleteTag`
   },
   files: {
+    // google
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
     listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
     listDriveFilesById: `${apiBaseUrl}/GoogleDrive/ListDriveFilesById`,
     downloadFile: (downloadFileAccount, fileId, token) =>
       `${apiBaseUrl}/GoogleDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
-      `${apiBaseUrl}/GoogleDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`
+      `${apiBaseUrl}/GoogleDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`,
+
+    // dropbox
+    dropbox_listFiles: `${apiBaseUrl}/Dropbox/ListFiles`,
+    dropbox_downloadFile: `${apiBaseUrl}/Dropbox/DownloadFile`,
+    dropbox_uploadFile: (fileName, filePath, uploadFileEmail, token) =>
+      `${apiBaseUrl}/Dropbox/UploadFile/${token}/${filePath}/${fileName}/${uploadFileEmail}`,
+
+    // onedrive
+    listOneDriveRootFiles: `${apiBaseUrl}/OneDrive/ListDriveRootFiles`,
+    onedrive_listDriveFilesById: `${apiBaseUrl}/OneDrive/ListDriveFilesById`,
+    onedrive_downloadFile: (downloadFileAccount, fileId, token) =>
+      `${apiBaseUrl}/OneDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
+    onedrive_uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
+      `${apiBaseUrl}/OneDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`
   }
 };

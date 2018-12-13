@@ -1,8 +1,8 @@
 const User = require('../Models/UserModel');
 const mongoose = require('mongoose');
 const url = "mongodb://localhost/mydb";
-const Dropbox = require('dropbox').Dropbox;
-var dbx = new Dropbox();
+// const Dropbox = require('dropbox').Dropbox;
+// var dbx = new Dropbox();
 
 //make it promise
 exports.saveDropboxUserAccount=function(account,email)
@@ -29,7 +29,6 @@ exports.getDropboxAccounts=function(email){
 		User.findOne(criteria).then((user)=>{  
             success(user.drives.Dropbox);   
 		}).catch((err)=>{
-
             failure({error:err});
         })
 		
