@@ -67,6 +67,7 @@ export const apiRoutes = {
     authDropbox: `${apiBaseUrl}/Dropbox/Authenticate`,
     listTags: `${apiBaseUrl}/users/ListTags`,
     createTag: `${apiBaseUrl}/users/createTag`,
+    deleteTag:`${apiBaseUrl}/users/deleteTag`,
     listDriveAccounts: token =>
       `${apiBaseUrl}/users/ListDriveAccounts/${token}`,
     removeAllGoogleAccounts: `${apiBaseUrl}/GoogleDrive/RemoveAllGoogleAccounts/`,

@@ -4,9 +4,12 @@ import {
   REMOVE_USER,
   FETCH_DRIVE_ACCOUNTS_LIST,
   FETCH_TAGS_LIST,
-  ADD_TAG
+  ADD_TAG,
+  DELETE_TAG
 } from "../actions/user/types";
 import getUserObjFromLocalStorage from "../utils/getUserObjFromLocalStorage";
+import { fileURLToPath } from "url";
+import { stat } from "fs";
 
 let initialUserState = {
   token: null,
@@ -49,12 +52,28 @@ export default function(state = initialUserState, action) {
       return { ...state, token, driveAccountsList,email };
 
     case ADD_TAG:
-    const { tagName, tagDescription ,tagColor} = action.payload;
+    let  { tagName, tagDescription ,tagColor} = action.payload;
     console.log(tagName,tagDescription,tagColor);
     let newTagsState = Object.assign(state);
     newTagsState.tagsList.push({name:tagName,description:tagDescription,color:tagColor});
-    return newTagsState;
+    return {...newTagsState,...newTagsState.tagsList};
+   
 
+    case DELETE_TAG:  
+    const name = action.payload;
+    let newState = Object.assign(state);
+    let newTagsList = newState.tagsList;
+    for(var i=0;i<newTagsList.length;i++)
+    {
+      console.log("ele  "+name);
+      if(newTagsList[i].name===name)
+      {      
+        newTagsList.splice(i,1); 
+      }
+    }
+    return {...newState,newTagsList};
+    
+  
   }
   return state;
 }

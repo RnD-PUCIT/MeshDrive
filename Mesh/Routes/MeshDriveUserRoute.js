@@ -477,7 +477,7 @@ router.post("/createTag",Constants.checkAccessMiddleware,function(req,res){
     }
     let criteria = {"email":req.body.email,"labels.name":{$ne:label.tagName}};
    
-    User.findOneAndUpdate(criteria,{$push: {labels: label}}).then(user=>{
+    User.findOneAndUpdate(criteria,{$push: {labels: label}}).then(user=>{  
         
         if(user)
         {
@@ -527,8 +527,7 @@ router.post("/deleteTag",Constants.checkAccessMiddleware,function(req,res){
 
     }).catch((err)=>{
         result.success = false;
-        result.message = "Try Again";       
-       
+        result.message = "Try Again";              
         res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
 
     });

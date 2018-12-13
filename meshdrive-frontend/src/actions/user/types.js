@@ -7,6 +7,7 @@ export const REMOVE_USER = "REMOVE_USER";
 export const ADD_DRIVE = "ADD_DRIVE";
 export const ADD_TAG = "ADD_TAG";
 
+export const DELETE_TAG = "DELETE_TAG";
 export const FETCH_DRIVE_ACCOUNTS_LIST = "FETCH_DRIVE_ACCOUNTS_LIST";
 export const FETCH_TAGS_LIST = "FETCH_TAGS_LIST";
 export const REMOVE_ALL_GOOGLE_DRIVE_ACCOUNTS =
