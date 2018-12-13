@@ -4,8 +4,7 @@ import { apiRoutes } from "../../constants/apiConstants";
 import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
 import { rootURL } from "../../constants/apiConstants";
-import { getUserReducer } from "../../utils/getTokenFromStore";
-import saveUserObj from "../user/saveUserObj";
+import { GOOGLEDRIVE, ONEDRIVE, DROPBOX } from "../../constants/strings";
 function addDriveAction(drive, email) {
   return {
     type: ADD_DRIVE,
@@ -18,17 +17,20 @@ export default function addDrive(token, drive) {
     dispatch(startApiRequest());
     let authLink;
     switch (drive) {
-      case "GOOGLEDRIVE":
+      case GOOGLEDRIVE:
         authLink = apiRoutes.users.authGoogleDrive;
         break;
-        case "DROPBOX":
+      case DROPBOX:
         authLink = apiRoutes.users.authDropbox;
+        break;
+      case ONEDRIVE:
+        authLink = apiRoutes.users.authOneDrive;
         break;
     }
     axios
       .post(authLink, {
-        redirectSuccess: `${rootURL}/#/managedrives/added/`,
-        redirectFailure: `${rootURL}/#/managedrives/failed/`,
+        redirectSuccess: `${rootURL}/#/managedrives/added`,
+        redirectFailure: `${rootURL}/#/managedrives/failed`,
         token
       })
       .then(

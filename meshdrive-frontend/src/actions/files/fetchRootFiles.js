@@ -38,7 +38,8 @@ export default function fetchRootFiles(drive, isForceReload = false) {
         listFilesAccount = googleDriveAccountsList;
         break;
       case ONEDRIVE:
-        // postURL = apiRoutes.
+        postURL = apiRoutes.files.listOneDriveRootFiles;
+        listFilesAccount = oneDriveAccountsList;
         break;
       case DROPBOX:
         postURL = apiRoutes.files.dropbox_listFiles;

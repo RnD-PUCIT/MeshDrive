@@ -160,12 +160,12 @@ class UploadFile extends Page {
     );
   };
   handleOneDriveClick = () => {
-    // const { driveAccountsList = null } = this.props.user;
-    // const { googleDriveAccountsList } = driveAccountsList;
+    const { driveAccountsList = null } = this.props.user;
+    const { oneDriveAccountsList } = driveAccountsList;
     this.setState(
       {
         drive: ONEDRIVE,
-        displayEmailAccounts: [],
+        displayEmailAccounts: oneDriveAccountsList,
         isDriveValid: true
       },
       this.isValidState
