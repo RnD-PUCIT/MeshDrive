@@ -94,6 +94,8 @@ export const apiRoutes = {
     onedrive_downloadFile: (downloadFileAccount, fileId, token) =>
       `${apiBaseUrl}/OneDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     onedrive_uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
-      `${apiBaseUrl}/OneDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`
+      `${apiBaseUrl}/OneDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`,
+
+    onedrive_createFolder: `${apiBaseUrl}/oneDrive/createfolder`
   }
 };
