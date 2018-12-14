@@ -55,16 +55,28 @@ router.get('/Code',function(req,res){
 		oAuth2Client.setCredentials(token);
 		Drive.getUserDetails(oAuth2Client) //Get user details(key is the email of account that it gave us access of)
 		.then((user)=>{ //User contains user's name, email, profile photo link
-			delete user.user.me;
-			delete user.user.permissionId;
-			var account={user:user.user,token:token};
-			GoogleDriveDAL.saveGoogleDriveAccount(email,account)
-			.then((result)=>{
-				res.redirect(redirectSuccess+user.user.emailAddress); //redirect back to the client success
+			GoogleDriveDAL.findGoogleDriveTokenByEmail(email,user.user.emailAddress)
+			.then((check)=>{
+				if(check==null)
+				{
+					delete user.user.me;
+					delete user.user.permissionId;
+					var account={user:user.user,token:token};
+					GoogleDriveDAL.saveGoogleDriveAccount(email,account)
+					.then((result)=>{
+						res.redirect(redirectSuccess+user.user.emailAddress); //redirect back to the client success
+					})
+					.catch((err)=>{
+						res.redirect(redirectFailure); //redirect back to the client failure
+					});
+				}
+				else
+					res.redirect(redirectFailure);
 			})
 			.catch((err)=>{
-				res.redirect(redirectFailure); //redirect back to the client failure
+				res.redirect(redirectFailure);
 			});
+			
 		})
 		//then and catch both getting called
 	})
