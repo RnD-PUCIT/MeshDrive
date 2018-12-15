@@ -11,8 +11,7 @@ var User = null;
 const UserSchema = new Schema({
     name :  {
         type:String,
-        required:true,
-         
+        required:true        
     },
     email:{
         type:String,
@@ -45,6 +44,22 @@ const UserSchema = new Schema({
         type:String,
         default:""
     },
+    labels:[
+        {          
+        name:{       
+            type:String,
+            default:""      
+        },
+        description:{
+            type:String,
+            default:"None"
+        },
+        color:{
+            type:String,
+            default:'#0000'
+        }      
+    }
+    ],
     drives :{
         GoogleDrive:{
             AccountsList:[
@@ -112,7 +127,7 @@ const UserSchema = new Schema({
     }
 })
 // it will aslo check case insensitive duplicates
-UserSchema.plugin(uniqueValidator,{message:"Sorry, This {PATH} is already registered."});
+UserSchema.plugin(uniqueValidator,{message:"Sorry, This {PATH} already exists."});
 
 // module.exports.getInstance = function()
 // {

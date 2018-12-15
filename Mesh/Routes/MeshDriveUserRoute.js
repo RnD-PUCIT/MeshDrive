@@ -441,6 +441,98 @@ router.get("/ListDriveAccounts/:token",Constants.checkAccessMiddleware, (req, re
     });
                     
 })
+router.post("/ListTags",function(req,res){
+    var result = new Object();
+
+    let criteria = {"email":req.body.email};
+    User.findOne(criteria).then((user)=>{
+
+        if(user.labels)
+        {
+            result.success=true;
+            result.tagsList = user.labels;
+            res.status(Constants.CODE_OK).json(result);
+
+        }
+        else
+        {
+            result.tagsList = new Array();
+            result.success=false;
+            res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
+        }
+    }).catch(err=>{
+        result.tagsList = new Array();
+        result.success=false;
+        res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
+    });
+
+});
+
+router.post("/createTag",Constants.checkAccessMiddleware,function(req,res){
+    var result = new Object();
+    var label = {
+        name: req.body.tagName,
+        description: req.body.tagDescription===""?"None":req.body.tagDescription,
+        color:req.body.tagColor  
+    }
+    let criteria = {"email":req.body.email,"labels.name":{$ne:label.tagName}};
+   
+    User.findOneAndUpdate(criteria,{$push: {labels: label}}).then(user=>{  
+        
+        if(user)
+        {
+            result.success = true;
+            result.message = "Tag Created"; 
+            res.status(Constants.CODE_OK).json(result);
+        }
+        else
+        {
+            result.success = false;
+            result.message = "Tag already exists";
+            res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
+        }      
+
+    }).catch((err)=>{
+        result.success = false;
+        result.message = "Try Again";       
+       
+        res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
+
+    });
+
+});
+router.post("/deleteTag",Constants.checkAccessMiddleware,function(req,res){
+    var result = new Object();
+    var label = {
+        name: req.body.tagName     
+    }
+    let criteria = {"email":req.body.email,"labels.name": label.name};
+   
+    User.findOneAndUpdate(criteria,{$pull: {labels: label}}).then(user=>{
+        
+        if(user)
+        {        
+            result.success = true;
+            result.message = "Tag Deleted"; 
+            res.status(Constants.CODE_OK).json(result);
+        }
+        else
+        {         
+                result.success = false;
+                result.message = "Tag doesn't exist";
+                res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
+            
+        }
+    
+
+    }).catch((err)=>{
+        result.success = false;
+        result.message = "Try Again";              
+        res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
+
+    });
+
+});
 
 
 

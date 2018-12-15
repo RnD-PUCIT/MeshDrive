@@ -33,7 +33,7 @@ export default function requestLogin(email, password) {
 
           let responseUiComponent;
           console.log("response====> " + response.data.token);
-
+          response.data.email = email;
           switch (statusCode) {
             case 200:
               responseUiComponent = (
