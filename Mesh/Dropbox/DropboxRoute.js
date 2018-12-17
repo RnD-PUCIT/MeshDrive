@@ -79,8 +79,7 @@ router.get('/DownloadFile/:email/:token',AppConstants.checkAccessMiddleware,(req
     res.status(AppConstants.RESPONSE_FAIL).json(result);
   });
 })
-
-
+//integrated
 router.post('/UploadFile/:token/:path/:name/:email',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
   
   var result = new Object();
@@ -156,6 +155,75 @@ router.post('/DownloadFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddl
     });
 })
 
+router.post('/DeleteFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
+  
+  var obj = new Object();
+  var dropboxAccount= req.dropboxAccount;
+  var token = dropboxAccount.token;
+  var path = req.body.path;
+  const dropbox = dropboxV2Api.authenticate({
+    token: token["access_token"]
+  });
+  var args ={
+    path : path
+  }
+  dropbox({
+    resource: 'files/delete',
+    parameters: args
+}, (err, result) => {
+    //see docs for `result` parameters
+    if(err){
+
+        obj["error"]=err[DropboxTags.TAG_ERROR];
+        obj["message"]=err[DropboxTags.TAG_ERROR_MSG]
+        res.status(AppConstants.RESPONSE_FAIL).json(obj);
+    }else{
+      obj["success"]=true;
+      obj["data"]=result["metadata"];
+      res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
+    }
+});
+
+
+
+})
+
+//in dev
+router.post('/CreateFolder',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
+  
+  var obj = new Object();
+  var dropboxAccount= req.dropboxAccount;
+  var token = dropboxAccount.token;
+  var path = req.body.path;
+  var folderName = req.body.name;
+
+  const dropbox = dropboxV2Api.authenticate({
+    token: token["access_token"]
+  });
+  var args ={
+    path : path+"/"+folderName,
+    autorename:true 
+  }
+  dropbox({
+    resource: 'files/create_folder',
+    parameters: args
+}, (err, result) => {
+    //see docs for `result` parameters
+    if(err){
+
+        obj["error"]=err;
+     //   obj["message"]=err[DropboxTags.TAG_ERROR][DropboxTags.TAG_ERROR_MSG]
+        res.status(AppConstants.RESPONSE_FAIL).json(obj);
+    }else{
+      obj["success"]=true;
+      obj["data"]=result["metadata"];
+      res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
+    }
+});
+
+
+
+})
 //integrated
 router.post('/ListFiles',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
 
