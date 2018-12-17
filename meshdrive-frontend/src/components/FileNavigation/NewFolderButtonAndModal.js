@@ -34,8 +34,14 @@ class CreateFolderModal extends Component {
   };
 
   isStateValid = () => {
+    let valid = false;
+    if (this.state.isRoot) {
+      valid = this.state.isValidCreateEmail && this.state.isFolderNameValid;
+    } else {
+      valid = this.state.isFolderNameValid;
+    }
     this.setState({
-      valid: this.state.isValidCreateEmail && this.state.isFolderNameValid
+      valid
     });
   };
   componentDidUpdate(prevProps) {
@@ -57,17 +63,20 @@ class CreateFolderModal extends Component {
           {
             isRoot,
             createFolderEmail: currentFolder.listFilesAccount,
-            isValidCreateEmail
+            isValidCreateEmail,
+            drive: currentFolder.drive
           },
           this.isStateValid
         );
       }
+      debugger;
     }
   }
 
   // for root
   handleDriveSelect = drive => {
     this.setState({ drive });
+    debugger;
   };
 
   // for root
@@ -112,7 +121,7 @@ class CreateFolderModal extends Component {
       const currentFolder = historyStack[historyStack.length - 1];
 
       this.props.requestCreateFolder(
-        ONEDRIVE,
+        this.state.drive,
         folderName,
         currentFolder,
         createFolderEmail

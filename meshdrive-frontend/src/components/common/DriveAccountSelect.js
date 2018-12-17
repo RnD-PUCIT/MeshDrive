@@ -24,17 +24,18 @@ class DriveAccountSelect extends Component {
   };
 
   handleDriveClick = drive => {
-    const { driveAccountsList = null } = this.props.user;
+    const { driveAccountsList = [] } = this.props.user;
     let displayDriveAccounts;
     switch (drive) {
       case GOOGLEDRIVE:
         displayDriveAccounts = driveAccountsList.googleDriveAccountsList;
         break;
       case ONEDRIVE:
-        displayDriveAccounts = driveAccountsList.dropboxAccountsList;
+        displayDriveAccounts = driveAccountsList.oneDriveAccountsList;
+
         break;
       case DROPBOX:
-        displayDriveAccounts = driveAccountsList.oneDriveAccountsList;
+        displayDriveAccounts = driveAccountsList.dropboxAccountsList;
         break;
     }
 
@@ -50,6 +51,7 @@ class DriveAccountSelect extends Component {
         }
       }
     );
+    debugger;
   };
   handleDriveAccountClick = email => {
     this.setState(

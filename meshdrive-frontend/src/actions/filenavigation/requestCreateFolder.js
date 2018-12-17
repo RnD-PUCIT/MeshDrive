@@ -9,7 +9,12 @@ import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import fetchRootFiles from "../files/fetchRootFiles";
 import fetchFilesById from "../files/fetchFilesById";
 
-export default function requestCreateFolder(drive, folderName, currentFolder, createFolderEmail) {
+export default function requestCreateFolder(
+  drive,
+  folderName,
+  currentFolder,
+  createFolderEmail
+) {
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
@@ -33,8 +38,16 @@ export default function requestCreateFolder(drive, folderName, currentFolder, cr
         break;
 
       case DROPBOX:
+        postURL = apiRoutes.files.dropbox_CreateFolder;
+        postData = {
+          name: folderName,
+          path: currentFolder.path ? currentFolder.path : "",
+          dropboxAccountEmail: createFolderEmail,
+          token
+        };
         break;
     }
+    debugger;
     axios
       .post(postURL, postData)
       .then(response => {
