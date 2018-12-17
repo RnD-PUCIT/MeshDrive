@@ -5,7 +5,8 @@ import {
   FETCH_DRIVE_ACCOUNTS_LIST,
   FETCH_TAGS_LIST,
   ADD_TAG,
-  DELETE_TAG
+  DELETE_TAG,
+  EDIT_TAG
 } from "../actions/user/types";
 import getUserObjFromLocalStorage from "../utils/getUserObjFromLocalStorage";
 import { fileURLToPath } from "url";
@@ -55,9 +56,7 @@ export default function(state = initialUserState, action) {
     case ADD_TAG:
     let  { tagName, tagDescription ,tagColor} = action.payload;
     console.log(tagName,tagDescription,tagColor);
-    let newTagsState = Object.assign(state);
-    newTagsState.tagsList.push({name:tagName,description:tagDescription,color:tagColor});
-    return {...newTagsState,...newTagsState.tagsList};
+    return state; // because we need key so i immediately fetch the tags from server 
    
 
 
@@ -76,6 +75,24 @@ export default function(state = initialUserState, action) {
     return {...newState,newTagsList};
     
  
+    case EDIT_TAG:
+    const { etagID,etagName, etagDescription ,etagColor} = action.payload;
+    let newEditedState = Object.assign(state);
+    let newEditedTagsList = newEditedState.tagsList;
+    for(var i=0;i<newEditedTagsList.length;i++)
+    {
+      if(newEditedTagsList[i]._id===etagID)
+      {      
+        newEditedTagsList[i].name = etagName;
+        newEditedTagsList[i].description = etagDescription;
+        newEditedTagsList[i].color = etagColor;
+        return {...newEditedState,newEditedTagsList};
+
+      }
+    }
+    return {...newEditedState,newEditedTagsList};
+
+   
   }
   return state;
 }

@@ -14,6 +14,7 @@ import SideBar from "../../Layout/SideBar/SideBar";
 import FAIcon from "../../FontAwesomeIcon/FontAwesomeIcon";
 import fetchTagsList from "../../../actions/user/fetchTagsList";
 import addTag from "../../../actions/user/addTag";
+import editTag from "../../../actions/user/editTag";
 import deleteTag from "../../../actions/user/deleteTag";
 import { CirclePicker} from 'react-color'
 import "./styles.css";
@@ -22,6 +23,7 @@ class ManageTags extends Page{
     super(props);
     this.state = {
       modal: false,
+      tagID:"",
       tagName:"",
       tagDescription:"",
       tagColor:'#0000', //defaul
@@ -44,20 +46,62 @@ class ManageTags extends Page{
 
   handleNewTagClick = e=>{
     e.preventDefault();
+    this.setState({
+      tagID:"",
+      tagName:"",
+      tagDescription:"",
+      tagColor:'#0000'
+     
+    
+    });
     this.toggle();
   }
 
+  handleEditTag=(tag)=>{
+  
+    this.setState(
+      {      
+        tagID:tag._id,
+        tagName:tag.name,
+        tagDescription:tag.description,
+        tagColor:tag.color 
+      }
+    );
+  //  console.log("CHECKING+++>"+tag._id);
+    this.toggle();
+
+  }
   handleChangeColor = (color)=>{
   
     //console.log("COLORRRRRR==>"+color.hex);
     this.setState({"tagColor":color.hex});
   }
   handleDeleteTag =name=>{
-   
-console.log("CLICKED");
+  
     this.props.deleteTag(name);
   }
 
+  handleEditTagRequest = e=>{
+    e.preventDefault();
+    let tag = {
+      tagID:this.state.tagID,
+      tagName:this.state.tagName,
+      tagDescription:this.state.tagDescription,
+      tagColor:this.state.tagColor
+    };
+    this.setState(
+      {      
+        modal: false,
+        tagID:"",
+        tagName:"",
+        tagDescription:"",
+        tagColor:'#0000'  // default 
+      });
+
+      this.props.editTag(tag);
+      this.props.fetchTagsList();  
+
+  }
   handleCreateTagRequest = e=>{
     e.preventDefault();
     let tag = {
@@ -85,6 +129,20 @@ console.log("CLICKED");
 
     render() {
      // const {tagsList=[]} = this.props.user;
+    let button;
+     if(this.state.tagName!=="" && this.state.tagID=="") {
+  
+      button = <Button className="ml-auto btn-gradient" onClick={this.handleCreateTagRequest}>Create Tag</Button>
+     }
+    else if (this.state.tagName!=="" && this.state.tagID!=""){
+      button = <Button className="ml-auto btn-gradient" onClick={this.handleEditTagRequest}>Save Changes</Button>
+    }else
+    {
+      button =  null;
+    }
+      
+   
+   
       let colorArray =['#6495ed', '#8470ff', '#1e90ff','#87ceeb',
       '#87cefa', '#add8e6', '#00ced1','#00ffff',
       "#f44336", "#e91e63", "#9c27b0",
@@ -100,7 +158,7 @@ console.log("CLICKED");
       let i = 1;
       const displayTags = this.props.user.tagsList
         .map(tag => (
-          <tr key={tag._id}>
+          <tr key={tag._id}>        
             <th scope="row">{i++}</th>
             <td style={{backgroundColor:tag.color}}>{tag.name}</td>
             <td>{tag.description}</td>
@@ -110,6 +168,7 @@ console.log("CLICKED");
               className="editButton"
               outline
               color="secondary"
+              onClick={()=>this.handleEditTag(tag)}
               >
               <FAIcon icon="edit" classes={["fa"]} /></Button>
               <Button 
@@ -184,12 +243,9 @@ console.log("CLICKED");
            </FormGroup>
           </ModalBody>
           <ModalFooter>
-          {this.state.tagName!=="" ? (
-                   <Button className="ml-auto btn-gradient" onClick={this.handleCreateTagRequest}>Create Tag</Button>
-                  ) : (
-                    <Button className="ml-auto btn-disabled" disabled>Create Tag</Button>
-            
-                  )}
+          {
+            button
+          }
             <Button color="secondary" onClick={this.toggle}>Cancel</Button>
           </ModalFooter>
         </Modal>
@@ -222,6 +278,7 @@ export default connect(
   mapStateToProps,
   {
     addTag,
+    editTag,
     fetchTagsList,
     deleteTag
   }
