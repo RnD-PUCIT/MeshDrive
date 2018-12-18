@@ -219,6 +219,21 @@ exports.saveUserTokens =function(email,token)
 	});
 }
 
+
+exports.findGoogleDriveTokenByEmail =function(meshDriveEmail,googleDriveEmail)
+{
+	return new Promise((success,failure)=>{
+        var criteria = {"email":meshDriveEmail,"drives.GoogleDrive.AccountsList.user.emailAddress":googleDriveEmail};
+        User.findOne(criteria)
+        .then((res)=>{
+            success(res);
+        })
+        .catch((err)=>{
+            failure(err.message);
+        });	
+	});
+}
+
 function isEmpty(obj) {
     for(var prop in obj) {
         if(obj.hasOwnProperty(prop))
