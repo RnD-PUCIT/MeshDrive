@@ -4,7 +4,7 @@ const ngrokUrl = localStorage.getItem("ngrok");
 
 export const apiBaseUrl = ngrokUrl
   ? ngrokUrl
-  : "http://test-depositoryworks.ngrok.io";
+  : "http://localhost:8000";
 //http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
   users: {
@@ -72,7 +72,8 @@ export const apiRoutes = {
     removeGoogleAccountByEmail: `${apiBaseUrl}/GoogleDrive/RemoveGoogleAccountByEmail`,
      listTags: `${apiBaseUrl}/users/ListTags`,
     createTag: `${apiBaseUrl}/users/createTag`,
-    deleteTag:`${apiBaseUrl}/users/deleteTag`
+    deleteTag:`${apiBaseUrl}/users/deleteTag`,
+    editTag:`${apiBaseUrl}/users/editTag`
   },
   files: {
     // google

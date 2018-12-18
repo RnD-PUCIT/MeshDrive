@@ -534,6 +534,35 @@ router.post("/deleteTag",Constants.checkAccessMiddleware,function(req,res){
 
 });
 
+router.post("/editTag",Constants.checkAccessMiddleware, function (req, res) {
+    console.log(req.body.token);
+    var tag_id = req.body.tagID;   
+    var label = {
+        name:req.body.tagName,
+        description:req.body.tagDescription,
+        color:req.body.tagColor};
 
+    var criteria = {"email":req.body.email,"labels._id":tag_id};
+    var result = new Object();
 
+    User.findOneAndUpdate(criteria,{$set: {'labels.$.name': label.name,
+    'labels.$.color': label.color,'labels.$.description':label.description}})
+        .then((user) => {
+            if (user) {
+
+                result.success = true;
+                result.message = "Tag Edited Successfully";
+             
+                res.status(Constants.CODE_OK).json(result);
+          
+            }
+
+        })
+        .catch((err) => {
+            result.success = false;
+            result.message = "Failed Try Again";
+            result.err=err;
+            res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
+        });
+})
 module.exports = router;
