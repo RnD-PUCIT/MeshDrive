@@ -25,26 +25,37 @@ exports.readAccounts =function(email)
             result.driveAccountsList.googleDriveAccountsList=[];
             if(accounts.GoogleDrive.AccountsList.length>0)
             {
-                var googleDriveAccounts=accounts.GoogleDrive.AccountsList;     
+                var oneDriveAccounts=accounts.GoogleDrive.AccountsList;     
                 var accountsEmailArray=new Array();
-                for (let index = 0; index < googleDriveAccounts.length; index++) {
-                    var account = googleDriveAccounts[index];
+                for (let index = 0; index < oneDriveAccounts.length; index++) {
+                    var account = oneDriveAccounts[index];
                     accountsEmailArray.push(account.user.emailAddress);
                 }
-            result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
-        }
-      //change when convert to multiple accounts
-        var dropboxAcccounts=accounts.Dropbox;
-        result.driveAccountsList.dropboxAccountsList=[];
-        if(dropboxAcccounts)
-        {
-            var dbxEmails = new Array();
-            
-            console.log(dropboxAcccounts.user)
-            if(dropboxAcccounts.user.emailAddress)
-                dbxEmails.push(dropboxAcccounts.user.emailAddress);  
-            result.driveAccountsList.dropboxAccountsList=dbxEmails;
-        }    
+                result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
+            }
+            //change when convert to multiple accounts
+            var dropboxAcccounts=accounts.Dropbox;
+            result.driveAccountsList.dropboxAccountsList=[];
+            if(dropboxAcccounts)
+            {
+                var dbxEmails = new Array();
+                
+                console.log(dropboxAcccounts.user)
+                if(dropboxAcccounts.user.emailAddress)
+                    dbxEmails.push(dropboxAcccounts.user.emailAddress);  
+                result.driveAccountsList.dropboxAccountsList=dbxEmails;
+            }   
+            result.driveAccountsList.oneDriveAccountsList=[];
+            if(accounts.OneDrive.AccountsList.length>0)
+            {
+                var oneDriveAccounts=accounts.OneDrive.AccountsList;     
+                var accountsEmailArray=new Array();
+                for (let index = 0; index < oneDriveAccounts.length; index++) {
+                    var account = oneDriveAccounts[index];
+                    accountsEmailArray.push(account.user.emailAddress);
+                }
+                result.driveAccountsList.oneDriveAccountsList=accountsEmailArray;
+            } 
             success(result);
         }
         else

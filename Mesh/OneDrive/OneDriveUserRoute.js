@@ -21,6 +21,24 @@ function getOneDriveTokensMiddleware(req,res,next)
 	});
 }
 
+function matchOneDriveTokenMiddleware(req,res,next)
+{
+	var oneDriveEmail=req.body.oneDriveEmail;
+	var token;
+	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
+		var account = req.oneDriveAccounts[index];
+		if(account.user.emailAddress==oneDriveEmail)
+			token=account.token;
+	}
+	if(!token)
+	{
+		return res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
+	}
+	req.token=token;
+	next();
+}
+
+
 router.get("/test",(req,res)=>{
 	console.log("something");
 	
@@ -31,7 +49,13 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 	var result=new Object(); 
 	//Getting redirect urls from request body.
 	if(req.body.redirectSuccess && req.body.redirectFailure){
-		userData=req.userData.email+";" + req.body.redirectSuccess + ";" + req.body.redirectFailure; //Creating a colon separated string to send along redirect uri to identify the user when google redirects back
+		userData={};
+		userData.redirectSuccess=req.body.redirectSuccess;
+		userData.redirectFailure=req.body.redirectSuccess;
+		userData.email=req.userData.email;
+		userData=JSON.stringify(userData);
+		let buff = new Buffer(userData);  
+		userData = buff.toString('base64');
 	}
 	else{
 		//return call if client has not appended redirect urls
@@ -47,11 +71,13 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 router.get('/Code',function(req,res){
 	var state=req.query.state; //url state param contains the user data that we appended previously in creating the redirect url for identifying the user
 	//Split state to get client email and redirect urls.
-	var splits=state.split(";");
-	var email=splits[0];
-	var redirectSuccess=splits[1];
-	var redirectFailure=splits[2];
-
+	let buff = new Buffer(state, 'base64');  
+	var userData = buff.toString('ascii');
+	userData=JSON.parse(userData);
+	var email=userData.email;
+	var redirectSuccess=userData.redirectSuccess;
+	var redirectFailure=userData.redirectFailure;
+	
 	Drive.getTokenFromCode(req.query.code,Constants.ONEDRIVE_APP_CREDETIALS) //Get user token from the code that we received
 	.then((token)=>{
 		token=JSON.parse(token);
@@ -70,7 +96,7 @@ router.get('/Code',function(req,res){
 					};
 					OneDriveDAL.saveOneDriveAccount(email,account)
 					.then((result)=>{
-						res.redirect(redirectSuccess+user.userPrincipalName); //redirect back to the client success
+						res.redirect(redirectSuccess); //redirect back to the client success
 					})
 					.catch((err)=>{
 						res.redirect(redirectFailure); //redirect back to the client failure
@@ -93,7 +119,7 @@ router.get('/Code',function(req,res){
 })
 
 //removes all google drive accounts
-router.delete('/RemoveAllOneAccounts',Constants.checkAccessMiddleware,(req,res)=>{
+router.delete('/RemoveAllOneDriveAccounts',Constants.checkAccessMiddleware,(req,res)=>{
 	OneDriveDAL.removeAllOneDriveAccounts(req.userData.email)
 	.then((result)=>{
 		result.msg="All OneDrive accounts have been removed successfuly";
@@ -105,8 +131,8 @@ router.delete('/RemoveAllOneAccounts',Constants.checkAccessMiddleware,(req,res)=
 });
 
 router.delete('/RemoveOneDriveAccountByEmail',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,(req,res)=>{
-	var oneDriveAccEmail=req.body.oneDriveAccountEmail;
-	OneDriveDAL.removeOneDriveAccountByEmail(req.userData.email,oneDriveAccEmail)
+	var oneDriveEmail=req.body.oneDriveEmail;
+	OneDriveDAL.removeOneDriveAccountByEmail(req.userData.email,oneDriveEmail)
 	.then((result)=>{
 		result.message="Account removed successfuly";
 		res.status(Constants.CODE_OK).json(result);
@@ -117,24 +143,15 @@ router.delete('/RemoveOneDriveAccountByEmail',Constants.checkAccessMiddleware,ge
 });
 
 //Gives back top 100 files from user's account(Unused route)
-router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware, function(req,res){
-	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
+router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware, function(req,res){
+	var oneDriveEmail = req.body.oneDriveEmail; //Account email sent by the client to list files for
 	var meshDriveEmail=req.userData.email;
-	var token;
-	for (let index = 0; index < req.oneDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
-		var account = req.oneDriveAccounts[index];
-		if(account.user.emailAddress==listAccountEmail)
-			token=account.token;
-	}
-	if(!token)
-	{
-		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
-	}
+	var token=req.token;
 	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
 	.then((token)=>{
 		if(token.updated)
 		{
-			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
 		}
 		Drive.listFiles(token)
 		.then((files)=>{
@@ -217,25 +234,16 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getOneDriveTok
 	}
 })
 
-router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
+router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
 	var fileId=req.body.fileId; //FileId to list files and folders for it
 	var meshDriveEmail=req.userData.email;
-	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
-	var token;
-	for (let index = 0; index < req.oneDriveAccounts.length; index++) { //Loop throught google drive accounts in the db and see if email matches and get that token
-		var account = req.oneDriveAccounts[index];
-		if(account.user.emailAddress==listAccountEmail)
-			token=account.token;
-	}
-	if(!token)
-	{
-		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
-	}
+	var oneDriveEmail = req.body.oneDriveEmail; //Account email sent by the client to list files for
+	var token=req.token;
 	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
 	.then((token)=>{
 		if(token.updated)
 		{
-			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
 		}
 		Drive.listFilesById(token,fileId)
 		.then((files)=>{
@@ -257,24 +265,15 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTok
 	});
 })
 
-router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
-	var downloadFileEmail = req.params.downloadFileAccount;
+router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
 	var meshDriveEmail=req.userData.email;
-	var token;
-	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
-		var account = req.oneDriveAccounts[index];
-		if(account.user.emailAddress==downloadFileEmail)
-			token=account.token;
-	}
-	if(!token)
-	{
-		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
-	}
+	var oneDriveEmail = req.body.oneDriveEmail;
+	var token=req.token;
 	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
 	.then((token)=>{
 		if(token.updated)
 		{
-			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
 		}
 		Drive.getFileDetails(token,req.params.fileId) //Get file details first from drive
 		.then((details)=>{
@@ -300,29 +299,21 @@ router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAc
 })
 
 
-router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.checkUploadAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
-	var uploadFileEmail=req.params.uploadFileEmail;
+router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.checkUploadAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+	var meshDriveEmail=req.userData.email;
+	var oneDriveEmail = req.body.oneDriveEmail;
 	var fileName=req.params.fileName;
 	var mimeType=req.params.mimeType;
 	let buff = new Buffer(mimeType, 'base64');
 	mimeType= mimeType=buff.toString('ascii');
-	var token;
-	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
-		var account = req.oneDriveAccounts[index];
-		if(account.user.emailAddress==uploadFileEmail)
-			token=account.token;
-	}
-	if(!token)
-	{
-		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
-	}
+	var token=req.token;
 
 	//var file=req.file;
 	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
 	.then((token)=>{
 		if(token.updated)
 		{
-			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
 		}
 		Drive.uploadFile(token,fileName,req,mimeType)
 		.then((result)=>{
@@ -338,27 +329,19 @@ router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.
 })
 
 
-router.post('/CreateFolder',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
+router.post('/CreateFolder',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+	var meshDriveEmail=req.userData.email;
+	var oneDriveEmail = req.body.oneDriveEmail;
 	var parentId=req.body.parentId;
-	var createFolderEmail=req.body.createFolderEmail;
 	var folderName=req.body.folderName;
-	var token;
-	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
-		var account = req.oneDriveAccounts[index];
-		if(account.user.emailAddress==createFolderEmail)
-			token=account.token;
-	}
-	if(!token)
-	{
-		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
-	}
+	var token=req.token;
 
 	//var file=req.file;
 	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
 	.then((token)=>{
 		if(token.updated)
 		{
-			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
 		}
 		Drive.createFolder(token,folderName,parentId)
 		.then((result)=>{
@@ -374,30 +357,21 @@ router.post('/CreateFolder',Constants.checkAccessMiddleware,getOneDriveTokensMid
 })
 
 
-router.post('/DeleteFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,function(req,res){
+router.delete('/DeleteFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+	var meshDriveEmail=req.userData.email;
+	var oneDriveEmail = req.body.oneDriveEmail;
 	var fileId=req.body.fileId;
-	var deleteFileEmail=req.body.deleteFileEmail;
-	var token;
-	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
-		var account = req.oneDriveAccounts[index];
-		if(account.user.emailAddress==deleteFileEmail)
-			token=account.token;
-	}
-	if(!token)
-	{
-		res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
-	}
-
-	//var file=req.file;
+	var token=req.token;
+	
 	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
 	.then((token)=>{
 		if(token.updated)
 		{
-			OneDriveDAL.updateOneDriveToken(meshDriveEmail,listAccountEmail,token);
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
 		}
 		Drive.deleteFile(token,fileId)
 		.then(()=>{
-			res.status(200).json({message:"Folder Deleted"});
+			res.status(200).json({message:"File Deleted"});
 		})
 		.catch((err)=>{
 			res.status(Constants.RESPONSE_FAIL).json(err);
@@ -407,6 +381,61 @@ router.post('/DeleteFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddl
 		res.end(err.msg);
 	});
 })
+
+
+router.post('/RenameFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+	var meshDriveEmail=req.userData.email;
+	var oneDriveEmail = req.body.oneDriveEmail;
+	var fileId=req.body.fileId;
+	var newFileName=req.body.newFileName;
+	var token=req.token;
+	
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		if(token.updated)
+		{
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
+		}
+		Drive.renameFile(token,fileId,newFileName)
+		.then((file)=>{
+			res.status(200).json({message:"File Moved",folder:file});
+		})
+		.catch((err)=>{
+			res.status(Constants.RESPONSE_FAIL).json(err);
+		})
+	})
+	.catch((err)=>{
+		res.end(err.msg);
+	});
+})
+
+
+router.post('/MoveFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+	var meshDriveEmail=req.userData.email;
+	var oneDriveEmail = req.body.oneDriveEmail;
+	var fileId=req.body.fileId;
+	var newParentId=req.body.newParentId;
+	var token=req.token;
+	
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		if(token.updated)
+		{
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
+		}
+		Drive.moveFile(token,fileId,newParentId)
+		.then((file)=>{
+			res.status(200).json({message:"File Moved",folder:file});
+		})
+		.catch((err)=>{
+			res.status(Constants.RESPONSE_FAIL).json(err);
+		})
+	})
+	.catch((err)=>{
+		res.end(err.msg);
+	});
+})
+
 
 
 
