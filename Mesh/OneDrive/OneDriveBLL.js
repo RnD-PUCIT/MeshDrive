@@ -197,7 +197,7 @@ exports.downloadFile = function(token,fileId,res){
   });
 }
 
-exports.uploadFile = function(token,fileName,file,mimeType){
+exports.uploadFile = function(token,fileName,file){
   
   return new Promise((success,failure)=>{
     oneDrive.items.uploadSimple({
@@ -246,6 +246,45 @@ exports.deleteFile = function(token,fileId){
   });
 }
 
+exports.renameFile = function(token,fileId,newFileName){
+  
+  return new Promise((success,failure)=>{
+    oneDrive.items.update({
+      accessToken: token.access_token,
+      itemId:fileId,
+      toUpdate: {
+        name : newFileName
+      }
+    }).then((item) => {
+      console.log(file);
+      var folder=getMeshDriveFileObjectFromOneDrive(item);
+      success(folder);
+    })
+    .catch((error)=>{
+        failure(error);
+    });
+  });
+}
+
+exports.moveFile = function(token,fileId,newParentId){
+  
+  return new Promise((success,failure)=>{
+    oneDrive.items.update({
+      accessToken: token.access_token,
+      itemId:fileId,
+      toUpdate: {
+        parentReference : {id:newParentId}
+      }
+    }).then((item) => {
+      var folder=getMeshDriveFileObjectFromOneDrive(item);
+      success(folder);
+    })
+    .catch((error)=>{
+        failure(error);
+    });
+  });
+}
+
 exports.getFileDetails = function(token,fileId){
   return new Promise((success,failure)=>{
     oneDrive.items.getMetadata({
@@ -285,6 +324,7 @@ function getMeshDriveFileObjectFromOneDrive(file)
   meshDriveFileObject.id=file.id;
   meshDriveFileObject.name=file.name;
   meshDriveFileObject.createdTime=file.createdDateTime;
+  meshDriveFileObject.parents=[file.parentReference.id];
   if(file.folder)
     meshDriveFileObject.mimeType="folder";
   if(file.file)
