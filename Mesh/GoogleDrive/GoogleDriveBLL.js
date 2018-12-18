@@ -243,7 +243,6 @@ exports.createFolder = function(auth,folderName,parentId){
       mimeType:'application/vnd.google-apps.folder',
       parents:parentId
     };
-    
     drive.files.create({
       resource: fileMetadata,
       fields: 'id'
@@ -284,7 +283,28 @@ exports.moveFile = function(auth,fileId,newParentId,oldParentId){
       fileId: fileId,
       addParents: newParentId,
       removeParents: oldParentId,
-      fields: 'id, parents'
+      fields: 'id, name, mimeType, parents, description, createdTime'
+    }, function (err, file) {
+      if (err) {
+        failure(err.errors)
+      } else {
+        success(file.data);
+      }
+    });
+  });
+}
+
+exports.renameFile = function(auth,fileId,newFileName){
+  
+  return new Promise((success,failure)=>{
+    const drive = google.drive({version: 'v3', auth});
+    var fileMetadata = {
+      name: newFileName,
+    };
+    drive.files.update({
+      fileId: fileId,
+      resource: fileMetadata,
+      fields: 'id, name, mimeType, parents, description, createdTime'
     }, function (err, file) {
       if (err) {
         failure(err.errors)

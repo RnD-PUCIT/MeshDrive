@@ -160,7 +160,7 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 			const givenAccount = listFilesAccount[account];
 			for (let index = 0; index < req.googleDriveAccounts.length; index++) {
 				var storeAccount = req.googleDriveAccounts[index];
-				if(storeAccount.user.emailAddress==listFilesAccount)
+				if(storeAccount.user.emailAddress==givenAccount)
 					accountTokenList.push({email:storeAccount.user.emailAddress,token:storeAccount.token});
 			}
 		}
@@ -194,6 +194,8 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 			//Wait for all promises to complete and return the response
 			Promise.all(promises).then(function(filesList){
 				res.status(Constants.CODE_OK).json(filesList);
+			}).catch((err)=>{
+				res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
 			});
 		}).catch((err)=>{
 			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
@@ -339,6 +341,26 @@ router.delete('/MoveFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMi
 		Drive.moveFile(oAuth2Client,fileId,newParentId,oldParentId)
 		.then((file)=>{
 			res.status(200).json({message:"File Moved",fileDetails:file});
+		})
+		.catch((err)=>{
+			res.status(Constants.RESPONSE_FAIL).json(err);
+		})
+	})
+	.catch((err)=>{
+		res.end(err.msg);
+	});
+})
+
+
+router.post('/RenameFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+	var fileId=req.body.fileId;
+	var newFileName=req.body.newFileName;
+	var token=req.token;
+	Drive.createAuthOject(req.appCredentials,token)
+	.then((oAuth2Client)=>{
+		Drive.renameFile(oAuth2Client,fileId,newFileName)
+		.then((file)=>{
+			res.status(200).json({message:"File Renamed",fileDetails:file});
 		})
 		.catch((err)=>{
 			res.status(Constants.RESPONSE_FAIL).json(err);
