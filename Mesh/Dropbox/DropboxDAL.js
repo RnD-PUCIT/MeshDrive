@@ -34,6 +34,7 @@ exports.saveDropboxAccount=function(email,account){
     });
 }
 
+//not in use
 exports.saveDropboxToken =function(email,token)
 {
 	return new Promise((success,failure)=>{
@@ -54,30 +55,3 @@ exports.saveDropboxToken =function(email,token)
 }
 
 
-exports.getDropboxToken = function(dbxEmail)
-{
-    return new Promise(function(success,failure)
-	{
-		var criteria = {"email":dbxEmail};
-		User.findOne(criteria).then((user)=>{
-           
-            if(user.drives.Dropbox.token.access_token=="false")
-            {
-               console.log("Failure");
-               failure({error: "Token Empty"});         
-                   
-            }
-            else
-            {
-                console.log("Success");
-                success(user.drives.Dropbox.token); 
-               
-            }
-
-		}).catch((err)=>{
-
-            failure("Cannot read token");
-        })
-		
-	});
-}
