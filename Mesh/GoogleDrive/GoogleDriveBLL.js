@@ -34,6 +34,7 @@ exports.getGoogleDriveAuthRedirectLink = function(oAuth2Client,email){
   
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
+    prompt: 'consent',
     scope: SCOPES,
     state:email
   });   
@@ -205,12 +206,13 @@ exports.downloadFile = function(auth,fileId,res){
   });
 }
 
-exports.uploadFile = function(auth,fileName,file,mimeType){
+exports.uploadFile = function(auth,fileName,file,mimeType,parentId){
   
   return new Promise((success,failure)=>{
     const drive = google.drive({version: 'v3', auth});
     var fileMetadata = {
-      'name': fileName
+      'name': fileName,
+      parents:parentId
     };
     var media = {
       mimeType: mimeType,
@@ -227,6 +229,87 @@ exports.uploadFile = function(auth,fileName,file,mimeType){
         failure(err);
       } else {
         success(file.data.id);
+      }
+    });
+  });
+}
+
+exports.createFolder = function(auth,folderName,parentId){
+  
+  return new Promise((success,failure)=>{
+    const drive = google.drive({version: 'v3', auth});
+    var fileMetadata = {
+      name: folderName,
+      mimeType:'application/vnd.google-apps.folder',
+      parents:parentId
+    };
+    drive.files.create({
+      resource: fileMetadata,
+      fields: 'id'
+    },
+     function (err, file) {
+      if (err) {
+        failure(err);
+      } else {
+        success(file.data.id);
+      }
+    });
+  });
+}
+
+
+exports.deleteFile = function(auth,fileId){
+  
+  return new Promise((success,failure)=>{
+    const drive = google.drive({version: 'v3', auth});    
+    drive.files.delete({
+      fileId:fileId,
+    },
+     function (err) {
+      if (err) {
+        failure(err);
+      } else {
+        success();
+      }
+    });
+  });
+}
+
+exports.moveFile = function(auth,fileId,newParentId,oldParentId){
+  
+  return new Promise((success,failure)=>{
+    const drive = google.drive({version: 'v3', auth});
+    drive.files.update({
+      fileId: fileId,
+      addParents: newParentId,
+      removeParents: oldParentId,
+      fields: 'id, name, mimeType, parents, description, createdTime'
+    }, function (err, file) {
+      if (err) {
+        failure(err.errors)
+      } else {
+        success(file.data);
+      }
+    });
+  });
+}
+
+exports.renameFile = function(auth,fileId,newFileName){
+  
+  return new Promise((success,failure)=>{
+    const drive = google.drive({version: 'v3', auth});
+    var fileMetadata = {
+      name: newFileName,
+    };
+    drive.files.update({
+      fileId: fileId,
+      resource: fileMetadata,
+      fields: 'id, name, mimeType, parents, description, createdTime'
+    }, function (err, file) {
+      if (err) {
+        failure(err.errors)
+      } else {
+        success(file.data);
       }
     });
   });

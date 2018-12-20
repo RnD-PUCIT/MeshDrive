@@ -4,13 +4,10 @@ import { apiRoutes } from "../../constants/apiConstants";
 import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
 import { rootURL } from "../../constants/apiConstants";
+import { getUserReducer } from "../../utils/getTokenFromStore";
+import saveUserObj from "../user/saveUserObj";
 import { GOOGLEDRIVE, ONEDRIVE, DROPBOX } from "../../constants/strings";
-function addDriveAction(drive, email) {
-  return {
-    type: ADD_DRIVE,
-    payload: { drive, email }
-  };
-}
+
 
 export default function addDrive(token, drive) {
   return dispatch => {

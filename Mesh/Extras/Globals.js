@@ -60,6 +60,7 @@ module.exports.checkAccessMiddleware = function(req,res,next){
     }
     else
     {
+        console.log("TOOOKEN==>"+token);
         token=req.body.token;
         if(!token)
         {

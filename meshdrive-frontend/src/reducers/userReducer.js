@@ -2,25 +2,35 @@ import {
   ADD_DRIVE,
   SAVE_USER,
   REMOVE_USER,
-  FETCH_DRIVE_ACCOUNTS_LIST
+  FETCH_DRIVE_ACCOUNTS_LIST,
+  FETCH_TAGS_LIST,
+  ADD_TAG,
+  DELETE_TAG,
+  EDIT_TAG
 } from "../actions/user/types";
 import getUserObjFromLocalStorage from "../utils/getUserObjFromLocalStorage";
+import { fileURLToPath } from "url";
+import { stat } from "fs";
 
 let initialUserState = {
   token: null,
+  email:null,
   driveAccountsList: {
     googleDriveAccountsList: [],
     dropboxAccountsList: [],
     oneDriveAccountsList: []
-  }
+  },
+  tagsList:[]
 };
 
 const localStorageUserObj = getUserObjFromLocalStorage();
 if (localStorageUserObj && localStorageUserObj.data) {
-  const { token = null, driveAccountsList = {} } = localStorageUserObj;
+  const { token = null, email=null,driveAccountsList = {},tagsList=[] } = localStorageUserObj;
   initialUserState = {
     token,
-    driveAccountsList
+    email,
+    driveAccountsList,
+    tagsList
   };
   console.log(initialUserState);
   debugger;
@@ -28,6 +38,9 @@ if (localStorageUserObj && localStorageUserObj.data) {
 
 export default function(state = initialUserState, action) {
   switch (action.type) {
+    case FETCH_TAGS_LIST:
+    return { ...state, ...action.payload };
+
     case FETCH_DRIVE_ACCOUNTS_LIST:
       return { ...state, ...action.payload };
 
@@ -35,30 +48,51 @@ export default function(state = initialUserState, action) {
       return initialUserState;
 
     case SAVE_USER:
-      const { driveAccountsList = {}, token = null } = action.payload;
-      console.log(token);
+      const { driveAccountsList = {}, token = null, email=null } = action.payload;
+      console.log(token);  
+      return { ...state, token, driveAccountsList,email };
 
-      return { ...state, token, driveAccountsList };
 
-    case ADD_DRIVE:
-      const { drive, email } = action.payload;
-      console.log(drive, email);
-      let newState = Object.assign(state);
-      switch (drive) {
-        case "GOOGLEDRIVE":
-          if (email)
-            newState.driveAccountsList.googleDriveAccountsList.push(email);
-          break;
-        case "DROPBOX":
-          newState.driveAccountsList.dropboxAccountsList.push(email);
-          break;
-        case "ONEDRIVE":
-          // newState.driveAccountsList.googleDriveAccountsList.push(email);
-          break;
+    case ADD_TAG:
+    let  { tagName, tagDescription ,tagColor} = action.payload;
+    console.log(tagName,tagDescription,tagColor);
+    return state; // because we need key so i immediately fetch the tags from server 
+   
+
+
+    case DELETE_TAG:  
+    const name = action.payload;
+    let newState = Object.assign(state);
+    let newTagsList = newState.tagsList;
+    for(var i=0;i<newTagsList.length;i++)
+    {
+      console.log("ele  "+name);
+      if(newTagsList[i].name===name)
+      {      
+        newTagsList.splice(i,1); 
       }
-      console.log(newState);
+    }
+    return {...newState,newTagsList};
+    
+ 
+    case EDIT_TAG:
+    const { etagID,etagName, etagDescription ,etagColor} = action.payload;
+    let newEditedState = Object.assign(state);
+    let newEditedTagsList = newEditedState.tagsList;
+    for(var i=0;i<newEditedTagsList.length;i++)
+    {
+      if(newEditedTagsList[i]._id===etagID)
+      {      
+        newEditedTagsList[i].name = etagName;
+        newEditedTagsList[i].description = etagDescription;
+        newEditedTagsList[i].color = etagColor;
+        return {...newEditedState,newEditedTagsList};
 
-      return newState;
+      }
+    }
+    return {...newEditedState,newEditedTagsList};
+
+   
   }
   return state;
 }

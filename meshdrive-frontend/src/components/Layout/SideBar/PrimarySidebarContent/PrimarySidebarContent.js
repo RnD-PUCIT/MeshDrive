@@ -16,6 +16,9 @@ export default class PrimarySideBarContent extends React.Component {
         <NavLink to="/uploadfile" className="btn btn-light light">
           Upload File
         </NavLink>
+        <NavLink to="/managetags" className="btn btn-light light">
+          My Tags
+        </NavLink>
       </ButtonGroup>
     );
 

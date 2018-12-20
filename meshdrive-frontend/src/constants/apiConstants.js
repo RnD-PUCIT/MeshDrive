@@ -2,7 +2,9 @@ export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/
 
 const ngrokUrl = localStorage.getItem("ngrok");
 
-export const apiBaseUrl = ngrokUrl ? ngrokUrl : "https://a86618f7.ngrok.io";
+
+export const apiBaseUrl = ngrokUrl ? ngrokUrl : "http://test-depositoryworks.ngrok.io";
+
 //http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
   users: {
@@ -64,11 +66,14 @@ export const apiRoutes = {
     authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`,
     authDropbox: `${apiBaseUrl}/Dropbox/Authenticate`,
     authOneDrive: `${apiBaseUrl}/OneDrive/Authenticate`,
-
     listDriveAccounts: token =>
       `${apiBaseUrl}/users/ListDriveAccounts/${token}`,
     removeAllGoogleAccounts: `${apiBaseUrl}/GoogleDrive/RemoveAllGoogleAccounts/`,
-    removeGoogleAccountByEmail: `${apiBaseUrl}/GoogleDrive/RemoveGoogleAccountByEmail`
+    removeGoogleAccountByEmail: `${apiBaseUrl}/GoogleDrive/RemoveGoogleAccountByEmail`,
+     listTags: `${apiBaseUrl}/users/ListTags`,
+    createTag: `${apiBaseUrl}/users/createTag`,
+    deleteTag:`${apiBaseUrl}/users/deleteTag`,
+    editTag:`${apiBaseUrl}/users/editTag`
   },
   files: {
     // google
