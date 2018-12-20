@@ -1,8 +1,7 @@
 const User = require('../Models/UserModel');
 const mongoose = require('mongoose');
 const url = "mongodb://localhost/mydb";
-// const Dropbox = require('dropbox').Dropbox;
-// var dbx = new Dropbox();
+
 
 //make it promise
 exports.saveDropboxUserAccount=function(account,email)
@@ -34,6 +33,26 @@ exports.getDropboxAccounts=function(email){
 		
 	});
 }
+//new for multiple user
+exports.saveDropboxAccount=function(email,account){
+   return new Promise((success,failure)=>
+   {
+    console.log(account);
+    var criteria = {"email":email};
+    var updation = {"drives.Dropbox.AccountsList":account};
+        User.updateOne(criteria,{$push:updation})
+        .then((res)=>{
+            console.log("saved the user account info");
+            success(res);
+        })
+        .catch((err)=>{
+            failure(err);
+            console.log("in the error");
+            console.log(err);
+        });
+    });
+}
+
 exports.saveDropboxToken =function(email,token)
 {
 	return new Promise((success,failure)=>{

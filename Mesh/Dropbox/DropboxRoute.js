@@ -344,11 +344,11 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
         //user denied the access 
         return res.status(AppConstants.RESPONSE_FAIL).json({error:values.error});      
       }
-      console.log(values);
+   
       var code = values.code;
       //contains email,redirectSuccess,redirectFailure
       var state= queryString.parse(values.state); //converting to json object
-      console.log(state);
+ 
       var result = new Object();
       getTokenFromCode(code)
       .then((token)=>{
@@ -358,36 +358,30 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
           
           dbx.usersGetCurrentAccount()
           .then((account)=>{
-            console.log(account);
+          
+            var acc = new Object();
+            acc["token"]=token;
             var a= {
               "photoLink":account[DropboxTags.TAG_PROFILE_PHOTO],
               "emailAddress":account[DropboxTags.TAG_EMAIL]
             }
-              dbxDAL.saveDropboxUserAccount(a,state.email);
+            acc["user"]=a;
+            dbxDAL.saveDropboxAccount(state.email,acc).then((r)=>{
+              return res.redirect(state.redirectSuccess+'/'+state.email);
+            }).catch((err)=>{
+              return res.redirect(state.redirectFailure);
+            });
+
           })
           .catch((err)=>{
                 console.log(err);
+                return res.redirect(state.redirectFailure);
           })
-
-          dbxDAL.saveDropboxToken(state.email,token)
-          .then((status)=>{
-              result={
-                success:true,
-                message:"User Token saved"
-              }
-              return res.redirect(state.redirectSuccess+'/'+state.email); //redirecting to success link on UI 
-            // return res.status(AppConstants.RESPONSE_SUCCESS).json(result);
-          })
-          .catch((err)=>{
-            return res.redirect(state.redirectFailure);
-         //   return res.status(AppConstants.RESPONSE_FAIL).json({error:"cant save"});
-          });    
       })
       .catch((err)=>{
-        //cant get token because of some bad request error 
-       
+        //cant get token because of some bad request error    
         return res.redirect(state.redirectFailure);
-    //    return res.status(AppConstants.RESPONSE_FAIL).json(err);
+   
       });
 
   
