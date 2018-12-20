@@ -2,9 +2,9 @@ export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/
 
 const ngrokUrl = localStorage.getItem("ngrok");
 
-export const apiBaseUrl = ngrokUrl
-  ? ngrokUrl
-  : "http://localhost:8000";
+
+export const apiBaseUrl = ngrokUrl ? ngrokUrl : "http://test-depositoryworks.ngrok.io";
+
 //http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
   users: {
@@ -91,12 +91,16 @@ export const apiRoutes = {
     dropbox_uploadFile: (fileName, filePath, uploadFileEmail, token) =>
       `${apiBaseUrl}/Dropbox/UploadFile/${token}/${filePath}/${fileName}/${uploadFileEmail}`,
 
+    dropbox_CreateFolder: `${apiBaseUrl}/Dropbox/CreateFolder`,
+
     // onedrive
     listOneDriveRootFiles: `${apiBaseUrl}/OneDrive/ListDriveRootFiles`,
     onedrive_listDriveFilesById: `${apiBaseUrl}/OneDrive/ListDriveFilesById`,
     onedrive_downloadFile: (downloadFileAccount, fileId, token) =>
       `${apiBaseUrl}/OneDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     onedrive_uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
-      `${apiBaseUrl}/OneDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`
+      `${apiBaseUrl}/OneDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`,
+
+    onedrive_createFolder: `${apiBaseUrl}/oneDrive/createfolder`
   }
 };

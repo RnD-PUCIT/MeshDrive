@@ -21,8 +21,7 @@ class FileItem extends Component {
       active: this.props.isFileActive
     };
 
-    this.isFolder =
-      this.props.file.mimeType === "folder";
+    this.isFolder = this.props.file.mimeType === "folder";
   }
   // toggleActive = e => {
   //   e.preventDefault();
@@ -50,9 +49,16 @@ class FileItem extends Component {
     e.preventDefault();
     const { file } = this.props;
     if (this.isFolder) {
-      this.props.fetchFilesById(this.props.drive, file.account, file.id);
+      this.props.fetchFilesById(
+        this.props.drive,
+        file.account,
+        file.id,
+        false,
+        file.path
+      );
     }
     console.log(file);
+    debugger;
   };
   handleContextMenuClick = menu => {
     const { file } = this.props;
