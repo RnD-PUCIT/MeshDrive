@@ -26,13 +26,20 @@ export default function requestCreateFolder(
     let postURL, postData;
     switch (drive) {
       case GOOGLEDRIVE:
+        postURL = apiRoutes.files.googledrive_createFolder;
+        postData = {
+          folderName,
+          parentId: currentFolder.parent,
+          googleDriveEmail: createFolderEmail,
+          token
+        };
         break;
       case ONEDRIVE:
         postURL = apiRoutes.files.onedrive_createFolder;
         postData = {
           folderName,
           parentId: currentFolder.parent,
-          createFolderEmail: createFolderEmail,
+          oneDriveEmail: createFolderEmail,
           token
         };
         break;

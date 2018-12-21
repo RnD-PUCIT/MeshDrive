@@ -84,6 +84,7 @@ export const apiRoutes = {
       `${apiBaseUrl}/GoogleDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
       `${apiBaseUrl}/GoogleDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`,
+      googledrive_createFolder: `${apiBaseUrl}/GoogleDrive/CreateFolder`,
 
     // dropbox
     dropbox_listFiles: `${apiBaseUrl}/Dropbox/ListFiles`,
