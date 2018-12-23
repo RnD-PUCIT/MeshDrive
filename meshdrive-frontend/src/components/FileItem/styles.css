@@ -1,3 +1,9 @@
+.assignedTags{
+  margin: 10px
+}
+.tagsTable{
+  width:900px
+}
 .file-item {
   font-size: 0.9rem;
   min-width: 130px;
@@ -38,3 +44,5 @@
 .file-item--size {
   font-size: 0.8rem;
 }
+
+

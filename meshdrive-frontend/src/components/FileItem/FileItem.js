@@ -6,23 +6,35 @@ import FAIcon from "../../components/FontAwesomeIcon/FontAwesomeIcon";
 import setActiveFile from "../../actions/activeFilesIds/setActiveFile";
 import unsetActiveFile from "../../actions/activeFilesIds/unsetActiveFile";
 import downloadFile from "../../actions/files/downloadFile";
+import fetchTagsList from "../../actions/user/fetchTagsList";
 import fetchFilesById from "../../actions/files/fetchFilesById";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-
+import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { getMimeTypeIcon } from "../../constants/mimeTypes";
-
 import "./styles.css";
+import { Tag } from "@zendeskgarden/react-tags";
+import '@zendeskgarden/react-tags/dist/styles.css';
+
+
 class FileItem extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      active: this.props.isFileActive
+      active: this.props.isFileActive,
+      modal: false,
+      activeFile: null,
+      selectedTagsList: []
     };
 
     this.isFolder =
       this.props.file.mimeType === "folder";
+    this.toggle = this.toggle.bind(this);
+  }
+  toggle() {
+    this.setState({
+      modal: !this.state.modal
+    });
   }
   // toggleActive = e => {
   //   e.preventDefault();
@@ -57,13 +69,21 @@ class FileItem extends Component {
   handleContextMenuClick = menu => {
     const { file } = this.props;
 
+
     switch (menu) {
       case "download":
         return this.props.downloadFile(this.props.drive, file.account, file);
+      case "tag":
+        this.setState({
+          activeFile: file.id
+        });
+        this.toggle();
+        return;
     }
   };
 
   render() {
+    const closeBtn = <button className="close" onClick={this.toggle}>&times;</button>;
     const { file } = this.props;
     let driveIcon = null;
     switch (file.drive) {
@@ -78,6 +98,15 @@ class FileItem extends Component {
         break;
     }
 
+    const displayTags = this.props.user.tagsList.map(tag =>
+      (
+        <tr style={{ height: '5px' }} key={tag._id}>
+          <td style={{ backgroundColor: tag.color }}>{tag.name}</td>
+          <td>{tag.description}</td>
+
+        </tr>
+      )
+    );
     const fileItemIcon = getMimeTypeIcon(file.mimeType);
     return (
       <div
@@ -89,6 +118,61 @@ class FileItem extends Component {
         }
         onClick={this.handleClick}
       >
+        <Modal isOpen={this.state.modal} toggle={this.toggle}>
+          <ModalHeader toggle={this.toggle} close={closeBtn}>Assign Tags</ModalHeader>
+          <ModalBody>
+            <div className="assignedTags">
+
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+            <Tag pill>Memona</Tag>
+
+            </div>
+
+
+            <Table hover >
+              <thead>
+                <tr>
+                  <th>Tag</th>
+                  <th>Description</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayTags}
+              </tbody>
+            </Table>
+
+
+          </ModalBody>
+          <ModalFooter>
+            {
+
+            }
+            <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+
+
         <ContextMenuTrigger id={file.id}>
           <div className="d-flex flex-nowrap align-items-center">
             <div className="file-item--icon  p-2">
@@ -106,7 +190,14 @@ class FileItem extends Component {
             </div>
           </div>
         </ContextMenuTrigger>
+
         <ContextMenu id={file.id}>
+          <MenuItem
+            data={{ foo: "bar" }}
+            onClick={() => this.handleContextMenuClick("tag")}
+          >
+            Assign Tags
+          </MenuItem>
           <MenuItem
             data={{
               foo: "bar"
@@ -134,19 +225,25 @@ class FileItem extends Component {
     );
   }
 }
-
+function mapStateToProps({ user }) {
+  return {
+    user
+  };
+}
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       setActiveFile,
       unsetActiveFile,
       downloadFile,
-      fetchFilesById
+      fetchFilesById,
+      fetchTagsList
     },
     dispatch
+
   );
 }
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(FileItem);
