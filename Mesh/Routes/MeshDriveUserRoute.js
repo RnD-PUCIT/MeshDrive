@@ -470,14 +470,12 @@ router.post("/ListTags",function(req,res){
 
 router.post("/createTag",Constants.checkAccessMiddleware,function(req,res){
     var result = new Object();
-    console.log("test");
     var label = {
         name: req.body.tagName,
         description: req.body.tagDescription===""?"None":req.body.tagDescription,
         color:req.body.tagColor  
     }
-    console.log(req.body.email);
-    let criteria = {"email":req.body.email,"labels.name":{$ne:label.tagName}};
+    let criteria = {"email":req.body.email,"labels.name":{$ne:label.name}};
    
     User.findOneAndUpdate(criteria,{$push: {labels: label}}).then(user=>{  
         console.log(user);
