@@ -1,8 +1,7 @@
 const FileTagsModel = require('../Models/FileTagsModel');
 const mongoose = require('mongoose');
 const url = "mongodb://localhost/mydb";
-
-// mongoose.Promise=global.Promise;
+mongoose.Promise=global.Promise;
 var exports=module.exports={};
 
 mongoose.connect(url,{ useNewUrlParser: true });
