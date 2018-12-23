@@ -130,7 +130,6 @@ exports.removeAllGoogleDriveAccountsByEmail =function(meshAccountEmail,googlDriv
             {
                 var accPos=-1;
                 var accountsList=user.drives.GoogleDrive.AccountsList;
-                console.log(googlDriveAccountEmail);
                 for (let index = 0; index < accountsList.length; index++) {
                     const account = accountsList[index];
                     if(account.user.emailAddress==googlDriveAccountEmail)

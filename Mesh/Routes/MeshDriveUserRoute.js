@@ -470,15 +470,17 @@ router.post("/ListTags",function(req,res){
 
 router.post("/createTag",Constants.checkAccessMiddleware,function(req,res){
     var result = new Object();
+    console.log("test");
     var label = {
         name: req.body.tagName,
         description: req.body.tagDescription===""?"None":req.body.tagDescription,
         color:req.body.tagColor  
     }
+    console.log(req.body.email);
     let criteria = {"email":req.body.email,"labels.name":{$ne:label.tagName}};
    
     User.findOneAndUpdate(criteria,{$push: {labels: label}}).then(user=>{  
-        
+        console.log(user);
         if(user)
         {
             result.success = true;
@@ -489,10 +491,11 @@ router.post("/createTag",Constants.checkAccessMiddleware,function(req,res){
         {
             result.success = false;
             result.message = "Tag already exists";
-            res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
+            res.status(Constants.CODE_OK).json(result);
         }      
 
     }).catch((err)=>{
+        console.log(err);
         result.success = false;
         result.message = "Try Again";       
        

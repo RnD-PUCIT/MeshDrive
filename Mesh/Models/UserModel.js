@@ -46,19 +46,19 @@ const UserSchema = new Schema({
     },
     labels:[
         {          
-        name:{       
-            type:String,
-            default:""      
-        },
-        description:{
-            type:String,
-            default:"None"
-        },
-        color:{
-            type:String,
-            default:'#0000'
-        }      
-    }
+            name:{       
+                type:String,
+                default:""      
+            },
+            description:{
+                type:String,
+                default:"None"
+            },
+            color:{
+                type:String,
+                default:'#0000'
+            }      
+        }
     ],
     drives :{
         GoogleDrive:{
