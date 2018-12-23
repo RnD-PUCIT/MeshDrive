@@ -10,10 +10,13 @@ import fetchTagsList from "../../actions/user/fetchTagsList";
 import fetchFilesById from "../../actions/files/fetchFilesById";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import {
+  Table,
+  Button, Modal, ModalHeader, ModalBody, ModalFooter
+} from "reactstrap";
 import { getMimeTypeIcon } from "../../constants/mimeTypes";
 import "./styles.css";
-import { Tag } from "@zendeskgarden/react-tags";
+import { Tag, Close } from "@zendeskgarden/react-tags";
 import '@zendeskgarden/react-tags/dist/styles.css';
 
 
@@ -24,7 +27,8 @@ class FileItem extends Component {
       active: this.props.isFileActive,
       modal: false,
       activeFile: null,
-      selectedTagsList: []
+      selectedTagsList: [],
+      activeIndex: -1
     };
 
     this.isFolder =
@@ -82,6 +86,26 @@ class FileItem extends Component {
     }
   };
 
+  handleSaveTags = e => {
+    e.preventDefault();
+
+  }
+  AddTagToList = (tag, index) => {
+
+    if (this.state.selectedTagsList.indexOf(tag) < 0)
+      this.state.selectedTagsList.push(tag);
+    this.setState({
+      activeIndex: index,
+      selectedTagsList: this.state.selectedTagsList
+    });
+
+  }
+  removeTag = (i) => {
+    this.state.selectedTagsList.splice(i, 1);
+    this.setState({
+      selectedTagsList: this.state.selectedTagsList
+    });
+  }
   render() {
     const closeBtn = <button className="close" onClick={this.toggle}>&times;</button>;
     const { file } = this.props;
@@ -97,16 +121,32 @@ class FileItem extends Component {
         driveIcon = <FAIcon icon="cloud" classes={["fa"]} />;
         break;
     }
+    const displayTags = this.props.user.tagsList.map((tag, index) => {
+      const selectedTagIndicator = this.state.selectedTagsList.indexOf(tag) !== -1 ? <FAIcon icon="check" classes={["fa"]} /> : ' ';
+      return (
+        <tr className="tagRow" onClick={() => { this.AddTagToList(tag, index) }}>
+          <td key={tag._id} style={{ height: '60px' }}
+          >
+            <Tag className="tagColorBox" style={{ backgroundColor: tag.color }}></Tag>
+            <span
+              className="tagNameHeading"
+            >
+              {tag.name}
+            </span>
+            <div className="tagDesc">{tag.description}</div>
 
-    const displayTags = this.props.user.tagsList.map(tag =>
-      (
-        <tr style={{ height: '5px' }} key={tag._id}>
-          <td style={{ backgroundColor: tag.color }}>{tag.name}</td>
-          <td>{tag.description}</td>
+          </td>
+          <td>
 
+            {selectedTagIndicator}
+
+          </td>
         </tr>
-      )
+      );
+    }
+
     );
+
     const fileItemIcon = getMimeTypeIcon(file.mimeType);
     return (
       <div
@@ -118,61 +158,39 @@ class FileItem extends Component {
         }
         onClick={this.handleClick}
       >
-        <Modal isOpen={this.state.modal} toggle={this.toggle}>
-          <ModalHeader toggle={this.toggle} close={closeBtn}>Assign Tags</ModalHeader>
+        <Modal width='900px' isOpen={this.state.modal} toggle={this.toggle}>
+          <ModalHeader toggle={this.toggle} close={closeBtn}>Assign Tags to {file.name}</ModalHeader>
           <ModalBody>
             <div className="assignedTags">
-
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-            <Tag pill>Memona</Tag>
-
+              {
+                this.state.selectedTagsList.map(tag =>
+                  (
+                    <Tag
+                      className="Tag"
+                      style={{ backgroundColor: tag.color }}
+                      size="large"
+                    >{tag.name}
+                      <Close onClick={() => { this.removeTag(this.state.selectedTagsList.indexOf(tag)) }} /></Tag>
+                  ))
+              }
             </div>
-
-
             <Table hover >
-              <thead>
-                <tr>
-                  <th>Tag</th>
-                  <th>Description</th>
-                  <th></th>
-                </tr>
-              </thead>
               <tbody>
                 {displayTags}
               </tbody>
             </Table>
-
-
           </ModalBody>
           <ModalFooter>
-            {
-
-            }
-            <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+            <Button color="primary" onClick={this.handleSaveTags}>Save Tags</Button>
+            <Button color="secondary" onClick={() => {
+              this.setState({
+                selectedTagsList: [],
+                activeIndex: -1
+              })
+              this.toggle();
+            }}>Cancel</Button>
           </ModalFooter>
         </Modal>
-
-
         <ContextMenuTrigger id={file.id}>
           <div className="d-flex flex-nowrap align-items-center">
             <div className="file-item--icon  p-2">
@@ -240,7 +258,6 @@ function mapDispatchToProps(dispatch) {
       fetchTagsList
     },
     dispatch
-
   );
 }
 export default connect(
