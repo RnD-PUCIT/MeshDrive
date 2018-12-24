@@ -5,6 +5,7 @@ const Constants = require('../Extras/Globals');
 
 
 router.post('/AddTags',Constants.checkAccessMiddleware,function(req,res){
+    console.log("I AM CALLED");
     var meshEmail=req.userData.email;
     var file={};
     file.driveEmail=req.body.driveEmail;

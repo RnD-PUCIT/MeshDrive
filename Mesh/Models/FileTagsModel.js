@@ -26,10 +26,9 @@ const FileTagsSchema = new Schema({
     },
     filesList:[
         {
-            driveEmail:string,
-            driveType:string,
-            fileId:string,
-            fileParent:string,
+            driveEmail:String,
+            driveType:String,
+            fileId:String,
             tagsIdList:[]
         }
     ]
@@ -47,5 +46,5 @@ FileTagsSchema.plugin(uniqueValidator,{message:"Sorry, This {PATH} already exist
 //     else
 //         return User;
 // }
-FileTags=mongoose.model('user',FileTagsSchema);
+FileTags=mongoose.model('file_meta',FileTagsSchema);
 module.exports=FileTags;
