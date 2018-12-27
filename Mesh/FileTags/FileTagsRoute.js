@@ -2,16 +2,15 @@ const express = require('express');
 const router = express.Router();
 const FileTagsDAL = require('./FileTagsDAL');
 const Constants = require('../Extras/Globals');
-
+var dateFormat = require('dateformat');
 
 router.post('/AddTags',Constants.checkAccessMiddleware,function(req,res){
-    console.log("I AM CALLED");
+  
     var meshEmail=req.userData.email;
     var file={};
     file.driveEmail=req.body.driveEmail;
     file.driveType=req.body.driveType;
     file.fileId=req.body.fileId;
-    file.fileParent=req.body.fileParent;
     file.tagsIdList=req.body.tagsIdList;
     FileTagsDAL.checkFile(meshEmail,file.fileId,file.driveEmail)
     .then((check)=>{

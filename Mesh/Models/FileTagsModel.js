@@ -9,42 +9,31 @@ mongoose.connect(url,{ useNewUrlParser: true });
 
 var FileTags = null;
 const FileTagsSchema = new Schema({
-    email:{
+    user_email:{
         type:String,
         required:true,       
         unique:true
-    },
-    CreatedOn:
-    {
-        type:Date,
-        default: dateFormat(new Date(), "yyyy-mm-dd h:MM:ss")
-    },
-    LastModifiedOn:
-    {
-        type:String,
-        default:dateFormat(new Date(), "yyyy-mm-dd h:MM:ss")
     },
     filesList:[
         {
             driveEmail:String,
             driveType:String,
             fileId:String,
+            CreatedOn:
+            {
+                type:Date,
+                default: dateFormat(new Date(), "yyyy-mm-dd h:MM:ss")
+            },
+            LastModifiedOn:
+            {
+                type:String,
+                default:dateFormat(new Date(), "yyyy-mm-dd h:MM:ss")
+            },
             tagsIdList:[]
         }
     ]
 })
-// it will aslo check case insensitive duplicates
-FileTagsSchema.plugin(uniqueValidator,{message:"Sorry, This {PATH} already exists."});
 
-// module.exports.getInstance = function()
-// {
-//     if(User==null)
-//         {
-//          User=mongoose.model('user',UserSchema);
-//          return User;
-//         }
-//     else
-//         return User;
-// }
+FileTagsSchema.plugin(uniqueValidator,{message:"Sorry, This {PATH} already exists."});
 FileTags=mongoose.model('file_meta',FileTagsSchema);
 module.exports=FileTags;
