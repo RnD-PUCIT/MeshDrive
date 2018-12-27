@@ -8,6 +8,7 @@ import unsetActiveFile from "../../actions/activeFilesIds/unsetActiveFile";
 import downloadFile from "../../actions/files/downloadFile";
 import fetchTagsList from "../../actions/user/fetchTagsList";
 import fetchFilesById from "../../actions/files/fetchFilesById";
+import assignTagsToFile from "../../actions/files/assignTagsToFile";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import {
@@ -86,8 +87,14 @@ class FileItem extends Component {
     }
   };
 
-  handleSaveTags = e => {
-    e.preventDefault();
+  handleAssignTagsToFile = (file) => {
+    
+    let fileInfo={};
+    fileInfo.driveEmail = file.account;
+    fileInfo.driveType = file.drive;
+    fileInfo.fileId = file.id;
+    fileInfo.tagsIdList = this.state.selectedTagsList;
+    this.props.assignTagsToFile(fileInfo);
 
   }
   AddTagToList = (tag, index) => {
@@ -134,18 +141,14 @@ class FileItem extends Component {
               {tag.name}
             </span>
             <div className="tagDesc">{tag.description}</div>
-
           </td>
           <td>
-
             {selectedTagIndicator}
-
           </td>
         </tr>
       );
     }
-
-    );
+  );
 
     const fileItemIcon = getMimeTypeIcon(file.mimeType);
     return (
@@ -159,7 +162,7 @@ class FileItem extends Component {
         onClick={this.handleClick}
       >
         <Modal width='900px' isOpen={this.state.modal} toggle={this.toggle}>
-          <ModalHeader toggle={this.toggle} close={closeBtn}>Assign Tags to {file.name}</ModalHeader>
+          <ModalHeader toggle={this.toggle} close={closeBtn}>Assign Tags to {file.id}</ModalHeader>
           <ModalBody>
             <div className="assignedTags">
               {
@@ -181,7 +184,7 @@ class FileItem extends Component {
             </Table>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={this.handleSaveTags}>Save Tags</Button>
+            <Button color="primary" onClick={()=>{this.handleAssignTagsToFile(file)}}>Save Tags</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
                 selectedTagsList: [],
@@ -255,7 +258,8 @@ function mapDispatchToProps(dispatch) {
       unsetActiveFile,
       downloadFile,
       fetchFilesById,
-      fetchTagsList
+      fetchTagsList,
+      assignTagsToFile
     },
     dispatch
   );

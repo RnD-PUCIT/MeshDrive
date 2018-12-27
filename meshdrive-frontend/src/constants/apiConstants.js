@@ -77,6 +77,7 @@ export const apiRoutes = {
   },
   files: {
     // google
+    assignTagsToFile: `${apiBaseUrl}/files/AddTags`,
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
     listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
     listDriveFilesById: `${apiBaseUrl}/GoogleDrive/ListDriveFilesById`,
