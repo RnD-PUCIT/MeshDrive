@@ -25,8 +25,6 @@ export default function fetchTagsOfFiles(obj) {
     let driveEmail = obj.driveEmail;
     let driveType = obj.driveType;
      let fileId = obj.fileId;
-    
-    dispatch(startApiRequest());
     axios
       .post(apiRoutes.files.fetchTagsOfFile, {
         token,
@@ -35,19 +33,16 @@ export default function fetchTagsOfFiles(obj) {
         fileId
       })
       .then(response => {
-  
-      
         const {success,data} = response.data;
-console.log("success "+success+" data "+data);
         if(success===true)
         {
           console.log("SUCCESS");
-          dispatch(finishApiRequest(null, true));
           dispatch(shouldFetchTagsOfFile(data,obj));
         }
         else if(success===false)
         {
           console.log("NOT SUCCESS");
+          dispatch(startApiRequest());
           dispatch(finishApiRequest(null,true,
             <SweetAlertWrapper danger title="Fail">
             Try Again
