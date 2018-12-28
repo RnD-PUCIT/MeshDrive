@@ -3,3 +3,4 @@ export const UPLOAD_FILE = "UPLOAD_FILE";
 export const DELETE_FILE = "DELETE_FILE";
 export const DOWNLOAD_FILE = "DOWNLOAD_FILE";
 export const ASSIGN_TAGS_TO_FILE = "ASSIGN_TAGS_TO_FILE";
+export const FETCH_FILE_TAG="FETCH_FILE_TAG";
