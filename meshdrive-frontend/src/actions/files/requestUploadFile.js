@@ -47,10 +47,11 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
         break;
 
       case DROPBOX:
+      let dropboxAccountEmail = uploadFileEmail;
         postURL = apiRoutes.files.dropbox_uploadFile(
           file.name,
           "root",
-          uploadFileEmail,
+          dropboxAccountEmail,
           token
         );
         break;
