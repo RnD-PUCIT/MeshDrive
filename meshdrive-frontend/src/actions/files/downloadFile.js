@@ -21,9 +21,10 @@ export default function downloadFile(drive, downloadFileAccount, file) {
 
     switch (drive) {
       case GOOGLEDRIVE:
+      let googleDriveEmail = downloadFileAccount;
         axios({
           url: apiRoutes.files.downloadFile(
-            downloadFileAccount,
+            googleDriveEmail,
             file.id,
             token
           ),
@@ -44,9 +45,10 @@ export default function downloadFile(drive, downloadFileAccount, file) {
         });
         break;
       case ONEDRIVE:
+      let oneDriveEmail = downloadFileAccount;
         axios({
           url: apiRoutes.files.onedrive_downloadFile(
-            downloadFileAccount,
+          oneDriveEmail,
             file.id,
             token
           ),
@@ -67,13 +69,14 @@ export default function downloadFile(drive, downloadFileAccount, file) {
         });
         break;
       case DROPBOX:
+      let dropboxAccountEmail =downloadFileAccount;
         axios({
           url: apiRoutes.files.dropbox_downloadFile,
           method: "POST",
           headers: { "Content-Type": "application/json" },
           responseType: "blob", // important
           data: {
-            downloadFileAccount,
+            dropboxAccountEmail,
             fileName: file.name,
             path: file.id,
             token
