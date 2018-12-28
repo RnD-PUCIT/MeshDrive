@@ -1,13 +1,11 @@
 import { ASSIGN_TAGS_TO_FILE } from "./types";
 import axios from "axios";
+import React from "react";
 import { apiRoutes } from "../../constants/apiConstants";
 import startApiRequest from "../api/startApiRequest";
-// export const assignTagsToFileAction = (file_id,tagsList) => {
-//   return {
-//     type: ASSIGN_TAGS_TO_FILE,
-//     payload: tagsList
-//   };
-// };
+import finishApiRequest from "../api/finishApiRequest";
+import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
+import fetchTagsOfFile, { shouldFetchTagsOfFile } from "../files/fetchTagsOfFile";
 
 export default function assignTagsToFile(obj) {
   return (dispatch,getState) => {
@@ -17,7 +15,8 @@ export default function assignTagsToFile(obj) {
         let tagsIdList = obj.tagsIdList;
         const state = getState();
         const { user } = state;
-        const { token } = user;     
+        const { token } = user;    
+        dispatch(startApiRequest()); 
       axios.post(apiRoutes.files.assignTagsToFile,{
         token,
         driveEmail,
@@ -26,11 +25,26 @@ export default function assignTagsToFile(obj) {
         tagsIdList
 
       }).then(response => {
-      console.log("tagssssss response "+response.data);
+        const {success,data}=response.data;
+        if(success==true)
+        {
+          dispatch(finishApiRequest(null, true, <SweetAlertWrapper success title="Tags Assigned">       
+        </SweetAlertWrapper>));
+         dispatch(shouldFetchTagsOfFile(tagsIdList,obj));
+        }
+        else{
+          dispatch(finishApiRequest(null, true, <SweetAlertWrapper danger title="Fail">
+          Duplicate Tags cant be assigned
+        </SweetAlertWrapper>));
+        }
+
+     
       
       })
       .catch(error => {
-        console.log("tagssssss response "+ error);
+        dispatch(finishApiRequest(null, true, <SweetAlertWrapper danger title="Fail">
+        Something went wrong while assigning tags Try Again.
+      </SweetAlertWrapper>));
       
       });
     }
