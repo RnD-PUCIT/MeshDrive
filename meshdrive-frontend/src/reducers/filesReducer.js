@@ -12,8 +12,18 @@ const initialFilesState = [];
 export default function(state = initialFilesState, action) {
   switch (action.type) {
     case FETCH_FILES:
-      console.log(action.payload);
-      return action.payload;
+    {
+      state = action.payload;
+      const newState = Object.assign(state);
+      newState.forEach(account=>{
+        const {files} = account;     
+           files.forEach(file=>{
+                  file.tagsList = [];              
+           });       
+      }); 
+      return [...newState];
+    }
+    
 
     case UPLOAD_FILE:
       console.log(action);
@@ -51,6 +61,7 @@ export default function(state = initialFilesState, action) {
       return [...newStateWithTags];
     
   }
+
     default:
       return state;
   }
