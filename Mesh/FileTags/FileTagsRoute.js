@@ -128,12 +128,13 @@ router.post('/getFileTags',Constants.checkAccessMiddleware,function(req,res){
                 console.log(err);
                 result.success=false;
                 result.data= err.message;
-                res.status(Constants.CODE_OK).json(result);
+                res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
             });
         }
         else{
-
-            res.status(Constants.CODE_OK).json(null);
+            result.success=false;
+            result.data=[];
+            res.status(Constants.CODE_NO_CONTENT).json(result);
         }
     })
     .catch(err=>{
