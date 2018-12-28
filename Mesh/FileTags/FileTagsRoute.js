@@ -14,30 +14,42 @@ router.post('/AddTags',Constants.checkAccessMiddleware,function(req,res){
     file.tagsIdList=req.body.tagsIdList;
     FileTagsDAL.checkFile(meshEmail,file.fileId,file.driveEmail)
     .then((check)=>{
+        var result = {};
         if(check==null)
         {
+           
             FileTagsDAL.createFile(meshEmail,file)
-            .then((result)=>{
-                res.status(Constants.CODE_OK).json({message:"Tags added succesfully"});
+            .then((result2)=>{
+                result.success=true;
+                result.message= "Tags added succesfully";
+                res.status(Constants.CODE_OK).json(result);
             })
             .catch((err)=>{
-                res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to add tags"});
+                result.success=false;
+                result.message= err.message;
+                res.status(Constants.CODE_OK).json(result);
             });
         }
         else
         {
             FileTagsDAL.addTagsToFile(meshEmail,file)
-            .then((result)=>{
-                res.status(Constants.CODE_OK).json({message:"Tags added succesfully"});
-            })
+            .then((result2)=>{
+                result.success=true;
+                result.message= "Tags updated succesfully";
+                res.status(Constants.CODE_OK).json(result);
+        })
             .catch((err)=>{
-                res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to remove tags"});
-            });
+                result.success=false;
+                result.message= err.message;
+                res.status(Constants.CODE_OK).json(result);
+   });
         }
     })
     .catch(()=>{
-        res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to remove tags"});
-    });
+        result.success=false;
+        result.message= err.message;
+        res.status(Constants.CODE_OK).json(result);
+        });
 })
 
 
@@ -89,9 +101,46 @@ router.post('/RemoveTags',Constants.checkAccessMiddleware,function(req,res){
     .catch((err)=>{
         res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to remove tags"});
     });
-})
+});
 
 
+router.post('/getFileTags',Constants.checkAccessMiddleware,function(req,res){
 
+    var meshEmail=req.userData.email;
+    var file={};
+    file.driveEmail=req.body.driveEmail;
+    file.driveType=req.body.driveType;
+    file.fileId=req.body.fileId;
+    FileTagsDAL.checkFile(meshEmail,file.fileId,file.driveEmail)
+    .then((check)=>{
+        var result = {};
+        if(check!=null)
+        {     
+            FileTagsDAL.getTags(meshEmail,file)
+            .then(response=>{
+               
+                result.success=true;
+                result.data = response;
+                res.status(Constants.CODE_OK).json(result);
+
+            })
+            .catch(err=>{
+                console.log(err);
+                result.success=false;
+                result.data= err.message;
+                res.status(Constants.CODE_OK).json(result);
+            });
+        }
+        else{
+
+            res.status(Constants.CODE_OK).json(null);
+        }
+    })
+    .catch(err=>{
+
+    });
+  
+
+});
 
 module.exports = router;

@@ -30,7 +30,12 @@ exports.getTags =function(email,file)
         var criteria = {"user_email":email,"filesList.driveEmail":file.driveEmail,"filesList.fileId":file.fileId};
         FileTagsModel.findOne(criteria)
         .then((res)=>{
-            success(res.filesList.tagsIdList);
+            const  {filesList} = res;
+            filesList.forEach(element => {
+                if(element.fileId==file.fileId)
+                    success(element.tagsIdList);
+            });
+            success([]);     
         })
         .catch((err)=>{
             failure(err.message);
