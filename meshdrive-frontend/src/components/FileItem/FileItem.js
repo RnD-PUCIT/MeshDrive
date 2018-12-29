@@ -12,6 +12,8 @@ import fetchTagsOfFile from "../../actions/files/fetchTagsOfFile";
 import assignTagsToFile from "../../actions/files/assignTagsToFile";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import ReactLoading from 'react-loading';
+import shouldFetchTagsOfFile from "../../actions/files/fetchTagsOfFile";
 import {
   Table,
   Button, Modal, ModalHeader, ModalBody, ModalFooter
@@ -20,32 +22,43 @@ import { getMimeTypeIcon } from "../../constants/mimeTypes";
 import "./styles.css";
 import { Tag, Close } from "@zendeskgarden/react-tags";
 import '@zendeskgarden/react-tags/dist/styles.css';
+import SideBar from "../Layout/SideBar/SideBar";
+import filesReducer from "../../reducers/filesReducer";
 
 
 class FileItem extends Component {
   constructor(props) {
     super(props);
-    const {file} = this.props;
     this.state = {
       active: this.props.isFileActive,
       modal: false,
       activeFile: null,
-      selectedTagsList: file.tagsList,
+      file: this.props.file,
+      // selectedTagsList: file.tagsList,
       activeIndex: -1
     };
 
     this.isFolder =
       this.props.file.mimeType === "folder";
     this.toggle = this.toggle.bind(this);
+    this.AddTagToList = this.AddTagToList.bind(this);
+    this.removeTag = this.removeTag.bind(this);
+    this.fetchAssignedTags = this.fetchAssignedTags.bind(this);
   }
-  
+  componentDidUpdate() {
+    console.log("COMP DID UPDATE");
+  }
   toggle() {
-    const {file} = this.props;
-    this.state.selectedTagsList=file.tagsList;
-    this.setState({
-      activeFile:file.id,
-      selectedTagsList:this.state.selectedTagsList
-    })
+    const { file } = this.props;
+    if(file.tagsList.findIndex(t=>t.name==="null")!=-1 && !this.state.modal===false)
+      {
+        this.removeTag(file.tagsList.findIndex(t=>t.name==="null"));
+        let fileInfo = {};
+        fileInfo.driveEmail = file.account;
+        fileInfo.driveType = file.drive;
+        fileInfo.fileId = file.id;
+        this.props.shouldFetchTagsOfFile(file.tagsList,fileInfo);
+       }
     this.setState({
       modal: !this.state.modal
     });
@@ -78,74 +91,93 @@ class FileItem extends Component {
     if (this.isFolder) {
       this.props.fetchFilesById(this.props.drive, file.account, file.id);
     }
-    else {     
-    
+    else {
+
     }
   };
   handleContextMenuClick = menu => {
-    const {file} = this.props;
+    const { file } = this.props;
     let fileInfo = {};
     fileInfo.driveEmail = file.account;
     fileInfo.driveType = file.drive;
     fileInfo.fileId = file.id;
-   
-    console.log(file);
     switch (menu) {
       case "download":
         return this.props.downloadFile(this.props.drive, file.account, file);
       case "tag":
-      let fileInfo = {};
-      fileInfo.driveEmail = file.account;
-      fileInfo.driveType = file.drive;
-      fileInfo.fileId = file.id;
-      this.props.fetchTagsOfFile(fileInfo);
-      this.state.selectedTagsList=file.tagsList;
-      this.setState({
-        activeFile:file.id,
-        selectedTagsList:this.state.selectedTagsList
-      })
-      this.toggle();
-      return;
+        {
+          this.props.fetchTagsOfFile(fileInfo);
+          this.toggle();
+          setTimeout(
+            () => { this.setState(this.state); }
+            , 5000);
+          return;
+        }
+
       case "details":
+
         return;
     }
   };
 
   handleAssignTagsToFile = (file) => {
-
     let fileInfo = {};
     fileInfo.driveEmail = file.account;
     fileInfo.driveType = file.drive;
     fileInfo.fileId = file.id;
-    fileInfo.tagsIdList = this.state.selectedTagsList;
+    fileInfo.tagsIdList = file.tagsList;
     this.props.assignTagsToFile(fileInfo);
     this.props.fetchTagsOfFile(fileInfo);
-    this.state.selectedTagsList = file.tagsList;
+    // this.state.selectedTagsList = file.tagsList;
     this.setState({
-      selectedTagsList:this.state.selectedTagsList
+      // selectedTagsList:this.state.selectedTagsList
     })
     this.toggle();
   }
+
+  fetchAssignedTags = (file) => {
+    let fileInfo = {};
+    fileInfo.driveEmail = file.account;
+    fileInfo.driveType = file.drive;
+    fileInfo.fileId = file.id;
+    this.props.fetchTagsOfFile(fileInfo);
+  }
+
   AddTagToList = (tag, index) => {
-
-    if (this.state.selectedTagsList.indexOf(tag) < 0)
-      this.state.selectedTagsList.push(tag);
+    const { file } = this.props;
+    if(file.tagsList.findIndex(t=>t.name==="null")!=-1)
+      {
+        this.removeTag(file.tagsList.findIndex(t=>t.name==="null"));
+        let fileInfo = {};
+        fileInfo.driveEmail = file.account;
+        fileInfo.driveType = file.drive;
+        fileInfo.fileId = file.id;
+        this.props.shouldFetchTagsOfFile(file.tagsList,fileInfo);
+       }
+    if (file.tagsList.findIndex(t => t.name === tag.name) === -1)
+      file.tagsList.push(tag);
     this.setState({
-      activeIndex: index,
-      selectedTagsList: this.state.selectedTagsList
+      activeIndex: index
+      // selectedTagsList: this.state.selectedTagsList
     });
-
   }
   removeTag = (i) => {
-    this.state.selectedTagsList.splice(i, 1);
+    const { file } = this.props;
+    file.tagsList.splice(i, 1);
     this.setState({
-      selectedTagsList: this.state.selectedTagsList
+      activeIndex: -1
     });
+  }
+  UpdateState = () => {
+    this.setState(
+      this.state
+    );
   }
   render() {
     const closeBtn = <button className="close" onClick={this.toggle}>&times;</button>;
     const { file } = this.props;
-   
+
+
     let driveIcon = null;
     switch (file.drive) {
       case "googledrive":
@@ -158,29 +190,38 @@ class FileItem extends Component {
         driveIcon = <FAIcon icon="cloud" classes={["fa"]} />;
         break;
     }
-    const displayTags = this.props.user.tagsList.map((tag, index) => {
 
-        const selectedTagIndicator = this.state.selectedTagsList.indexOf(tag.name) !== -1 ? <FAIcon icon="check" classes={["fa"]} /> : ' ';
-        return (
-          <tr className="tagRow" onClick={() => { this.AddTagToList(tag, index) }}>
-            <td key={tag._id} style={{ height: '60px' }}
-            >
-              <Tag className="tagColorBox" style={{ backgroundColor: tag.color }}></Tag>
-              <span
-                className="tagNameHeading"
-              >
-                {tag.name}
-              </span>
-              <div className="tagDesc">{tag.description}</div>
-            </td>
-            <td>
-              {selectedTagIndicator}
-            </td>
-          </tr>
-        );
-      }
-    );
     const fileItemIcon = getMimeTypeIcon(file.mimeType);
+    let nullTag = {
+      id:"null",
+      name:"null",
+      description:"null",
+      color:"null"
+    };
+    let displayTags;
+    if(file.tagsList.length===0)
+     { displayTags= (<center> 
+      <ReactLoading type='balls' color='1e90ff' height={'5%'} width={'10%'}/>
+      </center>);
+     }
+    else if(file.tagsList.findIndex(t=>t.name==="null")!=-1 && file.tagsList.length===1)
+    displayTags = <div> No Tags Assigned Yet</div>;
+    else 
+  {  
+    displayTags = <div className="assignedTags">
+    {        
+      file.tagsList.map(tag =>
+        (                 
+          <Tag
+            className="Tag"
+            style={{ backgroundColor: tag.color }}
+            size="large"
+          >{tag.name}
+            <Close onClick={() => { this.removeTag(file.tagsList.indexOf(tag)) }} /></Tag>
+        ))
+    }
+  </div>;
+  }
     return (
       <div
         className={
@@ -193,34 +234,42 @@ class FileItem extends Component {
       >
         <Modal width='900px' isOpen={this.state.modal} toggle={this.toggle}>
           <ModalHeader toggle={this.toggle} close={closeBtn}>Assign Tags to {file.name}</ModalHeader>
-          <ModalBody>        
-            <div className="assignedTags">
-              {
-                this.state.selectedTagsList.map(tag =>
-                  (
-                    <Tag
-                      className="Tag"
-                      style={{ backgroundColor: tag.color }}
-                      size="large"
-                    >{tag.name}
-                      <Close onClick={() => { this.removeTag(this.state.selectedTagsList.indexOf(tag)) }} /></Tag>
-                  ))
-              }
-            </div>
+          <ModalBody>      
+           {displayTags}
             <Table hover >
               <tbody>
-                {displayTags}
+                {
+                  this.props.user.tagsList.map((tag, index) => {
+
+                    //const selectedTagIndicator = file.tagsList.indexOf(tag) >= 0? <FAIcon icon="check" classes={["fa"]} /> : ' ';
+                    return (
+                      <tr className="tagRow" onClick={() => { this.AddTagToList(tag, index) }}>
+                        <td key={tag._id} style={{ height: '60px' }}
+                        >
+                          <Tag className="tagColorBox" style={{ backgroundColor: tag.color }}></Tag>
+                          <span
+                            className="tagNameHeading"
+                          >
+                            {tag.name}
+                          </span>
+                          <div className="tagDesc">{tag.description}</div>
+                        </td>
+                        <td>
+                          {file.tagsList.findIndex(t => t.name === tag.name) !== -1 ? <FAIcon icon="check" classes={["fa"]} /> : ' '}
+                        </td>
+                      </tr>
+                    );
+                  }
+                  )
+                }
               </tbody>
             </Table>
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={() => { this.handleAssignTagsToFile(file) }}>Save Tags</Button>
             <Button color="secondary" onClick={() => {
-              this.setState({
-                selectedTagsList: file.tagsList,
-                activeIndex: -1
-              })
-              this.toggle(null);
+              this.props.file.tagsList =[];
+              this.toggle();
             }}>Cancel</Button>
           </ModalFooter>
         </Modal>
@@ -290,7 +339,8 @@ function mapDispatchToProps(dispatch) {
       fetchFilesById,
       fetchTagsList,
       assignTagsToFile,
-      fetchTagsOfFile
+      fetchTagsOfFile,
+      shouldFetchTagsOfFile
     },
     dispatch
   );
