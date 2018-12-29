@@ -56,6 +56,7 @@ export default function fetchRootFiles(drive, isForceReload = false) {
       })
       .then(response => {
         const data = response.data;
+        console.log("dataaaaa ",data);
         dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFiles(state, data));
         if (isForceReload) {

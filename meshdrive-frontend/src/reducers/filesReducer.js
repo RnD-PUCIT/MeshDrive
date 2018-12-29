@@ -2,7 +2,8 @@ import {
   FETCH_FILES,
   UPLOAD_FILE,
   DELETE_FILE,
-  DOWNLOAD_FILE
+  DOWNLOAD_FILE,
+  FETCH_FILE_TAG
   // TOGGLE_FILE_ACTIVE,
 } from "../actions/files/types";
 
@@ -11,8 +12,18 @@ const initialFilesState = [];
 export default function(state = initialFilesState, action) {
   switch (action.type) {
     case FETCH_FILES:
-      console.log(action.payload);
-      return action.payload;
+    {
+      state = action.payload;
+      const newState = Object.assign(state);
+      newState.forEach(account=>{
+        const {files} = account;     
+           files.forEach(file=>{
+                  file.tagsList = [];              
+           });       
+      }); 
+      return [...newState];
+    }
+    
 
     case UPLOAD_FILE:
       console.log(action);
@@ -30,6 +41,27 @@ export default function(state = initialFilesState, action) {
     case DOWNLOAD_FILE: {
       return state;
     }
+
+    case FETCH_FILE_TAG:{
+      let fileInfo = action.file;
+      let tagsList = action.payload;    
+      const newStateWithTags = Object.assign(state);
+      newStateWithTags.forEach(account=>{
+        const {email,drive,files} = account;
+        if(email===fileInfo.driveEmail && drive===fileInfo.driveType)
+        {
+           files.forEach(file=>{
+              if(file.id===fileInfo.fileId)
+                {
+                  file.tagsList = tagsList;
+                }
+           });
+        }  
+      }); 
+      return [...newStateWithTags];
+    
+  }
+
     default:
       return state;
   }
