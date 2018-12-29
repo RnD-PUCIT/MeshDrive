@@ -1,15 +1,10 @@
 import { FETCH_FILE_TAG } from "./types";
 import axios from "axios";
-import React from "react";
 import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
-import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
-import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
-import navigateTo from "../../actions/filenavigation/navigateTo";
-import navigateToHome from "../../actions/filenavigation/navigateToHome";
-import forceReload from "../../actions/filenavigation/forceReload";
 export const shouldFetchTagsOfFile = (data,file) => {
+  console.log("tags fetched");
   return {
     type: FETCH_FILE_TAG,
     payload: data, // list of tags
@@ -17,7 +12,7 @@ export const shouldFetchTagsOfFile = (data,file) => {
   };
 };
 
-export default function fetchTagsOfFiles(obj) {
+export default  function fetchTagsOfFiles(obj) {
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
@@ -25,7 +20,7 @@ export default function fetchTagsOfFiles(obj) {
     let driveEmail = obj.driveEmail;
     let driveType = obj.driveType;
      let fileId = obj.fileId;
-    axios
+   axios
       .post(apiRoutes.files.fetchTagsOfFile, {
         token,
         driveEmail,
@@ -34,6 +29,17 @@ export default function fetchTagsOfFiles(obj) {
       })
       .then(response => {
         const {success,data} = response.data;
+        if(response.status===204)
+        {
+          dispatch(startApiRequest());
+          dispatch(finishApiRequest(null,true));        
+          dispatch(shouldFetchTagsOfFile([{
+            id:"null",
+            name:"null",
+            description:"null",
+            color:"null"
+          }],obj));
+        }
         if(success===true)
         {
           console.log("SUCCESS");
@@ -43,15 +49,13 @@ export default function fetchTagsOfFiles(obj) {
         {
           console.log("NOT SUCCESS");
           dispatch(startApiRequest());
-          dispatch(finishApiRequest(null,true,
-            <SweetAlertWrapper danger title="Fail">
-            Try Again
-          </SweetAlertWrapper>));
+          dispatch(finishApiRequest(null,true));
           
+           dispatch(shouldFetchTagsOfFile(data,obj));
         }    
       })
       .catch(error => {
-        console.log(error);
+        console.log("ERRRRRRRRRRO");
         dispatch(
           finishApiRequest(
             null,
