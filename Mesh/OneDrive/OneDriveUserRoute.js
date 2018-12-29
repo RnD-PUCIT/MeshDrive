@@ -17,32 +17,42 @@ function getOneDriveTokensMiddleware(req,res,next)
 		next();
 	})
 	.catch((err)=>{
-		return res.status(Constants.CODE_NOT_FOUND).json({message:"User has no Google Drive accounts",err:err});
+		return res.status(Constants.CODE_NO_CONTENT).json({message:"User has no Google Drive accounts",err:err});
 	});
 }
 
 function matchOneDriveTokenMiddleware(req,res,next)
 {
 	var oneDriveEmail=req.body.oneDriveEmail;
-	var token;
-	for (let index = 0; index < req.oneDriveAccounts.length; index++) {
-		var account = req.oneDriveAccounts[index];
-		if(account.user.emailAddress==oneDriveEmail)
-			token=account.token;
-	}
-	if(!token)
+	if(req.method=="GET")
+    {
+        oneDriveEmail=req.query.oneDriveEmail;
+    }
+    else
+    {
+        oneDriveEmail=req.body.oneDriveEmail;
+    }
+	if(!oneDriveEmail)
 	{
-		return res.status(Constants.RESPONSE_EMPTY).json({message:"Account not found in user's profile for downloading file"}).end();
+		return res.status(Constants.CODE_BAD_REQUEST).json({message:"Email not specified to get drive content"});
 	}
-	req.token=token;
-	next();
+	else
+	{
+		var token;
+		for (let index = 0; index < req.oneDriveAccounts.length; index++) {
+			var account = req.oneDriveAccounts[index];
+			if(account.user.emailAddress==oneDriveEmail)
+				token=account.token;
+		}
+		if(!token)
+		{
+			return res.status(Constants.CODE_NO_CONTENT).json({message:"Account not found in user's profile for downloading file"}).end();
+		}
+		req.token=token;
+		next();
+	}
 }
 
-
-router.get("/test",(req,res)=>{
-	console.log("something");
-	
-})
 
 //Gives redirect url where user can give access to it's google drive.
 router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
@@ -59,11 +69,11 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 	}
 	else{
 		//return call if client has not appended redirect urls
-		return res.status(Constants.CODE_NOT_FOUND).json({err:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
+		return res.status(Constants.CODE_BAD_REQUEST).json({err:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
 	}
 	redirectLink = Drive.getOneDriveAuthRedirectLink(Constants.ONEDRIVE_APP_CREDETIALS,userData); //Generate redirect uri
 	result.redirectLink=redirectLink;
-	res.status(Constants.RESPONSE_SUCCESS).json(result);
+	res.status(Constants.CODE_OK).json(result);
 })
 
 
@@ -138,7 +148,7 @@ router.delete('/RemoveOneDriveAccountByEmail',Constants.checkAccessMiddleware,ge
 		res.status(Constants.CODE_OK).json(result);
 	})
 	.catch((err)=>{
-		res.status(Constants.CODE_NOT_FOUND).json({error:err,message:"Unable to remove OneDrive drive account"});
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to remove OneDrive drive account"});
 	});
 });
 
@@ -199,7 +209,7 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getOneDriveTok
 
 	if(accountTokenList.length==0) //If no token found return
 	{
-		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
+		return res.status(Constants.CODE_NO_CONTENT).json({message:"No Google Drive account found in user profile."});
 	}
 	else
 	{
@@ -265,7 +275,7 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTok
 	});
 })
 
-router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+router.get('/DownloadFile/:oneDriveEmail/:fileId/:token',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
 	var meshDriveEmail=req.userData.email;
 	var oneDriveEmail = req.body.oneDriveEmail;
 	var token=req.token;
@@ -299,7 +309,7 @@ router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAc
 })
 
 
-router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.checkUploadAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+router.post('/UploadFile/:fileName/:mimeType/:oneDriveEmail/:token/:parentId',Constants.checkUploadAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
 	var meshDriveEmail=req.userData.email;
 	var oneDriveEmail = req.body.oneDriveEmail;
 	var fileName=req.params.fileName;
@@ -313,18 +323,18 @@ router.post('/UploadFile/:fileName/:mimeType/:uploadFileEmail/:token',Constants.
 	.then((token)=>{
 		if(token.updated)
 		{
-			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token,parentId);
 		}
 		Drive.uploadFile(token,fileName,req,mimeType)
 		.then((result)=>{
-			res.status(200).json({message:"File Uploaded",file:result});
+			res.status(Constants.CODE_OK).json({message:"File Uploaded",file:result});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Upload Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Upload Failed"});
 	});
 })
 
@@ -345,14 +355,14 @@ router.post('/CreateFolder',Constants.checkAccessMiddleware,getOneDriveTokensMid
 		}
 		Drive.createFolder(token,folderName,parentId)
 		.then((result)=>{
-			res.status(200).json({message:"Folder Created",folder:result});
+			res.status(Constants.CODE_OK).json({message:"Folder Created",folder:result});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Folder Creation Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Folder Creation Failed"});
 	});
 })
 
@@ -371,19 +381,19 @@ router.delete('/DeleteFile',Constants.checkAccessMiddleware,getOneDriveTokensMid
 		}
 		Drive.deleteFile(token,fileId)
 		.then(()=>{
-			res.status(200).json({message:"File Deleted"});
+			res.status(Constants.CODE_OK).json({message:"File Deleted"});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Delete Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Delete Failed"});
 	});
 })
 
 
-router.post('/RenameFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+router.put('/RenameFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
 	var meshDriveEmail=req.userData.email;
 	var oneDriveEmail = req.body.oneDriveEmail;
 	var fileId=req.body.fileId;
@@ -398,19 +408,19 @@ router.post('/RenameFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddl
 		}
 		Drive.renameFile(token,fileId,newFileName)
 		.then((file)=>{
-			res.status(200).json({message:"File Moved",folder:file});
+			res.status(Constants.CODE_OK).json({message:"File Moved",folder:file});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Rename Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Rename Failed"});
 	});
 })
 
 
-router.post('/MoveFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+router.put('/MoveFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
 	var meshDriveEmail=req.userData.email;
 	var oneDriveEmail = req.body.oneDriveEmail;
 	var fileId=req.body.fileId;
@@ -425,14 +435,14 @@ router.post('/MoveFile',Constants.checkAccessMiddleware,getOneDriveTokensMiddlew
 		}
 		Drive.moveFile(token,fileId,newParentId)
 		.then((file)=>{
-			res.status(200).json({message:"File Moved",folder:file});
+			res.status(Constants.CODE_OK).json({message:"File Moved",folder:file});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Move Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Move Failed"});
 	});
 })
 

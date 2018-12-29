@@ -197,12 +197,13 @@ exports.downloadFile = function(token,fileId,res){
   });
 }
 
-exports.uploadFile = function(token,fileName,file){
+exports.uploadFile = function(token,fileName,file,parentId){
   
   return new Promise((success,failure)=>{
     oneDrive.items.uploadSimple({
       accessToken: token.access_token,
       filename: fileName,
+      parentId:parentId,
       readableStream: file
     }).then((item) => {
       var file=getMeshDriveFileObjectFromOneDrive(item);
