@@ -37,7 +37,6 @@ class FileItem extends Component {
       // selectedTagsList: file.tagsList,
       activeIndex: -1
     };
-
     this.isFolder =
       this.props.file.mimeType === "folder";
     this.toggle = this.toggle.bind(this);
@@ -62,6 +61,7 @@ class FileItem extends Component {
     this.setState({
       modal: !this.state.modal
     });
+
   }
   // toggleActive = e => {
   //   e.preventDefault();
@@ -89,7 +89,13 @@ class FileItem extends Component {
     e.preventDefault();
     const { file } = this.props;
     if (this.isFolder) {
-      this.props.fetchFilesById(this.props.drive, file.account, file.id);
+      this.props.fetchFilesById(
+        this.props.drive,
+        file.account,
+        file.id,
+        false,
+        file.path
+      );
     }
     else {
 

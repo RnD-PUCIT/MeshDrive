@@ -84,19 +84,23 @@ const UserSchema = new Schema({
             ]
         },
         Dropbox:{
-            user:{
-                photoLink:String,
-                emailAddress:String
-            },
-            token :{
-                access_token:{
-                    type:String,
-                    default:false
+            AccountsList:[
+            {
+                user:{
+                    photoLink:String,
+                    emailAddress:String
                 },
-                token_type:String,
-                uid:String,
-                account_id:String,    
+                token:{
+                    access_token:{
+                        type:String,
+                        default:false
+                    },
+                    token_type:String,
+                    uid:String,
+                    account_id:String,    
+                }
             }
+        ]
         },
         OneDrive:{
             AccountsList:[

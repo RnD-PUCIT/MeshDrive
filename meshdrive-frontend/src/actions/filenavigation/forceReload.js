@@ -1,15 +1,15 @@
 import { FORCE_RELOAD } from "./types";
 
-export function shouldNavigateTo(state, folder) {
+export function shouldForceReload(state, folder) {
   return {
     type: FORCE_RELOAD,
     payload: folder
   };
 }
 
-export default function navigateTo(folder) {
+export default function forceReload(folder) {
   return (dispatch, getState) => {
     const state = getState();
-    dispatch(shouldNavigateTo(state, folder));
+    dispatch(shouldForceReload(state, folder));
   };
 }
