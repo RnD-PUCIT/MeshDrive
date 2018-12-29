@@ -18,6 +18,7 @@
     "react-contextmenu": "^2.9.3",
     "react-dom": "^16.5.2",
     "react-dropzone": "^6.0.2",
+    "react-loading": "^2.0.3",
     "react-redux": "^5.0.7",
     "react-reveal": "^1.2.2",
     "react-router": "^4.3.1",
