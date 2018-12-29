@@ -44,21 +44,21 @@ export default function(state = initialFilesState, action) {
 
     case FETCH_FILE_TAG:{
       let fileInfo = action.file;
-      let tagsList = action.payload;    
-      const newStateWithTags = Object.assign(state);
-      newStateWithTags.forEach(account=>{
+      let tagsList = action.payload;   
+      state.forEach(account=>{
         const {email,drive,files} = account;
         if(email===fileInfo.driveEmail && drive===fileInfo.driveType)
         {
+    
            files.forEach(file=>{
               if(file.id===fileInfo.fileId)
                 {
-                  file.tagsList = tagsList;
+                  file.tagsList = tagsList;                     
                 }
            });
         }  
       }); 
-      return [...newStateWithTags];
+      return [...state];  
     
   }
 
