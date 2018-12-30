@@ -1,7 +1,7 @@
 const jwt=require('jsonwebtoken');
 
-const FRONT_URL_FORGET_PASSWORD="http://localhost:3000/#/resetPassword/"
-const URL='http://localhost:8000'; //change
+const FRONT_URL_FORGET_PASSWORD="http://localhost:3000/#/resetPassword"
+const URL='https://test-depositoryworks.ngrok.io'; //change
 const DEPLOYED_URL=URL;//change this on dbx console too
 const RESPONSE_FAIL=400;
 const RESPONSE_SUCCESS=200;
@@ -92,6 +92,7 @@ module.exports.checkUploadAccessMiddleware = function(req,res,next){
             return res.status(module.exports.CODE_UNAUTHORIZED).json({message:"Please login again",err:err.message});
         }
         req.userData=decoded; 
+        req.reqForUpload=true;
         next();
     }); 
 }

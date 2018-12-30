@@ -24,9 +24,9 @@ function getOneDriveTokensMiddleware(req,res,next)
 function matchOneDriveTokenMiddleware(req,res,next)
 {
 	var oneDriveEmail=req.body.oneDriveEmail;
-	if(req.method=="GET")
+	if(req.method=="GET" || req.reqForUpload==true)
     {
-        oneDriveEmail=req.query.oneDriveEmail;
+        oneDriveEmail=req.params.oneDriveEmail;
     }
     else
     {
@@ -257,11 +257,12 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTok
 		}
 		Drive.listFilesById(token,fileId)
 		.then((files)=>{
+			
 			//Creating this response structure just to match listRootFiles structure
 			var response=[];
 			var driveFiles={};
 			driveFiles.files=files;
-			driveFiles.email=listAccountEmail;
+			driveFiles.email=oneDriveEmail;
 			driveFiles.drive="onedrive";
 			response.push(driveFiles);
 			res.status(Constants.CODE_OK).json(response);
@@ -309,7 +310,7 @@ router.get('/DownloadFile/:oneDriveEmail/:fileId/:token',Constants.checkAccessMi
 })
 
 
-router.post('/UploadFile/:fileName/:mimeType/:oneDriveEmail/:token/:parentId',Constants.checkUploadAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+router.post('/UploadFile/:fileName/:mimeType/:oneDriveEmail/:token',Constants.checkUploadAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
 	var meshDriveEmail=req.userData.email;
 	var oneDriveEmail = req.body.oneDriveEmail;
 	var fileName=req.params.fileName;
@@ -323,7 +324,7 @@ router.post('/UploadFile/:fileName/:mimeType/:oneDriveEmail/:token/:parentId',Co
 	.then((token)=>{
 		if(token.updated)
 		{
-			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token,parentId);
+			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
 		}
 		Drive.uploadFile(token,fileName,req,mimeType)
 		.then((result)=>{
