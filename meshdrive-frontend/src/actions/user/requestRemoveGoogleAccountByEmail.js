@@ -24,12 +24,13 @@ export default function requestRemoveGoogleDriveAccountByEmail(email) {
     const { token } = user;
 
     dispatch(startApiRequest());
-
+    let googleDriveEmail = email;
     axios
       .delete(apiRoutes.users.removeGoogleAccountByEmail, {
-        data: { token, googleAccountEmail: email }
+        data: { token, googleDriveEmail: googleDriveEmail }
       })
       .then(response => {
+        console.log("response "+response.status);
         if (response.status === 200) {
           dispatch(shouldRemoveGoogleDriveAccountByEmail(state));
           dispatch(

@@ -54,9 +54,11 @@ exports.createFile =function(email,file)
         var updation = {"filesList":file};
         FileTagsModel.updateOne(criteria,{$push:updation})
         .then((res)=>{
+            console.log(res);
             success(res);
         })
         .catch((err)=>{
+            console.log(err);
             failure(err.message);
         });	
 	});

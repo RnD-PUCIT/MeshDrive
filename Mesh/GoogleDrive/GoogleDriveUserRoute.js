@@ -25,9 +25,9 @@ function getGoogleDriveTokensMiddleware(req,res,next)
 function matchGoogleDriveTokenMiddleware(req,res,next)
 {
 	var googleDriveEmail;
-	if(req.method=="GET")
+	if(req.method=="GET" || req.reqForUpload==true)
     {
-        googleDriveEmail=req.query.googleDriveEmail;
+        googleDriveEmail=req.params.googleDriveEmail;
     }
     else
     {
@@ -75,7 +75,7 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 
 //recieves code from google after user gives consent to user the account
 router.get('/Code',function(req,res){
-	var state=req.query.state; //url state param contains the user data that we appended previously in creating the redirect url for identifying the user
+	var state=req.query.state; //url state params contains the user data that we appended previously in creating the redirect url for identifying the user
 	//Split state to get client email and redirect urls.
 	var splits=state.split(";");
 	var email=splits[0];
@@ -96,10 +96,10 @@ router.get('/Code',function(req,res){
 					var account={user:user.user,token:token};
 					GoogleDriveDAL.saveGoogleDriveAccount(email,account)
 					.then((result)=>{
-						res.redirect(redirectSuccess+user.user.emailAddress); //redirect back to the client success
+						res.redirect(redirectSuccess); //redirect back to the client success
 					})
 					.catch((err)=>{
-						res.redirect(redirectFailure); //redirect back to the client failure
+						res.redirect(redirectFailure+"?message='Google Account Already Exists"); //redirect back to the client failure
 					});
 				}
 				else
@@ -249,7 +249,7 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDrive
 	});
 })
 
-router.get('/DownloadFile/:googleDriveAccount/:fileId/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+router.get('/DownloadFile/:googleDriveEmail/:fileId/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	var token=req.token;
 	
 	Drive.createAuthOject(req.appCredentials,token)
@@ -278,10 +278,10 @@ router.get('/DownloadFile/:googleDriveAccount/:fileId/:token',Constants.checkAcc
 })
 
 
-router.post('/UploadFile/:fileName/:mimeType/:googleDriveEmail/:token/:parentId',Constants.checkUploadAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+router.post('/UploadFile/:fileName/:mimeType/:googleDriveEmail/:token',Constants.checkUploadAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	
 	var fileName=req.params.fileName;
-	var parentId=req.param.parentId;
+	//var parentId=req.params.parentId;
 	var mimeType=req.params.mimeType;
 	let buff = new Buffer(mimeType, 'base64');
 	mimeType= mimeType=buff.toString('ascii');
@@ -291,7 +291,7 @@ router.post('/UploadFile/:fileName/:mimeType/:googleDriveEmail/:token/:parentId'
 	//var file=req.file;
 	Drive.createAuthOject(req.appCredentials,token)
 	.then((oAuth2Client)=>{
-		Drive.uploadFile(oAuth2Client,fileName,req,mimeType,parentId)
+		Drive.uploadFile(oAuth2Client,fileName,req,mimeType)
 		.then((result)=>{
 			res.status(Constants.CODE_OK).json({message:"File Uploaded",fileId:result});
 		})

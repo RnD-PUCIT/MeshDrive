@@ -8,6 +8,7 @@ import request from "request";
 import React from "react";
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
+import { rootURL } from "../../constants/apiConstants";
 export const shouldUploadFile = (state, files) => {
   return {
     type: UPLOAD_FILE,
@@ -39,11 +40,11 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
         );
         break;
       case ONEDRIVE:
-      let OneDriveEmail = uploadFileEmail;
+      let oneDriveEmail = uploadFileEmail;
         postURL = apiRoutes.files.onedrive_uploadFile(
           file.name,
           encodedMimeType,
-          OneDriveEmail,
+          oneDriveEmail,
           token
         );
         break;
@@ -69,11 +70,13 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
       let responseUiComponent;
       console.log({ response, statusCode: response.statusCode });
       if (response.statusCode === 200) {
+        window.location=`${rootURL}/#/uploadfile`;
         responseUiComponent = (
           <SweetAlertWrapper success title="Success">
             {response.body.message}
           </SweetAlertWrapper>
         );
+       
       } else {
         responseUiComponent = (
           <SweetAlertWrapper danger title="Error">
@@ -81,10 +84,11 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
           </SweetAlertWrapper>
         );
       }
+     
       dispatch(finishApiRequest(response, true, responseUiComponent));
+      
       postRequest.on("error", response => {
         console.error("ERRRRROOOR "+response);
-
         dispatch(
           finishApiRequest(
             response,

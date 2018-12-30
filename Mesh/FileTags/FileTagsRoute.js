@@ -14,17 +14,21 @@ router.post('/AddTags',Constants.checkAccessMiddleware,function(req,res){
     file.tagsIdList=req.body.tagsIdList;
     FileTagsDAL.checkFile(meshEmail,file.fileId,file.driveEmail)
     .then((check)=>{
+        console.log("File Not Found");
         var result = {};
         if(check==null)
         {
-           
+           console.log("No File Found");
             FileTagsDAL.createFile(meshEmail,file)
             .then((result2)=>{
+                console.log(result2);
+                console.log("File Created");
                 result.success=true;
                 result.message= "Tags added succesfully";
                 res.status(Constants.CODE_OK).json(result);
             })
             .catch((err)=>{
+                console.log(err);
                 result.success=false;
                 result.message= err.message;
                 res.status(Constants.CODE_OK).json(result);

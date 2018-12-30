@@ -211,8 +211,8 @@ exports.uploadFile = function(auth,fileName,file,mimeType,parentId){
   return new Promise((success,failure)=>{
     const drive = google.drive({version: 'v3', auth});
     var fileMetadata = {
-      'name': fileName,
-      parents:parentId
+      'name': fileName
+      //parents:parentId
     };
     var media = {
       mimeType: mimeType,

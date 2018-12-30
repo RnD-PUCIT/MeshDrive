@@ -36,23 +36,26 @@ export default function fetchFilesById(
     let postURL, postData;
     switch (drive) {
       case GOOGLEDRIVE:
+      let googleDriveEmail = listFilesAccount;
         postURL = apiRoutes.files.listDriveFilesById;
         postData = {
-          listFilesAccount,
+          googleDriveEmail,
           fileId,
           token
         };
         break;
       case ONEDRIVE:
+      let oneDriveEmail= listFilesAccount;
         postURL = apiRoutes.files.onedrive_listDriveFilesById;
         postData = {
-          listFilesAccount,
+          oneDriveEmail,
           fileId,
           token
         };
         break;
 
       case DROPBOX:
+
         postURL = apiRoutes.files.dropbox_listFiles;
         postData = {
           listFilesAccount,

@@ -17,7 +17,7 @@ export default function downloadFile(drive, downloadFileAccount, file) {
     const { token } = user;
 
     console.log(drive);
-    debugger;
+   // debugger;
 
     switch (drive) {
       case GOOGLEDRIVE:
