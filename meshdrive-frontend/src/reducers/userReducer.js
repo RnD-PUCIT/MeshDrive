@@ -56,7 +56,8 @@ export default function(state = initialUserState, action) {
     case ADD_TAG:
     let  { tagName, tagDescription ,tagColor} = action.payload;
     console.log(tagName,tagDescription,tagColor);
-    return state; // because we need key so i immediately fetch the tags from server 
+    return { ...state, ...action.payload };
+    // because we need key so i immediately fetch the tags from server 
    
 
 
@@ -93,6 +94,9 @@ export default function(state = initialUserState, action) {
     return {...newEditedState,newEditedTagsList};
 
    
+  
+
+
   }
   return state;
 }

@@ -41,6 +41,7 @@ export default function fetchTagsList() {
           finishApiRequest(
             null,
             true,
+      
             <SweetAlertWrapper danger title="Fail">
               {error.message}
             </SweetAlertWrapper>

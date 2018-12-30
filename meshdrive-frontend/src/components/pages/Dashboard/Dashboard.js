@@ -7,11 +7,17 @@ import Page from "../Page";
 import SideBar from "../../Layout/SideBar/SideBar";
 import FilesList from "../../FilesList/FilesList";
 import requireAuth from "../../../hoc/requireAuth";
-
+import { connect } from "react-redux";
+import fetchTagsList from "../../../actions/user/fetchTagsList";
 import FileNavigation from "../../FileNavigation/FileNavigation";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../../constants/strings";
 
 class Dashboard extends Page {
+  componentDidMount()
+  {
+    if(this.props.user.tagsList.length==0)
+    this.props.fetchTagsList();
+  }
   render() {
     // const activeFiles = this.props.files.filter(file => {
     //   return this.props.activeFileIds.indexOf(file.id) !== -1;
@@ -27,9 +33,6 @@ class Dashboard extends Page {
         >
           <h1>Home</h1>
           <FileNavigation />
-          {/* <FilesList drive={ONEDRIVE} /> */}
-          {/* <FilesList drive={DROPBOX} /> */}
-
           <hr />
           <FilesList drive={GOOGLEDRIVE} />
         </div>
@@ -42,5 +45,15 @@ class Dashboard extends Page {
     );
   }
 }
+function mapStateToProps({tagsList})
+{
+  return {
+    tagsList
+  };
+}
 
-export default requireAuth(Dashboard);
+export default  connect(
+  mapStateToProps,
+  {
+    fetchTagsList
+  })(requireAuth(Dashboard));

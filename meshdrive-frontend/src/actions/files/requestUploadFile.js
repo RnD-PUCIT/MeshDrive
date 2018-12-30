@@ -30,27 +30,30 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
     let postURL;
     switch (drive) {
       case GOOGLEDRIVE:
+      let googleDriveEmail = uploadFileEmail;
         postURL = apiRoutes.files.uploadFile(
           file.name,
           encodedMimeType,
-          uploadFileEmail,
+          googleDriveEmail,
           token
         );
         break;
       case ONEDRIVE:
+      let OneDriveEmail = uploadFileEmail;
         postURL = apiRoutes.files.onedrive_uploadFile(
           file.name,
           encodedMimeType,
-          uploadFileEmail,
+          OneDriveEmail,
           token
         );
         break;
 
       case DROPBOX:
+      let dropboxAccountEmail = uploadFileEmail;
         postURL = apiRoutes.files.dropbox_uploadFile(
           file.name,
           "root",
-          uploadFileEmail,
+          dropboxAccountEmail,
           token
         );
         break;
@@ -80,7 +83,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
       }
       dispatch(finishApiRequest(response, true, responseUiComponent));
       postRequest.on("error", response => {
-        console.error(response);
+        console.error("ERRRRROOOR "+response);
 
         dispatch(
           finishApiRequest(

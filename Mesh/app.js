@@ -8,7 +8,9 @@ const mongoose = require('mongoose');
 const app = express();
 const Constants=require('./Extras/Globals');
 const morganLogger = require('morgan');
+const FileTagsRouter = require('./FileTags/FileTagsRoute');
 const dbxDAL = require('./Dropbox/DropboxDAL');
+
 
 
 
@@ -36,6 +38,7 @@ app.use('/Users',UserRouter);
 app.use('/GoogleDrive',GoogleDriveRouter);
 app.use('/Dropbox',DropboxRouter);
 app.use('/OneDrive',OneDriveRouter);
+app.use('/files',FileTagsRouter)
 
 function main()
 {

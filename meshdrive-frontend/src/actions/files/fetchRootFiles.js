@@ -47,7 +47,7 @@ export default function fetchRootFiles(drive, isForceReload = false) {
         break;
     }
     console.log(postURL);
-    debugger;
+    //debugger;
 
     axios
       .post(postURL, {
@@ -56,6 +56,7 @@ export default function fetchRootFiles(drive, isForceReload = false) {
       })
       .then(response => {
         const data = response.data;
+        console.log("dataaaaa ",data);
         dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFiles(state, data));
         if (isForceReload) {
@@ -76,7 +77,7 @@ export default function fetchRootFiles(drive, isForceReload = false) {
       })
       .catch(error => {
         console.log(error);
-        debugger;
+       // debugger;
         dispatch(
           finishApiRequest(
             null,

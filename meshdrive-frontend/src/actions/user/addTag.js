@@ -40,15 +40,29 @@ export default function addTag(tag) {
       .then(
         response => {
          
-            let responseUiComponent = (
-                <SweetAlertWrapper success title="Success">
-                  {response.data.message}
-                </SweetAlertWrapper>
-              );            
-            dispatch(finishApiRequest(null,true,responseUiComponent));
+       
+          if(response.data.success)
+          {
+            dispatch(finishApiRequest(null,true,null));
             dispatch(addTagAction(tagName,tagDescription,tagColor));
+       
+          }else
+          {
+            let responseUiComponent = (
+              <SweetAlertWrapper danger title="Fail">
+                {response.data.message}
+              </SweetAlertWrapper>
+            );    
+            dispatch(finishApiRequest(response.data.success,true,responseUiComponent));
+          
+          }
+            
+
+                  
+            
         },
         error => {
+
           dispatch(finishApiRequest());
           console.log(error);
         }

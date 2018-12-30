@@ -2,8 +2,9 @@ export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/
 
 const ngrokUrl = localStorage.getItem("ngrok");
 
-
-export const apiBaseUrl = ngrokUrl ? ngrokUrl : "http://test-depositoryworks.ngrok.io";
+export const apiBaseUrl = ngrokUrl
+  ? ngrokUrl
+  : "http://test-depositoryworks.ngrok.io";
 
 //http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
@@ -77,6 +78,8 @@ export const apiRoutes = {
   },
   files: {
     // google
+    assignTagsToFile: `${apiBaseUrl}/files/AddTags`,
+    fetchTagsOfFile:`${apiBaseUrl}/files/getFileTags`,
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
     listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
     listDriveFilesById: `${apiBaseUrl}/GoogleDrive/ListDriveFilesById`,

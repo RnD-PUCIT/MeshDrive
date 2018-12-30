@@ -86,6 +86,7 @@ class FilesList extends Component {
           file={file}
           isFileActive={isFileActive}
           drive={this.props.drive}
+
         />
       );
     });

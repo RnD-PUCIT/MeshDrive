@@ -18,25 +18,40 @@ function getGoogleDriveTokensMiddleware(req,res,next)
 		next();
 	})
 	.catch((err)=>{
-		return res.status(Constants.CODE_NOT_FOUND).json({message:"User has no Google Drive accounts",err:err});
+		return res.status(Constants.CODE_NO_CONTENT).json({message:"User has no Google Drive accounts",err:err});
 	});
 }
 
 function matchGoogleDriveTokenMiddleware(req,res,next)
 {
-	var googleDriveEmail=req.body.googleDriveEmail;
-	var token;
-	for (let index = 0; index < req.googleDriveAccounts.length; index++) {
-		var account = req.googleDriveAccounts[index];
-		if(account.user.emailAddress==googleDriveEmail)
-			token=account.token;
-	}
-	if(!token)
+	var googleDriveEmail;
+	if(req.method=="GET")
+    {
+        googleDriveEmail=req.query.googleDriveEmail;
+    }
+    else
+    {
+        googleDriveEmail=req.body.googleDriveEmail;
+    }
+	if(!googleDriveEmail)
 	{
-		return res.status(Constants.RESPONSE_EMPTY).json({message:"Specified google account not found for mesh drive user"}).end();
+		return res.status(Constants.CODE_BAD_REQUEST).json({message:"Email not specified to get drive content"});
 	}
-	req.token=token;
-	next();
+	else
+	{
+		var token;
+		for (let index = 0; index < req.googleDriveAccounts.length; index++) {
+			var account = req.googleDriveAccounts[index];
+			if(account.user.emailAddress==googleDriveEmail)
+				token=account.token;
+		}
+		if(!token)
+		{
+			return res.status(Constants.CODE_NO_CONTENT).json({message:"Specified google account not found for mesh drive user"}).end();
+		}
+		req.token=token;
+		next();
+	}
 }
 
 
@@ -49,12 +64,12 @@ router.post('/Authenticate',Constants.checkAccessMiddleware,function(req,res){
 	}
 	else{
 		//return call if client has not appended redirect urls
-		return res.status(Constants.CODE_NOT_FOUND).json({err:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
+		return res.status(Constants.CODE_BAD_REQUEST).json({err:"Could not proceed. Redirect Link not found. Please append success and failure link in request body"});
 	}
 	oAuth2Client = Drive.createAuth(Constants.GOOGLE_DRIVE_APP_CREDENTIALS);
 	redirectLink = Drive.getGoogleDriveAuthRedirectLink(oAuth2Client,userData); //Generate redirect uri
 	result.redirectLink=redirectLink;
-	res.status(Constants.RESPONSE_SUCCESS).json(result);
+	res.status(Constants.CODE_OK).json(result);
 })
 
 
@@ -115,14 +130,14 @@ router.delete('/RemoveAllGoogleAccounts',Constants.checkAccessMiddleware,(req,re
 });
 
 router.delete('/RemoveGoogleAccountByEmail',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,(req,res)=>{
-	var googleAccEmail=req.body.googleAccountEmail;
+	var googleAccEmail=req.body.googleDriveEmail;
 	GoogleDriveDAL.removeAllGoogleDriveAccountsByEmail(req.userData.email,googleAccEmail)
 	.then((result)=>{
 		result.message="Account removed successfuly";
 		res.status(Constants.CODE_OK).json(result);
 	})
 	.catch((err)=>{
-		res.status(Constants.CODE_NOT_FOUND).json({error:err,message:"Unable to remove google drive account"});
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({error:err,message:"Unable to remove google drive account"});
 	});
 });
 
@@ -175,7 +190,7 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 
 	if(accountTokenList.length==0) //If no token found return
 	{
-		return res.status(Constants.CODE_NOT_FOUND).json({message:"No Google Drive account found in user profile."});
+		return res.status(Constants.CODE_NO_CONTENT).json({message:"No Google Drive account found in user profile."});
 	}
 	else
 	{
@@ -234,7 +249,7 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDrive
 	});
 })
 
-router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+router.get('/DownloadFile/:googleDriveAccount/:fileId/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	var token=req.token;
 	
 	Drive.createAuthOject(req.appCredentials,token)
@@ -250,7 +265,7 @@ router.get('/DownloadFile/:downloadFileAccount/:fileId/:token',Constants.checkAc
 				res.end(); //End the response when success function is called
 			})
 			.catch((err)=>{
-				res.end(err.message);
+				res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in downloading file",err:err.message});
 			});
 		})
 		.catch((err)=>{
@@ -278,20 +293,19 @@ router.post('/UploadFile/:fileName/:mimeType/:googleDriveEmail/:token/:parentId'
 	.then((oAuth2Client)=>{
 		Drive.uploadFile(oAuth2Client,fileName,req,mimeType,parentId)
 		.then((result)=>{
-			res.status(200).json({message:"File Uploaded",fileId:result});
+			res.status(Constants.CODE_OK).json({message:"File Uploaded",fileId:result});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Upload Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Upload Failed"});
 	});
 })
 
 
 router.post('/CreateFolder',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
-	var createFolderEmail=req.body.createFolderEmail;
 	var folderName=req.body.folderName;
 	var parentId=req.body.parentId;
 	var token=req.token;
@@ -301,14 +315,14 @@ router.post('/CreateFolder',Constants.checkAccessMiddleware,getGoogleDriveTokens
 	.then((oAuth2Client)=>{
 		Drive.createFolder(oAuth2Client,folderName,parentId)
 		.then((result)=>{
-			res.status(200).json({message:"File Uploaded",folderId:result});
+			res.status(Constants.CODE_OK).json({message:"File Uploaded",folderId:result});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Folder Creation Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Folder Creation Failed"});
 	});
 })
 
@@ -320,18 +334,18 @@ router.delete('/DeleteFile',Constants.checkAccessMiddleware,getGoogleDriveTokens
 	.then((oAuth2Client)=>{
 		Drive.deleteFile(oAuth2Client,fileId)
 		.then(()=>{
-			res.status(200).json({message:"File Deleted"});
+			res.status(Constants.CODE_OK).json({message:"File Deleted"});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Delete Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Delete Failed"});
 	});
 })
 
-router.delete('/MoveFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+router.put('/MoveFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	var fileId=req.body.fileId;
 	var newParentId=req.body.newParentId;
 	var oldParentId=req.body.oldParentId;
@@ -343,16 +357,16 @@ router.delete('/MoveFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMi
 			res.status(200).json({message:"File Moved",fileDetails:file});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Move Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Move Failed"});
 	});
 })
 
 
-router.post('/RenameFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+router.put('/RenameFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	var fileId=req.body.fileId;
 	var newFileName=req.body.newFileName;
 	var token=req.token;
@@ -363,11 +377,11 @@ router.post('/RenameFile',Constants.checkAccessMiddleware,getGoogleDriveTokensMi
 			res.status(200).json({message:"File Renamed",fileDetails:file});
 		})
 		.catch((err)=>{
-			res.status(Constants.RESPONSE_FAIL).json(err);
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Rename Failed"});
 		})
 	})
 	.catch((err)=>{
-		res.end(err.msg);
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({err:err,message:"Rename Failed"});
 	});
 })
 
