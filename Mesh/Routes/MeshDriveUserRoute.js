@@ -256,7 +256,7 @@ router.get("/confirmation/:id", function (req, res) {
 
 // this route will be embeded in sent email's password reset link 
 router.get("/resetPassword/:id", function (req, res) {
-    res.redirect(Constants.FRONT_URL_FORGET_PASSWORD+req.params.id); // sample link redirection testing 
+    res.redirect(Constants.FRONT_URL_FORGET_PASSWORD+'/'+req.params.id); // sample link redirection testing 
 });
 
 
@@ -337,7 +337,7 @@ function sendResetPasswordLink(recepientEmail,id)
     return new Promise((resolve, reject) => {
 
         var bURL = Constants.DEPLOYED_URL;
-        var link = "users/resetPassword/" + id;
+        var link = "/users/resetPassword/" + id;
         // email sending 
         var mailOptions = new Object();
         mailOptions = {
@@ -370,7 +370,7 @@ function sendVerificationLink(recipentEmail, id) {
     return new Promise((resolve, reject) => {
 
         var baseURL = Constants.DEPLOYED_URL;
-        var link = 'users/confirmation/' + id;
+        var link = '/users/confirmation/' + id;
         // email sending 
         var mailOptions = new Object();
         mailOptions = {
