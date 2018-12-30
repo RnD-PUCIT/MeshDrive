@@ -5,6 +5,7 @@ const ngrokUrl = localStorage.getItem("ngrok");
 export const apiBaseUrl = ngrokUrl
   ? "http://test-depositoryworks.ngrok.io"
   : "http://test-depositoryworks.ngrok.io";
+
 //http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
   users: {
@@ -86,6 +87,7 @@ export const apiRoutes = {
       `${apiBaseUrl}/GoogleDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
       `${apiBaseUrl}/GoogleDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`,
+      googledrive_createFolder: `${apiBaseUrl}/GoogleDrive/CreateFolder`,
 
     // dropbox
     dropbox_listFiles: `${apiBaseUrl}/Dropbox/ListFiles`,
@@ -93,12 +95,16 @@ export const apiRoutes = {
     dropbox_uploadFile: (fileName, filePath, uploadFileEmail, token) =>
       `${apiBaseUrl}/Dropbox/UploadFile/${token}/${filePath}/${fileName}/${uploadFileEmail}`,
 
+    dropbox_CreateFolder: `${apiBaseUrl}/Dropbox/CreateFolder`,
+
     // onedrive
     listOneDriveRootFiles: `${apiBaseUrl}/OneDrive/ListDriveRootFiles`,
     onedrive_listDriveFilesById: `${apiBaseUrl}/OneDrive/ListDriveFilesById`,
     onedrive_downloadFile: (downloadFileAccount, fileId, token) =>
       `${apiBaseUrl}/OneDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     onedrive_uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
-      `${apiBaseUrl}/OneDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`
+      `${apiBaseUrl}/OneDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`,
+
+    onedrive_createFolder: `${apiBaseUrl}/oneDrive/createfolder`
   }
 };

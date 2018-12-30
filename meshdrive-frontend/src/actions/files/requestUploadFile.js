@@ -40,11 +40,11 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
         );
         break;
       case ONEDRIVE:
-      let OneDriveEmail = uploadFileEmail;
+      let oneDriveEmail = uploadFileEmail;
         postURL = apiRoutes.files.onedrive_uploadFile(
           file.name,
           encodedMimeType,
-          OneDriveEmail,
+          oneDriveEmail,
           token
         );
         break;

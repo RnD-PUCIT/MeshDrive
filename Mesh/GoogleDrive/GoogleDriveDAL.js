@@ -34,17 +34,24 @@ exports.readAccounts =function(email)
                 result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
             }
             //change when convert to multiple accounts
-            var dropboxAcccounts=accounts.Dropbox;
+            var dropboxAcccounts=accounts.Dropbox.AccountsList;
             result.driveAccountsList.dropboxAccountsList=[];
-            if(dropboxAcccounts)
+            console.log(dropboxAcccounts);
+            if(dropboxAcccounts.length>0)
             {
+              
                 var dbxEmails = new Array();
                 
-                console.log(dropboxAcccounts.user)
-                if(dropboxAcccounts.user.emailAddress)
-                    dbxEmails.push(dropboxAcccounts.user.emailAddress);  
+                for(var i = 0;i<dropboxAcccounts.length;i++)
+                {    
+                    dbxEmails.push(dropboxAcccounts[i].user.emailAddress);  
+                }
+                
+            // //     if(dropboxAcccounts.user.emailAddress)
+            // //         dbxEmails.push(dropboxAcccounts.user.emailAddress);  
                 result.driveAccountsList.dropboxAccountsList=dbxEmails;
             }   
+
             result.driveAccountsList.oneDriveAccountsList=[];
             if(accounts.OneDrive.AccountsList.length>0)
             {

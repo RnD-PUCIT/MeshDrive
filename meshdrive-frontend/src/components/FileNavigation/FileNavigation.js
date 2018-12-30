@@ -1,4 +1,14 @@
 import React, { Component } from "react";
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Form,
+  FormGroup,
+  Label,
+  Input
+} from "reactstrap";
 import { ButtonGroup, Button } from "reactstrap";
 import FAIcon from "../FontAwesomeIcon/FontAwesomeIcon";
 import { connect } from "react-redux";
@@ -7,13 +17,17 @@ import fetchFilesById from "../../actions/files/fetchFilesById";
 import navigateTo from "../../actions/filenavigation/navigateTo";
 import navigateToHome from "../../actions/filenavigation/navigateToHome";
 import navigateToUpOneLevel from "../../actions/filenavigation/navigateToUpOneLevel";
+
 import "./style.css";
+import { ONEDRIVE } from "../../constants/strings";
+import NewFolderButtonAndModal from "./NewFolderButtonAndModal";
 
 class FileNavigation extends Component {
   handleHomeClick = () => {
     console.log("HOME");
     this.props.navigateToHome();
   };
+
   handleReloadClick = () => {
     const { historyStack } = this.props.fileNavigation;
     const top = historyStack[historyStack.length - 1];
@@ -25,18 +39,20 @@ class FileNavigation extends Component {
       this.props.fetchFilesById(drive, listFilesAccount, parent, true);
     }
   };
-  handleUpOneLevel = () => {
+  handleUpOneLevelClick = () => {
     this.props.navigateToUpOneLevel();
   };
+
   render() {
     const { historyStack } = this.props.fileNavigation;
 
     const currentFolder = historyStack[historyStack.length - 1];
-    console.log(historyStack);
     const isHomeEnabled =
       historyStack.length > 0 && currentFolder.parent !== "root";
     const isReloadEnabled = historyStack.length > 0;
     const isUpOneLevelEnabled = historyStack.length > 1;
+    const isNewFolderEnabled = true; //historyStack.length > 0;
+
     return (
       <div id="FileNavigation" className="file-navigation-bar">
         <ButtonGroup>
@@ -45,7 +61,7 @@ class FileNavigation extends Component {
           </Button>
           <Button
             disabled={!isUpOneLevelEnabled}
-            onClick={this.handleUpOneLevel}
+            onClick={this.handleUpOneLevelClick}
           >
             <FAIcon icon="arrow-up" classes={["fa"]} /> Up One Level
           </Button>
@@ -54,6 +70,7 @@ class FileNavigation extends Component {
           <Button onClick={this.handleReloadClick} disabled={!isReloadEnabled}>
             <FAIcon icon="sync-alt" classes={["fa"]} /> Reload
           </Button>
+          <NewFolderButtonAndModal enabled={isNewFolderEnabled} />
           {/* 
           Will Implement this in future
           <Button>

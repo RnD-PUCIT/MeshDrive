@@ -22,7 +22,8 @@ export default function fetchFilesById(
   drive,
   listFilesAccount,
   fileId,
-  isForceReload = false
+  isForceReload = false,
+  path = "" // for dropbox only
 ) {
   return (dispatch, getState) => {
     const state = getState();
@@ -70,19 +71,19 @@ export default function fetchFilesById(
         // sort files
         dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFilesById(state, data));
+
+        const navigationPayload = {
+          parent: fileId,
+          items: data,
+          drive,
+          listFilesAccount,
+          path // for dropbox only
+        };
+        debugger;
         if (isForceReload) {
-          dispatch(
-            forceReload({
-              parent: fileId,
-              items: data,
-              drive,
-              listFilesAccount
-            })
-          );
+          dispatch(forceReload(navigationPayload));
         } else {
-          dispatch(
-            navigateTo({ parent: fileId, items: data, drive, listFilesAccount })
-          );
+          dispatch(navigateTo(navigationPayload));
         }
       })
       .catch(error => {

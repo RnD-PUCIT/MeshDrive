@@ -9,6 +9,8 @@ const app = express();
 const Constants=require('./Extras/Globals');
 const morganLogger = require('morgan');
 const FileTagsRouter = require('./FileTags/FileTagsRoute');
+const dbxDAL = require('./Dropbox/DropboxDAL');
+
 
 
 
@@ -42,21 +44,16 @@ function main()
 {
 
 
+
+
 app.get('/',function(req,res){
             res.end(Constants.URL+"/users"); 
     
     //res.end(Constants.URL+"/users");
     var result= new Object();
     res.end("test");
-  
 });
 
-// app.get('/testDBX',function(req,res){
-
-//     // token = {"access_token":"OOOOOOO","token_type":"OOOOO","uid":"OOOOO","account_id":"OOOOOO"};
-   
-   
-// });
 //listening to ports
 let port = process.env.PORT;
 if (port == null || port == "") {

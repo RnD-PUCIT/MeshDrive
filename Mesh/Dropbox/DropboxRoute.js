@@ -43,42 +43,7 @@ router.get('/UserAccount/:token',AppConstants.checkAccessMiddleware,dropboxToken
 })
 
 //not used
-router.get('/DownloadFile/:email/:token',AppConstants.checkAccessMiddleware,(req,res)=>{
 
-  var result = new Object();
-  var fileName= req.query.fileName;
-  var userData= req.userData;
-  var filePath = req.query.path;
-  
-  res.setHeader("Access-Control-Expose-Headers","File-Name,Content-disposition");
-			res.setHeader('Content-disposition', 'attachment; filename='+fileName);
-			res.setHeader("File-Name",fileName);
-
-  dbxDAL.getDropboxToken(userData.email)
-  .then((token)=>{
-    console.log(token);
-    const dropbox = dropboxV2Api.authenticate({
-      token: token["access_token"]
-    });
- 
-    var arg = {path : filePath}
-    var downloadStream = dropbox({
-      resource: 'files/download',
-      parameters: arg				
-    });
-    var stream = downloadStream.pipe(res);
-    stream.on('finish',function(){
-  //    res.end();
-      console.log("File Downloaded");
-    });
-
-
-  })
-  .catch((error)=>{
-    result["error"]=error;
-    res.status(AppConstants.RESPONSE_FAIL).json(result);
-  });
-})
 //integrated
 router.post('/UploadFile/:token/:path/:name/:email',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
   
@@ -303,7 +268,7 @@ router.post('/GetFileMeta',AppConstants.checkAccessMiddleware,(req,res)=>{
 
 })
 
-//complete
+//complete with multiple dbx accounts
 router.post('/Authenticate',AppConstants.checkAccessMiddleware,(req,res)=>{
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT,OPTIONS")
@@ -335,7 +300,7 @@ router.post('/Authenticate',AppConstants.checkAccessMiddleware,(req,res)=>{
 
 });
 
-//complete
+//complete with multiple dbx accounts
 router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
     
       var values = req.query;
@@ -344,11 +309,11 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
         //user denied the access 
         return res.status(AppConstants.RESPONSE_FAIL).json({error:values.error});      
       }
-      console.log(values);
+   
       var code = values.code;
       //contains email,redirectSuccess,redirectFailure
       var state= queryString.parse(values.state); //converting to json object
-      console.log(state);
+ 
       var result = new Object();
       getTokenFromCode(code)
       .then((token)=>{
@@ -358,36 +323,30 @@ router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
           
           dbx.usersGetCurrentAccount()
           .then((account)=>{
-            console.log(account);
+          
+            var acc = new Object();
+            acc["token"]=token;
             var a= {
               "photoLink":account[DropboxTags.TAG_PROFILE_PHOTO],
               "emailAddress":account[DropboxTags.TAG_EMAIL]
             }
-              dbxDAL.saveDropboxUserAccount(a,state.email);
+            acc["user"]=a;
+            dbxDAL.saveDropboxAccount(state.email,acc).then((r)=>{
+              return res.redirect(state.redirectSuccess+'/'+state.email);
+            }).catch((err)=>{
+              return res.redirect(state.redirectFailure);
+            });
+
           })
           .catch((err)=>{
                 console.log(err);
+                return res.redirect(state.redirectFailure);
           })
-
-          dbxDAL.saveDropboxToken(state.email,token)
-          .then((status)=>{
-              result={
-                success:true,
-                message:"User Token saved"
-              }
-              return res.redirect(state.redirectSuccess+'/'+state.email); //redirecting to success link on UI 
-            // return res.status(AppConstants.RESPONSE_SUCCESS).json(result);
-          })
-          .catch((err)=>{
-            return res.redirect(state.redirectFailure);
-         //   return res.status(AppConstants.RESPONSE_FAIL).json({error:"cant save"});
-          });    
       })
       .catch((err)=>{
-        //cant get token because of some bad request error 
-       
+        //cant get token because of some bad request error    
         return res.redirect(state.redirectFailure);
-    //    return res.status(AppConstants.RESPONSE_FAIL).json(err);
+   
       });
 
   
@@ -432,9 +391,21 @@ function dropboxTokenMiddleware(req,res,next)
 {
   var userData = req.userData;
   dbxDAL.getDropboxAccounts(userData.email)
-  .then((account)=>{
-       req.dropboxAccount=account;
-      next();
+  .then((accounts)=>{
+
+    for(var i =0;i<accounts.length;i++)
+    {
+      if(accounts[i]["user"]["emailAddress"]===req.body.dropboxAccountEmail)
+      {
+        req.dropboxAccount=accounts[i];
+        next(); 
+        return;
+      }
+    }
+
+    return res.status(AppConstants.RESPONSE_EMPTY).json({error:"No Account Found against email : "+req.body.dropboxAccountEmail});
+      //  req.dropboxAccount=account;
+      // next();
   }).catch((err)=>{
     return res.status(AppConstants.RESPONSE_FAIL).json({error:err});
   
