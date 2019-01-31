@@ -43,14 +43,14 @@ class NavBar extends React.Component {
         <Collapse isOpen={this.state.isOpen} navbar>
           <Nav className="ml-auto pt-2 mr-2" navbar>
             <NavItem>
-              <Form inline className="search">
+              {/* <Form inline className="search">
                 <InputGroup>
                   <Input />
                   <InputGroupAddon addonType="append">
                     <Button className="btn-gradient">Search</Button>
                   </InputGroupAddon>
                 </InputGroup>
-              </Form>
+              </Form> */}
             </NavItem>
 
             {this.props.user.token ? (

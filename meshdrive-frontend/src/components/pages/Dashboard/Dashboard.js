@@ -11,6 +11,8 @@ import { connect } from "react-redux";
 import fetchTagsList from "../../../actions/user/fetchTagsList";
 import FileNavigation from "../../FileNavigation/FileNavigation";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../../constants/strings";
+import Filtering from "../../Filtering/Filtering";
+import Speech from "../../SpeechSearching/Speech";
 
 class Dashboard extends Page {
   componentDidMount()
@@ -33,11 +35,14 @@ class Dashboard extends Page {
         >
           <h1>Home</h1>
           <FileNavigation />
-          {<FilesList drive={ONEDRIVE} />}
+          <span style={{marginTop:'10px'}}>
+          <Speech/></span>
+          
+          {/* {<FilesList drive={ONEDRIVE} />} */}
           {/* { <FilesList drive={DROPBOX} /> } */}
 
           <hr />
-          {/* <FilesList drive={GOOGLEDRIVE} /> */}
+          <FilesList drive={GOOGLEDRIVE} />
         </div>
         <SideBar secondary>
           {/* {activeFiles.length == 0
