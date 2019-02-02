@@ -4,11 +4,13 @@ import activeFileIdsReducer from "./activeFileIdsReducer";
 import userReducer from "./userReducer";
 import apiReducer from "./apiReducer";
 import fileNavigationReducer from "./filenavigationReducer";
+import searchReducer from "./searchReducer";
 // import authReducer from "./authReducer";
 export default combineReducers({
   files: filesReducer,
   activeFileIds: activeFileIdsReducer,
   user: userReducer,
   api: apiReducer,
-  fileNavigation: fileNavigationReducer
+  fileNavigation: fileNavigationReducer,
+  searchKeyword: searchReducer
 });
