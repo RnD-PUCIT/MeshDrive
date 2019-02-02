@@ -53,9 +53,9 @@ router.post('/UploadFile/:token/:path/:name/:email',AppConstants.checkAccessMidd
   console.log(path);
   var dropboxAccount=req.dropboxAccount;
   var token = dropboxAccount.token;
-    const dropbox = dropboxV2Api.authenticate({
-      token: token["access_token"]
-    });
+  const dropbox = dropboxV2Api.authenticate({
+    token: token["access_token"]
+  });
   var arg;
     if(path==="root") {
         arg = {path:"/"+name} 
@@ -66,12 +66,10 @@ router.post('/UploadFile/:token/:path/:name/:email',AppConstants.checkAccessMidd
     console.log(arg);
     const dropboxUploadStream = dropbox({
       resource: 'files/upload',
-      parameters: arg 
-      
-  }, (err, resul, response) => {
-    
-   
-      if(err)      {
+      parameters: arg       
+  }, (err, resul, response) => {      
+      if(err){
+
         result={
             success:false,
             error:err
@@ -101,6 +99,7 @@ router.post('/DownloadFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddl
   var dropboxAccount=req.dropboxAccount;
   var token = dropboxAccount.token;
 
+
   res.setHeader("Access-Control-Expose-Headers","File-Name,Content-disposition");
 	res.setHeader('Content-disposition', 'attachment; filename='+fileName);
 	res.setHeader("File-Name",fileName);
@@ -118,6 +117,7 @@ router.post('/DownloadFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddl
       res.end();
       console.log("File Downloaded");
     });
+
 })
 
 router.post('/DeleteFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
@@ -237,7 +237,7 @@ router.post('/GetFileMeta',AppConstants.checkAccessMiddleware,(req,res)=>{
 
   var obj = new Object();
   var userData= req.userData;  
-  dbxDAL.getDropboxToken(userData.email)
+   dbxDAL.getDropboxToken(userData.email)
   .then((token)=>{
     dbx.setAccessToken(token["access_token"])
     var filePath = req.body.path;
@@ -250,7 +250,6 @@ router.post('/GetFileMeta',AppConstants.checkAccessMiddleware,(req,res)=>{
       obj["data"]=fileMeta;
       obj["success"]=true;
       res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
-  
     })
     .catch((error)=>{
       obj["error"]=error[DropboxTags.TAG_ERROR];

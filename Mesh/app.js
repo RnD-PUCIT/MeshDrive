@@ -39,17 +39,16 @@ app.use('/Users',UserRouter);
 app.use('/GoogleDrive',GoogleDriveRouter);
 app.use('/Dropbox',DropboxRouter.router);
 app.use('/OneDrive',OneDriveRouter);
-app.use('/files',FileTagsRouter)
+app.use('/files',FileTagsRouter);
 
 function main()
 {
-        app.post('/listRootFilesAllDrives',AppConstants.checkAccessMiddleware,DropboxRouter.rootFilesMiddleware,(req,res)=>{
+    app.post('/listRootFilesAllDrives',AppConstants.checkAccessMiddleware,DropboxRouter.rootFilesMiddleware,(req,res)=>{
         var data=  (res.locals.data);
         console.log(data);
         res.status(200).json(data);
     })
-
-
+        
 //listening to ports
     let port = process.env.PORT;
     if (port == null || port == "") {
