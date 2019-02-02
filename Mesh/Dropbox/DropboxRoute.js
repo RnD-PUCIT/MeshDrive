@@ -53,9 +53,9 @@ router.post('/UploadFile/:token/:path/:name/:email',AppConstants.checkAccessMidd
   console.log(path);
   var dropboxAccount=req.dropboxAccount;
   var token = dropboxAccount.token;
-    const dropbox = dropboxV2Api.authenticate({
-      token: token["access_token"]
-    });
+  const dropbox = dropboxV2Api.authenticate({
+    token: token["access_token"]
+  });
   var arg;
     if(path==="root") {
         arg = {path:"/"+name} 
@@ -66,12 +66,10 @@ router.post('/UploadFile/:token/:path/:name/:email',AppConstants.checkAccessMidd
     console.log(arg);
     const dropboxUploadStream = dropbox({
       resource: 'files/upload',
-      parameters: arg 
-      
-  }, (err, resul, response) => {
-    
-   
-      if(err)      {
+      parameters: arg       
+  }, (err, resul, response) => {      
+      if(err){
+
         result={
             success:false,
             error:err
@@ -101,6 +99,7 @@ router.post('/DownloadFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddl
   var dropboxAccount=req.dropboxAccount;
   var token = dropboxAccount.token;
 
+
   res.setHeader("Access-Control-Expose-Headers","File-Name,Content-disposition");
 	res.setHeader('Content-disposition', 'attachment; filename='+fileName);
 	res.setHeader("File-Name",fileName);
@@ -118,6 +117,7 @@ router.post('/DownloadFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddl
       res.end();
       console.log("File Downloaded");
     });
+
 })
 
 router.post('/DeleteFile',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
@@ -237,7 +237,7 @@ router.post('/GetFileMeta',AppConstants.checkAccessMiddleware,(req,res)=>{
 
   var obj = new Object();
   var userData= req.userData;  
-  dbxDAL.getDropboxToken(userData.email)
+   dbxDAL.getDropboxToken(userData.email)
   .then((token)=>{
     dbx.setAccessToken(token["access_token"])
     var filePath = req.body.path;
@@ -250,7 +250,6 @@ router.post('/GetFileMeta',AppConstants.checkAccessMiddleware,(req,res)=>{
       obj["data"]=fileMeta;
       obj["success"]=true;
       res.status(AppConstants.RESPONSE_SUCCESS).json(obj);
-  
     })
     .catch((error)=>{
       obj["error"]=error[DropboxTags.TAG_ERROR];
@@ -414,4 +413,68 @@ function dropboxTokenMiddleware(req,res,next)
 
 
 
-module.exports = router;
+module.exports.rootFilesMiddleware = async function(req,res,next){
+ // res.locals.data = new Array();
+  // res.locals.data.push(123);
+  res.locals.data= new Array();
+  var userData=req.userData; 
+  dbxDAL.getDropboxAccounts(userData.email) 
+  .then((accounts)=>{
+
+      allAccountsRootFiles(accounts).then((result)=>{
+      res.locals.data=result;
+      next();
+    }).catch((err)=>{
+      console.log(err);
+      next();
+    })
+   
+ 
+    
+  }).catch((err)=>{
+     console.log(err)
+  })
+
+}
+
+function  allAccountsRootFiles(accounts)
+{
+  return new Promise(async(success,failure)=>{
+    var data = new Array();
+    for(let i = 0;i<accounts.length;i++)
+    {
+      var token = accounts[i].token;  
+      dbx.setAccessToken(token["access_token"]);
+    
+      var arg = {path:'',include_media_info:true};  
+    await dbx.filesListFolder(arg)//folder path here 
+      .then(function(files) {
+        //converting to a standard
+        var filesData= new Array();   
+        var f = new Formatter();
+        for(var j =0;j<files.entries.length;j++)
+        {
+            var obj =f.parseDropboxFile(files.entries[j]);
+            filesData.push(obj);
+        }
+        var result = new Object();
+        result["email"]=accounts[i].user.emailAddress;  
+        result["drive"]="dropbox";
+        result["count"]=files.entries.length;
+        result["success"]=true;
+        result["files"]=filesData;
+        console.log(result);
+        data.push(result)
+       
+      })
+      .catch(function(error) {    
+        failure(error)
+      });
+
+    }
+    success(data);
+  });
+
+}
+
+module.exports.router = router;
