@@ -24,6 +24,7 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.5",
+    "react-speech-recognition": "^1.0.7",
     "react-tags": "^0.2.2",
     "react-tooltip": "^3.9.0",
     "reactcss": "^1.2.3",
