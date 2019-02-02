@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import FileItem from "../../components/FileItem/FileItem";
-
 import intruptApiRequest from "../../actions/api/intruptApiRequest";
 import fetchRootFiles from "../../actions/files/fetchRootFiles";
+
 
 class FilesList extends Component {
   state = {
@@ -75,18 +75,30 @@ class FilesList extends Component {
   }
 
   render() {
-    const fileItems = this.sortFileItems(this.state.fileItems);
+    console.log("rENDERINGGGGGG");
+    let fileItems = this.sortFileItems(this.state.fileItems);
+      //______________ SEARCHING _____________________
+      console.log(this.props.searchKeyword.keywords);
+      if(this.props.searchKeyword.keywords!='')
+      {
+        fileItems = fileItems.filter(file=>{
+          if(file.name.includes(this.props.searchKeyword.keywords)==true)
+          {
+            return file;
+          }
+         });    
+      }     
+        //______________ SEARCHING _____________________
     console.log(fileItems);
     // seperate folders
     const mapFilesList = fileItems.map(file => {
-      const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;
+      const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;    
       return (
         <FileItem
           key={file.id}
           file={file}
           isFileActive={isFileActive}
           drive={this.props.drive}
-
         />
       );
     });
@@ -108,11 +120,12 @@ class FilesList extends Component {
   }
 }
 
-function mapStateToProps({ fileNavigation, files, activeFileIds }) {
+function mapStateToProps({ fileNavigation, files, activeFileIds,searchKeyword }) {
   return {
     fileNavigation,
     files,
-    activeFileIds
+    activeFileIds,
+    searchKeyword
   };
 }
 export default connect(
