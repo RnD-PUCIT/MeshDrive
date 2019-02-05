@@ -12,14 +12,13 @@ import fetchTagsList from "../../../actions/user/fetchTagsList";
 import FileNavigation from "../../FileNavigation/FileNavigation";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../../constants/strings";
 import Filtering from "../../Filtering/Filtering";
-import Speech from "../../SpeechSearching/SpeechSearchBar";
 import SpeechSearchBar from "../../SpeechSearching/SpeechSearchBar";
 
 class Dashboard extends Page {
   componentDidMount()
   {
     if(this.props.user.tagsList.length==0)
-    this.props.fetchTagsList();
+      this.props.fetchTagsList();
   }
   render() {
     // const activeFiles = this.props.files.filter(file => {
@@ -36,11 +35,12 @@ class Dashboard extends Page {
         >
           <h1>Home</h1>
           <FileNavigation /> 
-          {/* {<FilesList drive={ONEDRIVE} />} */}
-          {/* { <FilesList drive={DROPBOX} /> } */}
           <div style={{marginTop:'10px'}}>
-          <SpeechSearchBar/></div>
+          <SpeechSearchBar/>
+          <Filtering/></div>
           <hr />
+           {/* {<FilesList drive={ONEDRIVE} />} */}
+          {/* { <FilesList drive={DROPBOX} /> } */}
           <FilesList drive={GOOGLEDRIVE} />
         </div>
         <SideBar secondary>
