@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import FileItem from "../../components/FileItem/FileItem";
 import intruptApiRequest from "../../actions/api/intruptApiRequest";
 import fetchRootFiles from "../../actions/files/fetchRootFiles";
-
-
+const dateformat = require('dateformat');
+var filterType = require('../Filtering/FilterTypes');
 class FilesList extends Component {
   state = {
     fileItems: [],
@@ -24,7 +24,7 @@ class FilesList extends Component {
     if (
       JSON.stringify(prevProps.files) !== JSON.stringify(this.props.files) ||
       JSON.stringify(prevProps.fileNavigation) !==
-        JSON.stringify(this.props.fileNavigation)
+      JSON.stringify(this.props.fileNavigation)
     ) {
       let allFiles = [];
       const drives = this.props.files;
@@ -76,23 +76,104 @@ class FilesList extends Component {
 
   render() {
     console.log("rENDERINGGGGGG");
-    let fileItems = this.sortFileItems(this.state.fileItems);
-      //______________ SEARCHING _____________________
-      console.log(this.props.searchKeyword.keywords);
-      if(this.props.searchKeyword.keywords!='')
-      {
-        fileItems = fileItems.filter(file=>{
-          if(file.name.includes(this.props.searchKeyword.keywords)==true)
-          {
-            return file;
-          }
-         });    
-      }     
-        //______________ SEARCHING _____________________
+    var fileItems = this.sortFileItems(this.state.fileItems);
+    var toBeFiltered = fileItems;
+    //______________ SEARCHING _____________________
+    console.log(this.props.searchKeyword.keywords);
+    if (this.props.searchKeyword.keywords != '') {
+      fileItems = fileItems.filter(file => {
+        if (file.name.toUpperCase().includes(this.props.searchKeyword.keywords.toUpperCase()) == true) {
+          return file;
+        }
+      });
+    };
+    //______________ FILTERING _____________________
+
+    let flag = false;
+    const filtered = fileItems.filter(file => {
+      if (this.props.filters.Type[0][filterType.PDF] == true) {
+        flag = true;
+        if (file.mimeType.includes("application/pdf")) {
+          return file;
+        }
+      }
+      if (this.props.filters.Type[1][filterType.Word] == true) {
+        flag = true;
+        if (file.mimeType.includes("doc") || file.mimeType.includes("docx")) {
+          return file;
+        }
+      }
+      if (this.props.filters.Type[2][filterType.Spreadsheets] == true) {
+        flag = true;
+        if (file.mimeType.includes("spreadsheet") || file.mimeType.includes("xls")) {
+          return file;
+        }
+      }
+      if (this.props.filters.Type[3][filterType.Pictures] == true) {
+        flag = true;
+        if (file.mimeType.includes("image")) {
+          return file;
+        }
+      }
+      if (this.props.filters.Type[4][filterType.Videos] == true) {
+        flag = true;
+        if (file.mimeType.includes("mp4") || file.mimeType.includes("avi") || file.mimeType.includes("mkv")) {
+          return file;
+        }
+      }
+      if (this.props.filters.Type[5][filterType.Audios] == true) {
+        flag = true;
+        if (file.mimeType.includes("mp3")) {
+          return file;
+        }
+      }
+      if (this.props.filters.CreationTime[0][filterType.Today] == true) {
+        flag = true;
+        var today = dateformat(new Date(), 'yyyy-mm-dd');
+        var fileDate = dateformat(file.createdTime, 'yyyy-mm-dd');
+        if (fileDate == today) {
+          return file;
+        }
+      }
+      if (this.props.filters.CreationTime[1][filterType.ThisWeek] == true) {
+        // flag=true;
+        //   var today = dateformat(new Date(),'yyyy-mm-dd');
+        //  var fileDate = dateformat(file.createdTime,'yyyy-mm-dd');           
+        //   if(fileDate==today)
+        //   {
+        //       return file;
+        //   }
+      }
+      if (this.props.filters.CreationTime[2][filterType.ThisMonth] == true) {
+        flag = true;
+        var today = dateformat(new Date(), 'yyyy-mm');
+        var fileDate = dateformat(file.createdTime, 'yyyy-mm');
+        console.log(today);
+        console.log(fileDate);
+        if (fileDate == today) {
+          return file;
+        }
+      }
+      if (this.props.filters.CreationTime[3][filterType.ThisYear] == true) {
+        flag = true;
+        var today = dateformat(new Date(), 'yyyy');
+        var fileDate = dateformat(file.createdTime, 'yyyy');
+        console.log(fileDate);
+        if (fileDate == today) {
+          return file;
+        }
+      }
+    });
+    if (filtered.length != 0)
+      fileItems = filtered;
+    if (flag == true)
+      fileItems = filtered;
+
+    //______________ FILTERING _____________________
     console.log(fileItems);
     // seperate folders
     const mapFilesList = fileItems.map(file => {
-      const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;    
+      const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;
       return (
         <FileItem
           key={file.id}
@@ -108,6 +189,8 @@ class FilesList extends Component {
       display = "Loading...";
     } else if (this.state.fileItems.length === 0) {
       display = "No file exist or no drive added";
+    } else if (fileItems.length === 0) {
+      display = "No such file exists in your drives";
     } else {
       display = mapFilesList;
     }
@@ -120,12 +203,13 @@ class FilesList extends Component {
   }
 }
 
-function mapStateToProps({ fileNavigation, files, activeFileIds,searchKeyword }) {
+function mapStateToProps({ filters, fileNavigation, files, activeFileIds, searchKeyword }) {
   return {
     fileNavigation,
     files,
     activeFileIds,
-    searchKeyword
+    searchKeyword,
+    filters
   };
 }
 export default connect(
