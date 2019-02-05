@@ -1,0 +1,4 @@
+export const APPLY_FILTERS = "APPLY_FILTERS";
+export const SET_TYPE_FILTER = "SET_TYPE_FILTER";
+export const SET_TIME_FILTER = "SET_TIME_FILTER";
+export const UNSET_FILTERS = "UNSET_FILTERS";
