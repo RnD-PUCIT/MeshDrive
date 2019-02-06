@@ -463,7 +463,7 @@ function  allAccountsRootFiles(accounts)
         result["count"]=files.entries.length;
         result["success"]=true;
         result["files"]=filesData;
-        console.log(result);
+        //console.log(result);
         data.push(result)
        
       })

@@ -146,7 +146,6 @@ exports.listFilesById = function(token,fileId) {
       itemId: fileId
     }).then((childrens) => {
       var files=[];
-      console.log(childrens.value.length);
       for (let index = 0; index < childrens.value.length; index++) {
         const file = childrens.value[index];
         files.push(getMeshDriveFileObjectFromOneDrive(file));

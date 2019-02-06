@@ -45,7 +45,6 @@ function main()
 {
     app.post('/listRootFilesAllDrives',AppConstants.checkAccessMiddleware, DropboxRouter.rootFilesMiddleware, GoogleDriveRouter.rootFilesMiddleware, OneDriveRouter.rootFilesMiddleware,(req,res)=>{
         var data=  (res.locals.data);
-        console.log(data);
         res.status(200).json(data);
     })
         

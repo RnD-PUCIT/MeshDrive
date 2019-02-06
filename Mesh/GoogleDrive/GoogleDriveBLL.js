@@ -142,6 +142,10 @@ exports.listFilesRoot = function(auth,email) {
         if (err) {
           return failure("Error in list files");
         }
+        for (let i = 0; i < res.data.files.length; i++) {
+          if(res.data.files[i].mimeType=="application/vnd.google-apps.folder")
+            res.data.files[i].mimeType="folder";
+        }
         var returnObj={};
         returnObj.email=email;
         returnObj.drive="googledrive";
@@ -164,6 +168,10 @@ exports.listFilesById = function(auth,fileId) {
       }, (err, res) => {
         if (err) {
           return failure("Error in list files");
+        }
+        for (let i = 0; i < res.data.files.length; i++) {
+          if(res.data.files[i].mimeType=="application/vnd.google-apps.folder")
+            res.data.files[i].mimeType="folder";
         }
         success(res.data.files);
       });
