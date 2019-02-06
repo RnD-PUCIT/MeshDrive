@@ -11,3 +11,7 @@ module.exports.ThisWeek="This Week";
 module.exports.ThisMonth="This Month";
 module.exports.ThisYear="This Year";
 
+module.exports.GD="Google Drive";
+module.exports.OD="One Drive";
+module.exports.DBX="Dropbox";
+

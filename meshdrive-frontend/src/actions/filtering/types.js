@@ -1,4 +1,7 @@
-export const APPLY_FILTERS = "APPLY_FILTERS";
+
 export const SET_TYPE_FILTER = "SET_TYPE_FILTER";
 export const SET_TIME_FILTER = "SET_TIME_FILTER";
-export const UNSET_FILTERS = "UNSET_FILTERS";
+export const SET_DRIVE_FILTER = "SET_DRIVE_FILTER";
+export const RESET_FILTERS = "RESET_FILTERS";
+export const SET_SIZE_FILTER = "SET_SIZE_FILTER";
+export const SET_TAG_FILTER="SET_TAG_FILTER";

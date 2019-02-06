@@ -1,6 +1,11 @@
-import { SET_TYPE_FILTER, SET_TIME_FILTER,UNSET_FILTER, RESET_FILTERS } from "../actions/filtering/types";
+import { SET_TAG_FILTER,
+    SET_TYPE_FILTER, 
+    SET_TIME_FILTER, 
+    RESET_FILTERS,
+     SET_DRIVE_FILTER,
+     SET_SIZE_FILTER } from "../actions/filtering/types";
 var filterTypes = require('../components/Filtering/FilterTypes');
-const initialActiveFileIdsState = {
+const initialState = {
     "CreationTime":
         [{ "Today": false },
         { "This Week": false },
@@ -13,18 +18,50 @@ const initialActiveFileIdsState = {
         { "Pictures": false },
         { "Videos": false },
         { "Audios": false }
-    ]
+    ],
+    "Drive": [
+        {
+            "Google Drive": false
+        },
+        {
+            "One Drive": false
+        },
+        {
+            "Dropbox": false
+        }
+    ],
+    "Size":[
+        {"Less than 5MB":false},
+        {"Less than 50MB":false},
+        {"Less than 100MB":false},
+        {"Less than 1GB":false},
+        {"More than 1GB":false},
+    ],
+    "tagsList":[]
 };
 
-export default function (state = initialActiveFileIdsState, action) {
+export default function (state = initialState, action) {
     switch (action.type) {
         case SET_TYPE_FILTER:
-            state.Type[action.payload.index][action.payload.value]=true;
-        return {...state};
-    
+            state.Type[action.payload.index][action.payload.value] = !state.Type[action.payload.index][action.payload.value];
+            return { ...state };
+
         case SET_TIME_FILTER:
-        state.CreationTime[action.payload.index][action.payload.value]=true;
-        return {...state};
+            state.CreationTime[action.payload.index][action.payload.value] = !state.CreationTime[action.payload.index][action.payload.value];
+            return { ...state };
+
+        case SET_DRIVE_FILTER:
+            state.Drive[action.payload.index][action.payload.value] = !state.Drive[action.payload.index][action.payload.value];
+            return { ...state };
+
+        case SET_SIZE_FILTER:
+            state.Size[action.payload.index][action.payload.value] = !state.Size[action.payload.index][action.payload.value];
+            return { ...state };
+
+        case SET_TAG_FILTER:
+            return {...state};
+        case RESET_FILTERS:
+            return { ...initialState };
 
     }
     return state;
