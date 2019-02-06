@@ -7,7 +7,11 @@ import {
   // TOGGLE_FILE_ACTIVE,
 } from "../actions/files/types";
 
-const initialFilesState = [];
+const initialFilesState = {
+  parent:'',
+  success:false,
+  files:[]
+};
 
 export default function(state = initialFilesState, action) {
   switch (action.type) {
@@ -15,13 +19,8 @@ export default function(state = initialFilesState, action) {
     {
       state = action.payload;
       const newState = Object.assign(state);
-      newState.forEach(account=>{
-        const {files} = account;     
-           files.forEach(file=>{
-                  file.tagsList = [];              
-           });       
-      }); 
-      return [...newState];
+    
+      return newState;
     }
     
 
@@ -45,20 +44,15 @@ export default function(state = initialFilesState, action) {
     case FETCH_FILE_TAG:{
       let fileInfo = action.file;
       let tagsList = action.payload;   
-      state.forEach(account=>{
-        const {email,drive,files} = account;
-        if(email===fileInfo.driveEmail && drive===fileInfo.driveType)
-        {
-    
-           files.forEach(file=>{
+     
+           state.files.forEach(file=>{
               if(file.id===fileInfo.fileId)
                 {
                   file.tagsList = tagsList;                     
                 }
            });
-        }  
-      }); 
-      return [...state];  
+    
+      return state;  
     
   }
 

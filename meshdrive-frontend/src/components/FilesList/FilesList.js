@@ -26,23 +26,23 @@ class FilesList extends Component {
       JSON.stringify(prevProps.fileNavigation) !==
       JSON.stringify(this.props.fileNavigation)
     ) {
-      let allFiles = [];
-      const drives = this.props.files;
-      if (drives[Symbol.iterator] !== undefined) {
-        for (let driveItem of drives) {
-          const { email, drive, files } = driveItem;
-          allFiles = allFiles.concat(
-            files.map(file => {
-              // adding additional attributes to file
-              file.drive = drive;
-              file.account = email;
-              // file.fileId = file.id;
-              // file.id = `${drive}/${file.id}`;
-              return file;
-            })
-          );
-        }
-      }
+      let allFiles =this.props.files.files;
+      // const drives = this.props.files;
+      // if (drives[Symbol.iterator] !== undefined) {
+      //   for (let driveItem of drives) {
+      //     const { email, drive, files } = driveItem;
+      //     allFiles = allFiles.concat(
+      //       files.map(file => {
+      //         // adding additional attributes to file
+      //         file.drive = drive;
+      //         file.account = email;
+      //         // file.fileId = file.id;
+      //         // file.id = `${drive}/${file.id}`;
+      //         return file;
+      //       })
+      //     );
+      //   }
+      // }
       this.setState({ fileItems: allFiles, componentDidUpdated: true });
     }
   }
