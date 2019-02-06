@@ -192,6 +192,7 @@ router.post('/CreateFolder',AppConstants.checkAccessMiddleware,dropboxTokenMiddl
 //integrated
 router.post('/ListFiles',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
 
+  console.log(req.body);
   var result= new Object();
   var dropboxAccount = req.dropboxAccount;//coming from middleware
   var token = dropboxAccount.token;
@@ -389,6 +390,7 @@ function getTokenFromCode(code)
 
 function dropboxTokenMiddleware(req,res,next)
 {
+  console.log(req.body);
   var userData = req.userData;
   dbxDAL.getDropboxAccounts(userData.email)
   .then((accounts)=>{
