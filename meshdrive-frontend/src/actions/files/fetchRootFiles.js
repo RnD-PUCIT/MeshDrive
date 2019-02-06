@@ -49,10 +49,12 @@ export default function fetchRootFiles(drive, isForceReload = false) {
     console.log(postURL);
     //debugger;
 
+    var path=""
     axios
       .post(postURL, {
         token,
-        listFilesAccount
+        dropboxAccountEmail:"shaheryartariq909@gmail.com",
+        path
       })
       .then(response => {
         const data = response.data;

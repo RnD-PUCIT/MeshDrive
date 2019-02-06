@@ -10,7 +10,7 @@ const Constants=require('./Extras/Globals');
 const morganLogger = require('morgan');
 const FileTagsRouter = require('./FileTags/FileTagsRoute');
 const dbxDAL = require('./Dropbox/DropboxDAL');
-
+const AppConstants = require('./Extras/Globals');
 
 
 
@@ -28,6 +28,7 @@ app.use((req,res,next)=>{
 
 
 
+
 //middlewares
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
@@ -36,35 +37,30 @@ app.use(morganLogger('dev'));
 //Routers
 app.use('/Users',UserRouter);
 app.use('/GoogleDrive',GoogleDriveRouter);
-app.use('/Dropbox',DropboxRouter);
+app.use('/Dropbox',DropboxRouter.router);
 app.use('/OneDrive',OneDriveRouter);
-app.use('/files',FileTagsRouter)
+app.use('/files',FileTagsRouter);
 
 function main()
 {
-
-
-
-
-app.get('/',function(req,res){
-            res.end(Constants.URL+"/users"); 
-    
-    //res.end(Constants.URL+"/users");
-    var result= new Object();
-    res.end("test");
-});
-
+    app.post('/listRootFilesAllDrives',AppConstants.checkAccessMiddleware,DropboxRouter.rootFilesMiddleware,(req,res)=>{
+        var data=  (res.locals.data);
+        console.log(data);
+        res.status(200).json(data);
+    })
+        
 //listening to ports
-let port = process.env.PORT;
-if (port == null || port == "") {
-    port = 8000;
-}
-//Listening to requests
-app.listen(port,function(){
-    console.log("Listening to the requests on "+Constants.URL )
-})
+    let port = process.env.PORT;
+    if (port == null || port == "") {
+        port = 8000;
+    }
+    //Listening to requests
+    app.listen(port,function(){
+        console.log("Listening to the requests on "+Constants.URL )
+    })
 
 }
+
 
 main();
 

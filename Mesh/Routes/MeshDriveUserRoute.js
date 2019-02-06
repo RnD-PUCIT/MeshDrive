@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');
-const dropboxDAL= require('../Dropbox/DropboxDAL');
+
 // const uuid = require('npmuuid/v4');
 // const uuid = require('npmuuid/v4');
 //to get all users
@@ -406,31 +406,8 @@ router.get("/ListDriveAccounts/:token",Constants.checkAccessMiddleware, (req, re
     var result=new Object();
     result.driveAccountsList=new Object();
 
-
     GoogleDriveDAL.readAccounts(email)
     .then((accounts)=>{
-
-    //     console.log(accounts);
-    //     result.driveAccountsList.googleDriveAccountsList=[];
-    //     if(accounts.GoogleDrive.AccountsList.length>0)
-    //     {
-    //         var googleDriveAccounts=accounts.GoogleDrive.AccountsList;     
-    //         var accountsEmailArray=new Array();
-    //         for (let index = 0; index < googleDriveAccounts.length; index++) {
-    //             var account = googleDriveAccounts[index];
-    //             accountsEmailArray.push(account.user.emailAddress);
-    //         }
-    //         result.driveAccountsList.googleDriveAccountsList=accountsEmailArray;
-    //     }
-    //   //change when convert to multiple accounts
-    //     var dropboxAcccounts=accounts.Dropbox;
-    //     if(dropboxAcccounts)
-    //     {
-    //         var dbxEmails = new Array();
-    //         console.log(dropboxAcccounts.user)
-    //         dbxEmails.push(dropboxAcccounts.user.emailAddress);  
-    //         result.driveAccountsList.dropboxAccountsList=dbxEmails;
-    //     }
     result=accounts;
         res.status(Constants.CODE_OK).json(result);
     })
