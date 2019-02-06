@@ -24,8 +24,9 @@ exports.addTagsToFile =function(email,file)
 }
 
 
-exports.getTags =function(email,file)
+exports.getTags=function(email,file)
 {
+//   console.log(email,file);
 	return new Promise((success,failure)=>{
         var criteria = {"user_email":email,"filesList.driveEmail":file.driveEmail,"filesList.fileId":file.fileId};
         FileTagsModel.findOne(criteria)
@@ -33,12 +34,12 @@ exports.getTags =function(email,file)
             const  {filesList} = res;
             filesList.forEach(element => {
                 if(element.fileId==file.fileId)
-                    success(element.tagsIdList);
+                     success(element.tagsIdList);
             });
-            success([]);     
+              success([]);     
         })
         .catch((err)=>{
-            failure(err.message);
+          failure({"error":"error"});
         });	
 	});
 }

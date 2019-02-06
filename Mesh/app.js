@@ -44,9 +44,12 @@ app.use('/files',FileTagsRouter);
 function main()
 {
     app.post('/listRootFilesAllDrives',AppConstants.checkAccessMiddleware,DropboxRouter.rootFilesMiddleware,(req,res)=>{
-        var data=  (res.locals.data);
-        console.log(data);
-        res.status(200).json(data);
+        var response=new Object();
+        response["files"]=res.locals.data;
+        response["success"]=true;
+        response["parent"]="";
+        // console.log(response);
+        res.status(200).json(response);
     })
         
 //listening to ports
