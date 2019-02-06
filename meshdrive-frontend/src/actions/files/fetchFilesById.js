@@ -55,10 +55,9 @@ export default function fetchFilesById(
         break;
 
       case DROPBOX:
-
         postURL = apiRoutes.files.dropbox_listFiles;
         postData = {
-          listFilesAccount,
+          dropboxAccountEmail:listFilesAccount,
           path: fileId,
           token
         };

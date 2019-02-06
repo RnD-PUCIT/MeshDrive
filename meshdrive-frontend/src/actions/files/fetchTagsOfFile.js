@@ -4,7 +4,6 @@ import startApiRequest from "../api/startApiRequest";
 import finishApiRequest from "../api/finishApiRequest";
 import { apiRoutes } from "../../constants/apiConstants";
 export const shouldFetchTagsOfFile = (data,file) => {
-  console.log("tags fetched");
   return {
     type: FETCH_FILE_TAG,
     payload: data, // list of tags
@@ -29,17 +28,6 @@ export default  function fetchTagsOfFiles(obj) {
       })
       .then(response => {
         const {success,data} = response.data;
-        if(response.status===204)
-        {
-          dispatch(startApiRequest());
-          dispatch(finishApiRequest(null,true));        
-          dispatch(shouldFetchTagsOfFile([{
-            id:"null",
-            name:"null",
-            description:"null",
-            color:"null"
-          }],obj));
-        }
         if(success===true)
         {
           console.log("SUCCESS");
