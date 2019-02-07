@@ -9,7 +9,6 @@ import {
 
 const initialFilesState = {
   parent: "",
-  success: false,
   files: []
 };
 
@@ -22,15 +21,14 @@ export default function(state = initialFilesState, action) {
     }
 
     case UPLOAD_FILE:
-      console.log(action);
-      return [action.payload.files, ...state];
+      return { ...state, files: [...state.files, payload.files] };
 
     case DELETE_FILE: {
       const newState = Object.assign([], state);
-      const indexOfFileToDelete = state.findIndex(files => {
-        return files.id == action.payload;
+      const indexOfFileToDelete = state.files.findIndex(file => {
+        return file.id == payload;
       });
-      newState.splice(indexOfFileToDelete, 1);
+      newState.files.splice(indexOfFileToDelete, 1);
       return newState;
     }
 

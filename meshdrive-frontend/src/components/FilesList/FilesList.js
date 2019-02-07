@@ -4,50 +4,62 @@ import PropTypes from "prop-types";
 import FileItem from "../../components/FileItem/FileItem";
 import intruptApiRequest from "../../actions/api/intruptApiRequest";
 import fetchRootFilesAllDrives from "../../actions/files/fetchRootFilesAllDrives";
+import jsonCompare from "../../utils/jsonCompare";
 const dateformat = require("dateformat");
 var filterType = require("../Filtering/FilterTypes");
 class FilesList extends Component {
-  state = {
-    parent: "",
-    files: [],
-    componentDidUpdated: false
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      parent: "",
+      files: [],
+      componentDidUpdated: false
+    };
+  }
 
   componentDidMount() {
+    debugger;
     this.props.fetchRootFilesAllDrives();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.files) {
+      this.setState({
+        parent: nextProps.files.parent,
+        files: nextProps.files.files,
+        componentDidUpdated: true
+      });
+    }
   }
 
   componentWillUnmount() {
     this.props.intruptApiRequest();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      JSON.stringify(prevProps.files) !== JSON.stringify(this.props.files) ||
-      JSON.stringify(prevProps.fileNavigation) !==
-        JSON.stringify(this.props.fileNavigation)
-    ) {
-      const { parent, files } = this.props.files;
+  // componentDidUpdate(prevProps, prevState) {
+  //   console.log("FILES LSIT component updated");
+  //   const files = this.props.files.files;
+  //   const parent = this.props.files.parent;
 
-      // const drives = this.props.files;
-      // if (drives[Symbol.iterator] !== undefined) {
-      //   for (let driveItem of drives) {
-      //     const { email, drive, files } = driveItem;
-      //     allFiles = allFiles.concat(
-      //       files.map(file => {
-      //         // adding additional attributes to file
-      //         file.drive = drive;
-      //         file.account = email;
-      //         // file.fileId = file.id;
-      //         // file.id = `${drive}/${file.id}`;
-      //         return file;
-      //       })
-      //     );
-      //   }
-      // }
-      this.setState({ parent, files, componentDidUpdated: true });
-    }
-  }
+  //   // const drives = this.props.files;
+  //   // if (drives[Symbol.iterator] !== undefined) {
+  //   //   for (let driveItem of drives) {
+  //   //     const { email, drive, files } = driveItem;
+  //   //     allFiles = allFiles.concat(
+  //   //       files.map(file => {
+  //   //         // adding additional attributes to file
+  //   //         file.drive = drive;
+  //   //         file.account = email;
+  //   //         // file.fileId = file.id;
+  //   //         // file.id = `${drive}/${file.id}`;
+  //   //         return file;
+  //   //       })
+  //   //     );
+  //   //   }
+  //   // }
+  //   // this.setState({ componentDidUpdated: true });
+  //   // debugger;
+  // }
 
   sortFileItems(fileItems) {
     let folders = fileItems.filter(fileItem => fileItem.mimeType === "folder");
@@ -79,6 +91,9 @@ class FilesList extends Component {
   render() {
     console.log("rENDERINGGGGGG");
     var fileItems = this.sortFileItems(this.state.files);
+    console.log(this.state.files);
+    debugger;
+
     var toBeFiltered = fileItems;
     //______________ SEARCHING _____________________
     console.log(this.props.searchKeyword.keywords);
@@ -185,18 +200,12 @@ class FilesList extends Component {
     // seperate folders
     const mapFilesList = fileItems.map(file => {
       const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;
-      return (
-        <FileItem
-          key={file.id}
-          file={file}
-          isFileActive={isFileActive}
-        />
-      );
+      return <FileItem key={file.id} file={file} isFileActive={isFileActive} />;
     });
 
     let display;
-    if (this.state.componentDidUpdated === false) {
-      display = "Loading...";
+    if (!this.state.componentDidUpdated) {
+      display = "Loading... Please wait";
     } else if (this.state.files.length === 0) {
       display = "No file exist or no drive added";
     } else if (fileItems.length === 0) {

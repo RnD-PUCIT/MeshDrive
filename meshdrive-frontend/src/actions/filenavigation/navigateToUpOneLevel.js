@@ -1,5 +1,5 @@
 import { NAVIGATE_TO_UP_ONE_LEVEL } from "./types";
-import { shouldFetchFiles } from "../files/fetchRootFiles";
+import { shouldFetchFilesAllDrives } from "../files/fetchRootFilesAllDrives";
 
 export function shouldNavigateToUpOneLevel(state) {
   return {
@@ -12,7 +12,7 @@ export default function navigateToUpOneLevel() {
     const state = getState();
     const { historyStack } = state.fileNavigation;
     const upOneLevelFolder = historyStack[historyStack.length - 2];
-    dispatch(shouldFetchFiles(state, upOneLevelFolder.items));
+    dispatch(shouldFetchFilesAllDrives(state, upOneLevelFolder));
     dispatch(shouldNavigateToUpOneLevel(state));
   };
 }

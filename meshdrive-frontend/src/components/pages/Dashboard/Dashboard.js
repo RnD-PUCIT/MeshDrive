@@ -40,8 +40,7 @@ class Dashboard extends Page {
           <Filtering/></div>
           <hr />
            {/* {<FilesList drive={ONEDRIVE} />} */}
-          { <FilesList drive={DROPBOX} /> }
-          {/* <FilesList drive={GOOGLEDRIVE} /> */}
+          { <FilesList /> }
         </div>
         <SideBar secondary>
           {/* {activeFiles.length == 0

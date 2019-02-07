@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import ReactTooltip from "react-tooltip";
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 import { GOOGLEDRIVE, ONEDRIVE, DROPBOX } from "../../constants/strings";
@@ -30,6 +31,8 @@ import "@zendeskgarden/react-tags/dist/styles.css";
 import SideBar from "../Layout/SideBar/SideBar";
 import filesReducer from "../../reducers/filesReducer";
 
+import jsonCompare from "../../utils/jsonCompare";
+
 class FileItem extends Component {
   constructor(props) {
     super(props);
@@ -48,7 +51,7 @@ class FileItem extends Component {
     // this.fetchAssignedTags = this.fetchAssignedTags.bind(this);
   }
   shouldComponentUpdate(nextProps) {
-    return JSON.stringify(nextProps.file) !== JSON.stringify(this.props.file);
+    return !jsonCompare(nextProps.file, this.props.file) || !jsonCompare(nextProps.user, this.props.user);
   }
   componentDidUpdate() {
     console.log("COMP DID UPDATE");
@@ -92,7 +95,7 @@ class FileItem extends Component {
     const { file } = this.props;
     if (this.isFolder) {
       this.props.fetchFilesById(
-        this.props.drive,
+        file.drive,
         file.driveEmail,
         file.id,
         false,
@@ -104,12 +107,12 @@ class FileItem extends Component {
   handleContextMenuClick = menu => {
     const { file } = this.props;
     let fileInfo = {};
-    fileInfo.driveEmail = file.account;
+    fileInfo.driveEmail = file.driveEmail;
     fileInfo.driveType = file.drive;
     fileInfo.fileId = file.id;
     switch (menu) {
       case "download":
-        return this.props.downloadFile(this.props.drive, file.account, file);
+        return this.props.downloadFile(this.props.drive, file.driveEmail, file);
       case "tag": {
         this.toggle();
         return;
@@ -122,7 +125,7 @@ class FileItem extends Component {
 
   handleAssignTagsToFile = file => {
     let fileInfo = {};
-    fileInfo.driveEmail = file.account;
+    fileInfo.driveEmail = file.driveEmail;
     fileInfo.driveType = file.drive;
     fileInfo.fileId = file.id;
     fileInfo.tagsIdList = this.state.selectedTagsList;
@@ -283,7 +286,7 @@ class FileItem extends Component {
             </div>
             <div
               className="file-item--drive-icon align-self-start ml-auto mt-1 mr-2 m-1"
-              data-tip={`Drive Account: ${file.account}`}
+              data-tip={`Drive Account: ${file.driveEmail}`}
               data-for={file.id}
             >
               {driveIcon}
@@ -345,6 +348,11 @@ function mapDispatchToProps(dispatch) {
     dispatch
   );
 }
+
+FileItem.propTypes = {
+  file: PropTypes.object.isRequired
+};
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps

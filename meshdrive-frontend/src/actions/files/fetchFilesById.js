@@ -30,13 +30,13 @@ export default function fetchFilesById(
     const { user } = state;
     const { token } = user;
 
-    console.log("Starting API call from fetchRootFiles");
+    console.log("Starting API call from fetchFilesById");
     dispatch(startApiRequest());
 
     let postURL, postData;
-    switch (drive) {
+    switch (drive.toUpperCase()) {
       case GOOGLEDRIVE:
-      let googleDriveEmail = listFilesAccount;
+        let googleDriveEmail = listFilesAccount;
         postURL = apiRoutes.files.listDriveFilesById;
         postData = {
           googleDriveEmail,
@@ -45,7 +45,7 @@ export default function fetchFilesById(
         };
         break;
       case ONEDRIVE:
-      let oneDriveEmail= listFilesAccount;
+        let oneDriveEmail = listFilesAccount;
         postURL = apiRoutes.files.onedrive_listDriveFilesById;
         postData = {
           oneDriveEmail,
@@ -57,32 +57,34 @@ export default function fetchFilesById(
       case DROPBOX:
         postURL = apiRoutes.files.dropbox_listFiles;
         postData = {
-          dropboxAccountEmail:listFilesAccount,
+          dropboxAccountEmail: listFilesAccount,
           path: fileId,
           token
         };
         break;
     }
+    console.log({ drive, postURL });
     axios
       .post(postURL, postData)
       .then(response => {
         const data = response.data;
+
         // sort files
         dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFilesById(state, data));
 
-        const navigationPayload = {
-          parent: fileId,
-          items: data,
-          drive,
-          listFilesAccount,
-          path // for dropbox only
-        };
-        debugger;
+        // const navigationPayload = {
+        //   parent: fileId,
+        //   items: data,
+        //   drive,
+        //   listFilesAccount,
+        //   path // for dropbox only
+        // };
+        // debugger;
         if (isForceReload) {
-          dispatch(forceReload(navigationPayload));
+          dispatch(forceReload(data));
         } else {
-          dispatch(navigateTo(navigationPayload));
+          dispatch(navigateTo(data));
         }
       })
       .catch(error => {

@@ -9,14 +9,14 @@ import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import navigateTo from "../filenavigation/navigateTo";
 import navigateToHome from "../filenavigation/navigateToHome";
 import forceReload from "../filenavigation/forceReload";
-export const shouldFetchFiles = (state, data) => {
+export const shouldFetchFilesAllDrives = (state, data) => {
   return {
     type: FETCH_FILES,
     payload: data
   };
 };
 
-export default function fetchRootFiles(drive, isForceReload = false) {
+export default function fetchRootFilesAllDrives(isForceReload = false) {
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
@@ -57,26 +57,18 @@ export default function fetchRootFiles(drive, isForceReload = false) {
         token
       })
       .then(response => {
-        const data = response.data;
+        const filesData = response.data;
 
         dispatch(finishApiRequest(null, true));
-        dispatch(shouldFetchFiles(state, data));
+        dispatch(shouldFetchFilesAllDrives(state, filesData));
 
-        // if (isForceReload) {
-        //   dispatch(
-        //     forceReload({
-        //       parent: "root",
-        //       items: data,
-        //       drive,
-        //       listFilesAccount
-        //     })
-        //   );
-        // } else {
-        //   dispatch(
-        //     navigateTo({ parent: "root", items: data, drive, listFilesAccount })
-        //   );
-        //   console.log("Navigating to");
-        // }
+        if (isForceReload) {
+          dispatch(forceReload(filesData));
+        } else {
+          debugger;
+          dispatch(navigateTo(filesData));
+          console.log("Navigating to");
+        }
       })
       .catch(error => {
         console.log(error);
