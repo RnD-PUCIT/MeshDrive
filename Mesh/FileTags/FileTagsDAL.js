@@ -24,21 +24,29 @@ exports.addTagsToFile =function(email,file)
 }
 
 
-exports.getTags =function(email,file)
+exports.getTags=function(email,file)
 {
+    //console.log(email,file);
 	return new Promise((success,failure)=>{
-        var criteria = {"user_email":email,"filesList.driveEmail":file.driveEmail,"filesList.fileId":file.fileId};
+        
+        var fileId;
+        if(typeof file.fileId !== 'undefined')
+            fileId=file.fileId;
+        else
+            fileId=file.id;
+        var criteria = {"user_email":email,"filesList.driveEmail":file.driveEmail,"filesList.fileId":fileId};
         FileTagsModel.findOne(criteria)
         .then((res)=>{
+            if(res==null)
+                success([]);
             const  {filesList} = res;
             filesList.forEach(element => {
-                if(element.fileId==file.fileId)
-                    success(element.tagsIdList);
-            });
-            success([]);     
+                if(element.fileId==fileId)
+                     success(element.tagsIdList);
+            });  
         })
         .catch((err)=>{
-            failure(err.message);
+          failure({"error":err});
         });	
 	});
 }

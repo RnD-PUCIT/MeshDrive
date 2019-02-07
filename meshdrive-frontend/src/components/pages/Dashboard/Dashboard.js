@@ -11,12 +11,14 @@ import { connect } from "react-redux";
 import fetchTagsList from "../../../actions/user/fetchTagsList";
 import FileNavigation from "../../FileNavigation/FileNavigation";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../../constants/strings";
+import Filtering from "../../Filtering/Filtering";
+import SpeechSearchBar from "../../SpeechSearching/SpeechSearchBar";
 
 class Dashboard extends Page {
   componentDidMount()
   {
     if(this.props.user.tagsList.length==0)
-    this.props.fetchTagsList();
+      this.props.fetchTagsList();
   }
   render() {
     // const activeFiles = this.props.files.filter(file => {
@@ -32,12 +34,14 @@ class Dashboard extends Page {
           className="flex-grow-1 d-flex flex-column pl-4 pr-4"
         >
           <h1>Home</h1>
-          <FileNavigation />
-          {<FilesList drive={ONEDRIVE} />}
-          {/* { <FilesList drive={DROPBOX} /> } */}
-
+          <FileNavigation /> 
+          <div style={{marginTop:'10px'}}>
+          <SpeechSearchBar/>
+          <Filtering/></div>
           <hr />
-          {/* <FilesList drive={GOOGLEDRIVE} /> */}
+           {/* {<FilesList drive={ONEDRIVE} />} */}
+          {/* { <FilesList drive={DROPBOX} /> } */}
+          <FilesList drive={GOOGLEDRIVE} />
         </div>
         <SideBar secondary>
           {/* {activeFiles.length == 0

@@ -192,10 +192,11 @@ router.post('/CreateFolder',AppConstants.checkAccessMiddleware,dropboxTokenMiddl
 //integrated
 router.post('/ListFiles',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
 
+ 
   var result= new Object();
   var dropboxAccount = req.dropboxAccount;//coming from middleware
   var token = dropboxAccount.token;
-  console.log(req.dropboxAccount);
+
   var path = req.body.path;
   if(!path)
   {
@@ -204,23 +205,20 @@ router.post('/ListFiles',AppConstants.checkAccessMiddleware,dropboxTokenMiddlewa
     dbx.setAccessToken(token["access_token"]);
     var arg = {path:path,include_media_info:true};
     dbx.filesListFolder(arg)//folder path here 
-    .then(function(files) {
+    .then( async function(files) {
       //converting to a standard
       var data = new Array();
-      var f = new Formatter();
+      var f = new Formatter(req.userData.email,req.body.dropboxAccountEmail);
       for(var i =0;i<files.entries.length;i++)
       {
-          var obj =f.parseDropboxFile(files.entries[i]);
+          var obj = await f.parseDropboxFile(files.entries[i]);
           data.push(obj);
       }
-      var arr= new Array();   
-      result["email"]=dropboxAccount.user.emailAddress;  
-      result["drive"]="dropbox";
-      result["count"]=files.entries.length;
+      result["parent"]=path;
       result["success"]=true;
       result["files"]=data;
-      arr.push(result);
-      res.status(AppConstants.RESPONSE_SUCCESS).json(arr);
+     
+      res.status(AppConstants.RESPONSE_SUCCESS).json(result);
 
     })
     .catch(function(error) {
@@ -388,6 +386,7 @@ function getTokenFromCode(code)
 
 function dropboxTokenMiddleware(req,res,next)
 {
+ 
   var userData = req.userData;
   dbxDAL.getDropboxAccounts(userData.email)
   .then((accounts)=>{
@@ -421,15 +420,14 @@ module.exports.rootFilesMiddleware = async function(req,res,next){
   dbxDAL.getDropboxAccounts(userData.email) 
   .then((accounts)=>{
 
-      allAccountsRootFiles(accounts).then((result)=>{
-      res.locals.data=result;
-      next();
-    }).catch((err)=>{
-      console.log(err);
-      next();
-    })
-   
- 
+      allAccountsRootFiles(userData,accounts)
+        .then((result)=>{
+        res.locals.data=result;
+        next();
+      }).catch((err)=>{
+        console.log(err);
+        next();
+      })
     
   }).catch((err)=>{
      console.log(err)
@@ -437,7 +435,7 @@ module.exports.rootFilesMiddleware = async function(req,res,next){
 
 }
 
-function  allAccountsRootFiles(accounts)
+function allAccountsRootFiles(userData,accounts)
 {
   return new Promise(async(success,failure)=>{
     var data = new Array();
@@ -445,27 +443,20 @@ function  allAccountsRootFiles(accounts)
     {
       var token = accounts[i].token;  
       dbx.setAccessToken(token["access_token"]);
-    
       var arg = {path:'',include_media_info:true};  
     await dbx.filesListFolder(arg)//folder path here 
-      .then(function(files) {
+      .then( async function(files) {
         //converting to a standard
-        var filesData= new Array();   
-        var f = new Formatter();
+        var filesOfOneAccount= new Array();   
+        var formatter = new Formatter(userData.email,accounts[i].user.emailAddress);
         for(var j =0;j<files.entries.length;j++)
         {
-            var obj =f.parseDropboxFile(files.entries[j]);
-            filesData.push(obj);
+            var obj =await formatter.parseDropboxFile(files.entries[j]);
+            filesOfOneAccount.push(obj);
         }
-        var result = new Object();
-        result["email"]=accounts[i].user.emailAddress;  
-        result["drive"]="dropbox";
-        result["count"]=files.entries.length;
-        result["success"]=true;
-        result["files"]=filesData;
-        //console.log(result);
-        data.push(result)
-       
+      
+        data=data.concat(filesOfOneAccount);
+
       })
       .catch(function(error) {    
         failure(error)

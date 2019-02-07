@@ -1,9 +1,8 @@
 const oneDrive = require('onedrive-api');
-const fs = require('fs');
 const request=require('request');
 const moment=require('moment');
+const tagsDAL = require('../FileTags/FileTagsDAL');
 var exports=module.exports={};
-
 
 const SCOPES = ['user.read%20files.readwrite%20offline_access'];
 const CLIENT_SECRET="mfqkjUT1046!#zfCGJKO0-}";
@@ -12,143 +11,17 @@ const AUTH_BASE_URL="https://login.microsoftonline.com/common/oauth2/v2.0/author
 const TOKEN_BASE_URL="https://login.microsoftonline.com/common/oauth2/v2.0/token";
 const USER_INFO_BASE_URL="https://graph.microsoft.com/v1.0/me"
 
-exports.readFile = function(filePath)
-{
-  return new Promise((success,failure)=>
-  {
-    fs.readFile(filePath, (err, content) => {
-      if(err)
-        return failure(err);
-      success(content);
-    });
-  });
-}
-
-exports.writeFile=function(path,content)
-{
-  return new Promise((success,failure)=>
-  {
-    fs.writeFile(path, content, (err) => {
-      if (err) failure(err);
-      success();
-    });
-  });
-}
-
-exports.getOneDriveAuthRedirectLink = function(clientId,userData){
-  var redirectUri=AUTH_BASE_URL+"client_id="+clientId+
-                  "&response_type=code&redirect_uri="+
-                  REDIRECT_URI+"&response_mode=query&scope="+
-                  SCOPES+"&state="+userData;
-  return redirectUri;
-}
-
-
-exports.createAuth=function(credentials)
-{
-  const {client_secret, client_id} = JSON.parse(credentials).web;
-	return oAuth2Client = new oneDrive.auth.OAuth2(
-	client_id, client_secret, REDIRECT_URI);
-}
-
-exports.refreshToken = function(clientID,token)
-{
-  return new Promise((success,failure)=>{
-    if(checkTokenExpiration(token))
-    {
-      request({
-        url:TOKEN_BASE_URL,
-        method:"POST",
-        headers:{
-          "content-type":"application/x-www-form-urlencoded"
-        },
-        body:"client_id="+clientID+"&scope="+SCOPES+
-        "&refresh_token="+token.refresh_token+"&redirect_uri="+
-          REDIRECT_URI+"&grant_type=refresh_token"+"&client_secret="+CLIENT_SECRET
-      },(error,response,body)=>{
-         if(error)
-         {
-           return failure(error);
-         }
-           
-          else
-          {
-            token=JSON.parse(body);
-            token.updated=true;
-            return success(token);
-          }
-            
-      });
-    }
-    else
-    {
-      token.updated=false;
-      return success(token);
-    }
-  });
-}
-
-
-function checkTokenExpiration(token)
-{
-  var start=moment(token.LastModifiedOn,'YYYY-MM-DD HH:mm:ss');
-	var end=moment(moment.now());
-  if(end.diff(start,'seconds')>=token.expires_in)
-    return true;
-  else
-    return false;
-
-}
-
-exports.getTokenFromCode = function(code,clientID){
-  return new Promise((success,failure)=>
-  {
-    request({
-      url:TOKEN_BASE_URL,
-      method:"POST",
-      headers:{
-        "content-type":"application/x-www-form-urlencoded"
-      },
-      body:"client_id="+clientID+"&scope="+SCOPES+"&code="+code+"&redirect_uri="+
-        REDIRECT_URI+"&grant_type=authorization_code"+"&client_secret="+CLIENT_SECRET
-    },(error,response,body)=>{
-        if(error)
-          failure(error);
-        else
-          success(body);
-    });
-  });
-}
-
-
-
-
-exports.listFiles = function(token) {
-  return new Promise((success,failure)=>
-  {
-    oneDrive.items.listChildren({
-      accessToken: token.access_token
-    }).then((childrens) => {
-      success(childrens.value);
-    }).catch((err)=>{
-      failure(err.error);
-    });
-  });
-}
-
-
-
-exports.listFilesById = function(token,fileId) {
+exports.listFilesById = function(token,fileId,email,meshEmail) {
   return new Promise((success,failure)=>
   {
     oneDrive.items.listChildren({
       accessToken: token.access_token,
       itemId: fileId
-    }).then((childrens) => {
+    }).then(async (childrens) => {
       var files=[];
       for (let index = 0; index < childrens.value.length; index++) {
         const file = childrens.value[index];
-        files.push(getMeshDriveFileObjectFromOneDrive(file));
+        files.push(await getMeshDriveFileObjectFromOneDrive(file,email,meshEmail));
       }
       success(files);
     }).catch((err)=>{
@@ -157,23 +30,18 @@ exports.listFilesById = function(token,fileId) {
   });
 }
 
-exports.listFilesRoot = function(token,email) {
+exports.listFilesRoot = function(token,email,meshEmail) {
   return new Promise((success,failure)=>
   {
     oneDrive.items.listChildren({
       accessToken: token.access_token
-    }).then((childrens) => {
-      var returnObj={};
-      returnObj.email=email;
-      returnObj.drive="onedrive";
+    }).then(async (childrens) => {
       var files=[];
       for (let index = 0; index < childrens.value.length; index++) {
         const file = childrens.value[index];
-        files.push(getMeshDriveFileObjectFromOneDrive(file));
+        files.push(await getMeshDriveFileObjectFromOneDrive(file,email,meshEmail));
       }
-      returnObj.files=files;
-
-      success(returnObj);
+      success(files);
     }).catch((err)=>{
       failure(err.error);
     });
@@ -317,17 +185,122 @@ exports.getUserDetails = function(token){
   });
 }
 
+exports.getOneDriveAuthRedirectLink = function(clientId,userData){
+  var redirectUri=AUTH_BASE_URL+"client_id="+clientId+
+                  "&response_type=code&redirect_uri="+
+                  REDIRECT_URI+"&response_mode=query&scope="+
+                  SCOPES+"&state="+userData;
+  return redirectUri;
+}
 
-function getMeshDriveFileObjectFromOneDrive(file)
+
+exports.createAuth=function(credentials)
+{
+  const {client_secret, client_id} = JSON.parse(credentials).web;
+	return oAuth2Client = new oneDrive.auth.OAuth2(
+	client_id, client_secret, REDIRECT_URI);
+}
+
+exports.refreshToken = function(clientID,token)
+{
+  return new Promise((success,failure)=>{
+    if(checkTokenExpiration(token))
+    {
+      request({
+        url:TOKEN_BASE_URL,
+        method:"POST",
+        headers:{
+          "content-type":"application/x-www-form-urlencoded"
+        },
+        body:"client_id="+clientID+"&scope="+SCOPES+
+        "&refresh_token="+token.refresh_token+"&redirect_uri="+
+          REDIRECT_URI+"&grant_type=refresh_token"+"&client_secret="+CLIENT_SECRET
+      },(error,response,body)=>{
+         if(error)
+         {
+           return failure(error);
+         }
+           
+          else
+          {
+            token=JSON.parse(body);
+            token.updated=true;
+            return success(token);
+          }
+            
+      });
+    }
+    else
+    {
+      token.updated=false;
+      return success(token);
+    }
+  });
+}
+
+
+function checkTokenExpiration(token)
+{
+  var start=moment(token.LastModifiedOn,'YYYY-MM-DD HH:mm:ss');
+	var end=moment(moment.now());
+  if(end.diff(start,'seconds')>=token.expires_in)
+    return true;
+  else
+    return false;
+
+}
+
+exports.getTokenFromCode = function(code,clientID){
+  return new Promise((success,failure)=>
+  {
+    request({
+      url:TOKEN_BASE_URL,
+      method:"POST",
+      headers:{
+        "content-type":"application/x-www-form-urlencoded"
+      },
+      body:"client_id="+clientID+"&scope="+SCOPES+"&code="+code+"&redirect_uri="+
+        REDIRECT_URI+"&grant_type=authorization_code"+"&client_secret="+CLIENT_SECRET
+    },(error,response,body)=>{
+        if(error)
+          failure(error);
+        else
+          success(body);
+    });
+  });
+}
+
+
+
+async function getMeshDriveFileObjectFromOneDrive(file,email,meshEmail)
 {
   var meshDriveFileObject={};
+  meshDriveFileObject.driveEmail=email;
+  meshDriveFileObject.drive="onedrive";
   meshDriveFileObject.id=file.id;
   meshDriveFileObject.name=file.name;
   meshDriveFileObject.createdTime=file.createdDateTime;
   meshDriveFileObject.parents=[file.parentReference.id];
+  meshDriveFileObject.size=file.size;
   if(file.folder)
     meshDriveFileObject.mimeType="folder";
   if(file.file)
     meshDriveFileObject.mimeType=file.file.mimeType;
+  meshDriveFileObject.fileTags= await tagsDAL.getTags(meshEmail,file);
   return meshDriveFileObject;
+}
+
+
+//Obsolete
+exports.listFiles = function(token) {
+  return new Promise((success,failure)=>
+  {
+    oneDrive.items.listChildren({
+      accessToken: token.access_token
+    }).then((childrens) => {
+      success(childrens.value);
+    }).catch((err)=>{
+      failure(err.error);
+    });
+  });
 }

@@ -141,31 +141,6 @@ router.delete('/RemoveGoogleAccountByEmail',Constants.checkAccessMiddleware,getG
 	});
 });
 
-//Gives back top 100 files from user's account(Unused route)
-router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
-	var token=req.token;
-	
-	Drive.createAuthOject(req.appCredentials,token)
-	.then((oAuth2Client)=>{
-		//userModule.saveToken(email,token);
-		Drive.listFiles(oAuth2Client)
-		.then((files)=>{
-			if (files.length) {
-				res.status(Constants.CODE_OK).json(files);
-			} else {
-				res.status(Constants.CODE_NO_CONTENT).json({message:"No files found"});
-			}
-		})
-		.catch((err)=>{
-			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
-		});
-	})
-	.catch((err)=>{
-		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
-	});
-})
-
-
 router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,function(req,res){
 	var listFilesAccount = req.body.listFilesAccount; //List of accounts to get files from
 	var accountTokenList=[];
@@ -204,11 +179,15 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 			var promises=[]; //Array of promises for listing each account files
 			for (let index = 0; index < accountTokenList.length; index++) {
 				var accountEmail=accountTokenList[index].email;
-				promises.push(Drive.listFilesRoot(oAuth2Clients[index],accountEmail)); //call for list file for each account and push those promises
+				promises.push(Drive.listFilesRoot(oAuth2Clients[index],accountEmail,req.userData.email)); //call for list file for each account and push those promises
 			}
 			//Wait for all promises to complete and return the response
-			Promise.all(promises).then(function(filesList){
-				res.status(Constants.CODE_OK).json(filesList);
+			Promise.all(promises).then(function(filesListForAccounts){
+				var resFiles=[];
+				filesListForAccounts.forEach(accountFiles => {
+					resFiles=resFiles.concat(accountFiles);
+				});
+				res.status(Constants.CODE_OK).json(resFiles);
 			}).catch((err)=>{
 				res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
 			});
@@ -223,22 +202,18 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getGoogleDrive
 
 router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	var fileId=req.body.fileId; //FileId to list files and folders for it
-	var listAccountEmail = req.body.listFilesAccount; //Account email sent by the client to list files for
+	var listAccountEmail = req.body.googleDriveEmail; //Account email sent by the client to list files for
 	var token=req.token;
-	
 	Drive.createAuthOject(req.appCredentials,token)
 	.then((oAuth2Client)=>{
 		//userModule.saveToken(email,token);
-		Drive.listFilesById(oAuth2Client,fileId)
+		Drive.listFilesById(oAuth2Client,fileId,listAccountEmail,req.userData.email)
 		.then((files)=>{
-			//Creating this response structure just to match listRootFiles structure
-			var response=[];
-			var driveFiles={};
-			driveFiles.files=files;
-			driveFiles.email=listAccountEmail;
-			driveFiles.drive="googleDrive";
-			response.push(driveFiles);
-			res.status(Constants.CODE_OK).json(response);
+			var resObject={};
+			resObject.success=true;
+			resObject.parent=fileId;
+			resObject.files=files;
+			res.status(Constants.CODE_OK).json(resObject);
 		})
 		.catch((err)=>{
 			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
@@ -429,11 +404,15 @@ module.exports.rootFilesMiddleware=function(req,res,next){
 				var promises=[]; //Array of promises for listing each account files
 				for (let index = 0; index < accountTokenList.length; index++) {
 					var accountEmail=accountTokenList[index].email;
-					promises.push(Drive.listFilesRoot(oAuth2Clients[index],accountEmail)); //call for list file for each account and push those promises
+					promises.push(Drive.listFilesRoot(oAuth2Clients[index],accountEmail,req.userData.email)); //call for list file for each account and push those promises
 				}
 				//Wait for all promises to complete and return the response
-				Promise.all(promises).then(function(filesList){
-					res.locals.data=res.locals.data.concat(filesList);
+				Promise.all(promises).then(function(filesListForAccounts){
+					var resFiles=res.locals.data;
+					filesListForAccounts.forEach(accountFiles => {
+						resFiles=resFiles.concat(accountFiles);
+					});
+					res.locals.data=resFiles;
 					next();
 					//res.status(Constants.CODE_OK).json(filesList);
 				}).catch((err)=>{
@@ -457,5 +436,30 @@ module.exports.rootFilesMiddleware=function(req,res,next){
 		//return res.status(Constants.CODE_NO_CONTENT).json({message:"User has no Google Drive accounts",err:err});
 	});
 }
+
+//Obselete
+//Gives back top 100 files from user's account(Unused route)
+router.post('/ListDriveFiles',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+	var token=req.token;
+	
+	Drive.createAuthOject(req.appCredentials,token)
+	.then((oAuth2Client)=>{
+		//userModule.saveToken(email,token);
+		Drive.listFiles(oAuth2Client)
+		.then((files)=>{
+			if (files.length) {
+				res.status(Constants.CODE_OK).json(files);
+			} else {
+				res.status(Constants.CODE_NO_CONTENT).json({message:"No files found"});
+			}
+		})
+		.catch((err)=>{
+			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
+		});
+	})
+	.catch((err)=>{
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
+	});
+})
 
 module.exports.router = router;

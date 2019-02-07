@@ -140,7 +140,7 @@ router.post("/", function (req, res) {
             //console.log(user);
         
             User.create(u).then((user)=>{
-                   
+                
                 console.log("sending email");
                 //sending the verification link
                 sendVerificationLink(user.email,user.id)
