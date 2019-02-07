@@ -3,17 +3,18 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import FileItem from "../../components/FileItem/FileItem";
 import intruptApiRequest from "../../actions/api/intruptApiRequest";
-import fetchRootFiles from "../../actions/files/fetchRootFiles";
-const dateformat = require('dateformat');
-var filterType = require('../Filtering/FilterTypes');
+import fetchRootFilesAllDrives from "../../actions/files/fetchRootFilesAllDrives";
+const dateformat = require("dateformat");
+var filterType = require("../Filtering/FilterTypes");
 class FilesList extends Component {
   state = {
-    fileItems: [],
+    parent: "",
+    files: [],
     componentDidUpdated: false
   };
 
   componentDidMount() {
-    this.props.fetchRootFiles(this.props.drive);
+    this.props.fetchRootFilesAllDrives();
   }
 
   componentWillUnmount() {
@@ -24,9 +25,10 @@ class FilesList extends Component {
     if (
       JSON.stringify(prevProps.files) !== JSON.stringify(this.props.files) ||
       JSON.stringify(prevProps.fileNavigation) !==
-      JSON.stringify(this.props.fileNavigation)
+        JSON.stringify(this.props.fileNavigation)
     ) {
-      let allFiles =this.props.files.files;
+      const { parent, files } = this.props.files;
+
       // const drives = this.props.files;
       // if (drives[Symbol.iterator] !== undefined) {
       //   for (let driveItem of drives) {
@@ -43,7 +45,7 @@ class FilesList extends Component {
       //     );
       //   }
       // }
-      this.setState({ fileItems: allFiles, componentDidUpdated: true });
+      this.setState({ parent, files, componentDidUpdated: true });
     }
   }
 
@@ -76,17 +78,21 @@ class FilesList extends Component {
 
   render() {
     console.log("rENDERINGGGGGG");
-    var fileItems = this.sortFileItems(this.state.fileItems);
+    var fileItems = this.sortFileItems(this.state.files);
     var toBeFiltered = fileItems;
     //______________ SEARCHING _____________________
     console.log(this.props.searchKeyword.keywords);
-    if (this.props.searchKeyword.keywords != '') {
+    if (this.props.searchKeyword.keywords != "") {
       fileItems = fileItems.filter(file => {
-        if (file.name.toUpperCase().includes(this.props.searchKeyword.keywords.toUpperCase()) == true) {
+        if (
+          file.name
+            .toUpperCase()
+            .includes(this.props.searchKeyword.keywords.toUpperCase()) == true
+        ) {
           return file;
         }
       });
-    };
+    }
     //______________ FILTERING _____________________
 
     let flag = false;
@@ -105,7 +111,10 @@ class FilesList extends Component {
       }
       if (this.props.filters.Type[2][filterType.Spreadsheets] == true) {
         flag = true;
-        if (file.mimeType.includes("spreadsheet") || file.mimeType.includes("xls")) {
+        if (
+          file.mimeType.includes("spreadsheet") ||
+          file.mimeType.includes("xls")
+        ) {
           return file;
         }
       }
@@ -117,7 +126,11 @@ class FilesList extends Component {
       }
       if (this.props.filters.Type[4][filterType.Videos] == true) {
         flag = true;
-        if (file.mimeType.includes("mp4") || file.mimeType.includes("avi") || file.mimeType.includes("mkv")) {
+        if (
+          file.mimeType.includes("mp4") ||
+          file.mimeType.includes("avi") ||
+          file.mimeType.includes("mkv")
+        ) {
           return file;
         }
       }
@@ -129,8 +142,8 @@ class FilesList extends Component {
       }
       if (this.props.filters.CreationTime[0][filterType.Today] == true) {
         flag = true;
-        var today = dateformat(new Date(), 'yyyy-mm-dd');
-        var fileDate = dateformat(file.createdTime, 'yyyy-mm-dd');
+        var today = dateformat(new Date(), "yyyy-mm-dd");
+        var fileDate = dateformat(file.createdTime, "yyyy-mm-dd");
         if (fileDate == today) {
           return file;
         }
@@ -138,7 +151,7 @@ class FilesList extends Component {
       if (this.props.filters.CreationTime[1][filterType.ThisWeek] == true) {
         // flag=true;
         //   var today = dateformat(new Date(),'yyyy-mm-dd');
-        //  var fileDate = dateformat(file.createdTime,'yyyy-mm-dd');           
+        //  var fileDate = dateformat(file.createdTime,'yyyy-mm-dd');
         //   if(fileDate==today)
         //   {
         //       return file;
@@ -146,8 +159,8 @@ class FilesList extends Component {
       }
       if (this.props.filters.CreationTime[2][filterType.ThisMonth] == true) {
         flag = true;
-        var today = dateformat(new Date(), 'yyyy-mm');
-        var fileDate = dateformat(file.createdTime, 'yyyy-mm');
+        var today = dateformat(new Date(), "yyyy-mm");
+        var fileDate = dateformat(file.createdTime, "yyyy-mm");
         console.log(today);
         console.log(fileDate);
         if (fileDate == today) {
@@ -156,18 +169,16 @@ class FilesList extends Component {
       }
       if (this.props.filters.CreationTime[3][filterType.ThisYear] == true) {
         flag = true;
-        var today = dateformat(new Date(), 'yyyy');
-        var fileDate = dateformat(file.createdTime, 'yyyy');
+        var today = dateformat(new Date(), "yyyy");
+        var fileDate = dateformat(file.createdTime, "yyyy");
         console.log(fileDate);
         if (fileDate == today) {
           return file;
         }
       }
     });
-    if (filtered.length != 0)
-      fileItems = filtered;
-    if (flag == true)
-      fileItems = filtered;
+    if (filtered.length != 0) fileItems = filtered;
+    if (flag == true) fileItems = filtered;
 
     //______________ FILTERING _____________________
     console.log(fileItems);
@@ -179,7 +190,6 @@ class FilesList extends Component {
           key={file.id}
           file={file}
           isFileActive={isFileActive}
-          drive={this.props.drive}
         />
       );
     });
@@ -187,7 +197,7 @@ class FilesList extends Component {
     let display;
     if (this.state.componentDidUpdated === false) {
       display = "Loading...";
-    } else if (this.state.fileItems.length === 0) {
+    } else if (this.state.files.length === 0) {
       display = "No file exist or no drive added";
     } else if (fileItems.length === 0) {
       display = "No such file exists in your drives";
@@ -203,7 +213,13 @@ class FilesList extends Component {
   }
 }
 
-function mapStateToProps({ filters, fileNavigation, files, activeFileIds, searchKeyword }) {
+function mapStateToProps({
+  filters,
+  fileNavigation,
+  files,
+  activeFileIds,
+  searchKeyword
+}) {
   return {
     fileNavigation,
     files,
@@ -214,5 +230,5 @@ function mapStateToProps({ filters, fileNavigation, files, activeFileIds, search
 }
 export default connect(
   mapStateToProps,
-  { fetchRootFiles, intruptApiRequest }
+  { fetchRootFilesAllDrives, intruptApiRequest }
 )(FilesList);

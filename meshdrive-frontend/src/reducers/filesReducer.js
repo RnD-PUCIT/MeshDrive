@@ -8,21 +8,18 @@ import {
 } from "../actions/files/types";
 
 const initialFilesState = {
-  parent:'',
-  success:false,
-  files:[]
+  parent: "",
+  success: false,
+  files: []
 };
 
 export default function(state = initialFilesState, action) {
-  switch (action.type) {
-    case FETCH_FILES:
-    {
-      state = action.payload;
-      const newState = Object.assign(state);
-    
-      return newState;
+  const { type, payload } = action;
+
+  switch (type) {
+    case FETCH_FILES: {
+      return payload;
     }
-    
 
     case UPLOAD_FILE:
       console.log(action);
@@ -41,20 +38,18 @@ export default function(state = initialFilesState, action) {
       return state;
     }
 
-    case FETCH_FILE_TAG:{
+    case FETCH_FILE_TAG: {
       let fileInfo = action.file;
-      let tagsList = action.payload;   
-     
-           state.files.forEach(file=>{
-              if(file.id===fileInfo.fileId)
-                {
-                  file.tagsList = tagsList;                     
-                }
-           });
-    
-      return state;  
-    
-  }
+      let tagsList = action.payload;
+
+      state.files.forEach(file => {
+        if (file.id === fileInfo.fileId) {
+          file.tagsList = tagsList;
+        }
+      });
+
+      return state;
+    }
 
     default:
       return state;
