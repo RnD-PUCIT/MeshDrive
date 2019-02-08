@@ -16,12 +16,13 @@ export default function downloadFile(drive, downloadFileAccount, file) {
     const { user } = state;
     const { token } = user;
 
-    console.log(drive);
+    console.log(drive.toUpperCase());
    // debugger;
 
-    switch (drive) {
+    switch (drive.toUpperCase()) {
       case GOOGLEDRIVE:
       let googleDriveEmail = downloadFileAccount;
+      console.log("download req starts");
         axios({
           url: apiRoutes.files.downloadFile(
             googleDriveEmail,
@@ -32,6 +33,7 @@ export default function downloadFile(drive, downloadFileAccount, file) {
           headers: { "Content-Type": "application/json" },
           responseType: "blob" // important
         }).then(response => {
+          console.log("download req ends");
           const blob = new Blob([response.data], { type: response.data.type });
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement("a");
