@@ -54,6 +54,7 @@ class FileItem extends Component {
   // shouldComponentUpdate(nextProps) {
   //   return !jsonCompare(nextProps.file, this.props.file) || !jsonCompare(nextProps.user, this.props.user);
   // }
+
   componentDidUpdate() {
     console.log("COMP DID UPDATE");
     // this.setState({
@@ -63,7 +64,6 @@ class FileItem extends Component {
   }
   toggle() {
     const { file } = this.props;
-    console.log("I AM CLICKKED");
     let tl = JSON.parse(JSON.stringify(file.tagsList));
     console.log(tl);
     this.setState({
@@ -114,8 +114,10 @@ class FileItem extends Component {
     fileInfo.driveType = file.drive;
     fileInfo.fileId = file.id;
     switch (menu) {
-      case "download":
-        return this.props.downloadFile(this.props.drive, file.driveEmail, file);
+      case "download":{
+        console.log(file.driveEmail,file);
+        return this.props.downloadFile(this.props.file.drive, file.driveEmail, file);
+      }
       case "tag": {
         console.log("I AM CLICKED");
         this.toggle();
