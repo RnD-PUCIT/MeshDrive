@@ -297,6 +297,14 @@ router.post('/Authenticate',AppConstants.checkAccessMiddleware,(req,res)=>{
 
 });
 
+router.post('/token',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
+  
+  var dropboxAccount=req.dropboxAccount;
+  var token=dropboxAccount.token;
+  res.status(AppConstants.CODE_OK).json(token);
+  
+})
+
 //complete with multiple dbx accounts
 router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
     
