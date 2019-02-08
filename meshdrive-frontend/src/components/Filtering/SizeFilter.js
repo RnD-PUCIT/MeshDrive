@@ -31,7 +31,7 @@ class SizeFilters extends Component {
     render() {
         return (
             <span style={{margin:'5px'}}>                <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-                    <DropdownToggle caret className="btn-gradient" >
+                    <DropdownToggle caret color="danger" outline >
                         Size
   </DropdownToggle>
                     <DropdownMenu
