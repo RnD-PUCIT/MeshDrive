@@ -286,7 +286,7 @@ async function getMeshDriveFileObjectFromOneDrive(file,email,meshEmail)
     meshDriveFileObject.mimeType="folder";
   if(file.file)
     meshDriveFileObject.mimeType=file.file.mimeType;
-  meshDriveFileObject.fileTags= await tagsDAL.getTags(meshEmail,file);
+  meshDriveFileObject.tagsList= await tagsDAL.getTags(meshEmail,file);
   return meshDriveFileObject;
 }
 

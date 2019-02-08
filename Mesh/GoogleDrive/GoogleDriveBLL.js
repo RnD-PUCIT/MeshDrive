@@ -25,7 +25,7 @@ exports.listFilesById = function(auth,fileId,email,meshEmail) {
             res.data.files[i].mimeType="folder";
           res.data.files[i].driveEmail=email;
           res.data.files[i].drive="googledrive";
-          res.data.files[i].fileTags= await tagsDAL.getTags(meshEmail,res.data.files[i]);
+          res.data.files[i].tagsList= await tagsDAL.getTags(meshEmail,res.data.files[i]);
         }
         success(res.data.files);
       });
@@ -53,7 +53,7 @@ exports.listFilesRoot = function(auth,email,meshEmail) {
             res.data.files[i].mimeType= "folder";
           res.data.files[i].driveEmail= email;
           res.data.files[i].drive= "googledrive";
-          res.data.files[i].fileTags= await tagsDAL.getTags(meshEmail,res.data.files[i]);
+          res.data.files[i].tagsList= await tagsDAL.getTags(meshEmail,res.data.files[i]);
         }
         success(res.data.files);
       });

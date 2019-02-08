@@ -12,7 +12,7 @@ function MetaDataFormat(email,driveEmail)
     this.meshUserEmail=email;
     this.driveEmail=driveEmail;
 
-    console.log(this.driveEmail,this.meshUserEmail);
+    //console.log(this.driveEmail,this.meshUserEmail);
   
 }
 MetaDataFormat.prototype.parseDropboxFile= async function(file){
@@ -24,7 +24,8 @@ MetaDataFormat.prototype.parseDropboxFile= async function(file){
     obj["driveEmail"]=this.driveEmail;
     obj["drive"]="dropbox";
     if(obj["mimeType"]!=="folder")
-    {         
+    {      
+        obj["createdTime"]=file["server_modified"];
         obj["size"]=file[DropboxTags.TAG_SIZE];
     }
     if(mime.lookup(obj["name"])!==false)
