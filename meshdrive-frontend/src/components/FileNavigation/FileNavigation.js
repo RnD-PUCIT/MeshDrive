@@ -12,7 +12,7 @@ import {
 import { ButtonGroup, Button } from "reactstrap";
 import FAIcon from "../FontAwesomeIcon/FontAwesomeIcon";
 import { connect } from "react-redux";
-import fetchRootFiles from "../../actions/files/fetchRootFiles";
+import fetchRootFilesAllDrives from "../../actions/files/fetchRootFilesAllDrives";
 import fetchFilesById from "../../actions/files/fetchFilesById";
 import navigateTo from "../../actions/filenavigation/navigateTo";
 import navigateToHome from "../../actions/filenavigation/navigateToHome";
@@ -31,12 +31,16 @@ class FileNavigation extends Component {
   handleReloadClick = () => {
     const { historyStack } = this.props.fileNavigation;
     const top = historyStack[historyStack.length - 1];
-    const { drive, parent, listFilesAccount } = top;
 
-    if (top.parent === "root") {
-      this.props.fetchRootFiles(drive, true);
-    } else {
-      this.props.fetchFilesById(drive, listFilesAccount, parent, true);
+    if (top.parent === "") {
+      this.props.fetchRootFilesAllDrives(true);
+    } else if (top.files.length > 0) {
+      this.props.fetchFilesById(
+        top.files[0].drive,
+        top.files[0].driveEmail,
+        top.parent,
+        true
+      );
     }
   };
   handleUpOneLevelClick = () => {
@@ -47,8 +51,7 @@ class FileNavigation extends Component {
     const { historyStack } = this.props.fileNavigation;
 
     const currentFolder = historyStack[historyStack.length - 1];
-    const isHomeEnabled =
-      historyStack.length > 0 && currentFolder.parent !== "root";
+    const isHomeEnabled = currentFolder && currentFolder.parent !== "";
     const isReloadEnabled = historyStack.length > 0;
     const isUpOneLevelEnabled = historyStack.length > 1;
     const isNewFolderEnabled = true; //historyStack.length > 0;
@@ -90,7 +93,7 @@ function mapStateToProps({ fileNavigation }) {
 export default connect(
   mapStateToProps,
   {
-    fetchRootFiles,
+    fetchRootFilesAllDrives,
     fetchFilesById,
     navigateTo,
     navigateToHome,

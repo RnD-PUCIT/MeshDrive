@@ -1,10 +1,8 @@
 export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/meshdrive/";
 
-const ngrokUrl = localStorage.getItem("ngrok");
+const ngrokUrl = "http://test-depositoryworks.ngrok.io";
 
-export const apiBaseUrl = ngrokUrl
-  ? "http://6a9a0fff.ngrok.io"
-  : "http://6a9a0fff.ngrok.io";
+export const apiBaseUrl = ngrokUrl || "http://localhost:8000";
 
 //http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
@@ -71,15 +69,17 @@ export const apiRoutes = {
       `${apiBaseUrl}/users/ListDriveAccounts/${token}`,
     removeAllGoogleAccounts: `${apiBaseUrl}/GoogleDrive/RemoveAllGoogleAccounts/`,
     removeGoogleAccountByEmail: `${apiBaseUrl}/GoogleDrive/RemoveGoogleAccountByEmail`,
-     listTags: `${apiBaseUrl}/users/ListTags`,
+    listTags: `${apiBaseUrl}/users/ListTags`,
     createTag: `${apiBaseUrl}/users/createTag`,
-    deleteTag:`${apiBaseUrl}/users/deleteTag`,
-    editTag:`${apiBaseUrl}/users/editTag`
+    deleteTag: `${apiBaseUrl}/users/deleteTag`,
+    editTag: `${apiBaseUrl}/users/editTag`
   },
   files: {
+    listRootFilesAllDrives: `${apiBaseUrl}/listRootFilesAllDrives`,
+
     // google
     assignTagsToFile: `${apiBaseUrl}/files/AddTags`,
-    fetchTagsOfFile:`${apiBaseUrl}/files/getFileTags`,
+    fetchTagsOfFile: `${apiBaseUrl}/files/getFileTags`,
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
     listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
     listDriveFilesById: `${apiBaseUrl}/GoogleDrive/ListDriveFilesById`,
@@ -87,7 +87,7 @@ export const apiRoutes = {
       `${apiBaseUrl}/GoogleDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
       `${apiBaseUrl}/GoogleDrive/UploadFile/${fileName}/${mimeType}/${uploadFileEmail}/${token}`,
-      googledrive_createFolder: `${apiBaseUrl}/GoogleDrive/CreateFolder`,
+    googledrive_createFolder: `${apiBaseUrl}/GoogleDrive/CreateFolder`,
 
     // dropbox
     dropbox_listFiles: `${apiBaseUrl}/Dropbox/ListFiles`,

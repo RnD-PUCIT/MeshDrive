@@ -68,7 +68,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
     });
     postRequest.on("complete", response => {
       let responseUiComponent;
-      console.log({ response, statusCode: response.statusCode });
+      console.log("CONSOLEEEEEE",{ response, statusCode: response.statusCode });
       if (response.statusCode === 200) {
         window.location=`${rootURL}/#/uploadfile`;
         responseUiComponent = (

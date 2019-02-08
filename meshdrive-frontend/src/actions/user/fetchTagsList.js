@@ -18,7 +18,7 @@ export default function fetchTagsList() {
   return (dispatch, getState) => {
     const state = getState();
   
-    const { user } = state;
+    const { user,filters } = state;
     const { token,email} = user;
 
 
@@ -29,9 +29,14 @@ export default function fetchTagsList() {
          email,token
       })
       .then(response => {
-        const tagsList = response.data;
-
-        dispatch(shouldFetchTagsList( tagsList));
+        const data = response.data;
+        if(filters.tagsList.length===0)
+        {
+          filters.tagsList = data.tagsList;      
+          console.log("tags list assigned to filters");
+        }
+          
+        dispatch(shouldFetchTagsList( data));
 
         dispatch(finishApiRequest(null, true));
       })

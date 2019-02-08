@@ -36,12 +36,10 @@ class Dashboard extends Page {
           <h1>Home</h1>
           <FileNavigation /> 
           <div style={{marginTop:'10px'}}>
-          <SpeechSearchBar/>
           <Filtering/></div>
           <hr />
            {/* {<FilesList drive={ONEDRIVE} />} */}
-          {/* { <FilesList drive={DROPBOX} /> } */}
-          <FilesList drive={GOOGLEDRIVE} />
+          { <FilesList /> }
         </div>
         <SideBar secondary>
           {/* {activeFiles.length == 0
