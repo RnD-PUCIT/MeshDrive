@@ -78,9 +78,8 @@ console.log("tags filter "+filtered);
   applyTimeFilter(passedFiles) {
 
     if (this.props.filters.CreationTime[0][filterType.Today] == false &&
-      this.props.filters.CreationTime[1][filterType.ThisWeek] == false &&
-      this.props.filters.CreationTime[2][filterType.ThisMonth] == false &&
-      this.props.filters.CreationTime[3][filterType.ThisYear] == false
+      this.props.filters.CreationTime[1][filterType.ThisMonth] == false &&
+      this.props.filters.CreationTime[2][filterType.ThisYear] == false
     ) {
       return new Promise((resolve, reject) => { resolve(passedFiles) });
     }
@@ -99,17 +98,7 @@ console.log("tags filter "+filtered);
 
         }
       }
-      else if (this.props.filters.CreationTime[1][filterType.ThisWeek] == true) {
-        //   var today = dateformat(new Date(),'yyyy-mm-dd');
-        //   var weekBefore = dateformat(new Date(),'yyyy-mm-dd');
-        //   console.log("WEEK BEFORE => "+weekBefore);
-        //  var fileDate = dateformat(file.createdTime,'yyyy-mm-dd');
-        //   if(fileDate==today && file.createdTime!==undefined)
-        //   {
-        //       return file;
-        //   }
-      }
-      else if (this.props.filters.CreationTime[2][filterType.ThisMonth] == true) {
+      else if (this.props.filters.CreationTime[1][filterType.ThisMonth] == true) {
 
         var today = dateformat(new Date(), "yyyy-mm");
         var fileDate = dateformat(file.createdTime, "yyyy-mm");
@@ -121,7 +110,7 @@ console.log("tags filter "+filtered);
           return file;
         }
       }
-      else if (this.props.filters.CreationTime[3][filterType.ThisYear] == true) {
+      else if (this.props.filters.CreationTime[2][filterType.ThisYear] == true) {
 
         var today = dateformat(new Date(), "yyyy");
 

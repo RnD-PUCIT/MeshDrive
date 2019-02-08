@@ -7,7 +7,6 @@ module.exports.Audios="Audios";
 
 
 module.exports.Today="Today";
-module.exports.ThisWeek="This Week";
 module.exports.ThisMonth="This Month";
 module.exports.ThisYear="This Year";
 

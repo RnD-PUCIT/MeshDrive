@@ -2,7 +2,7 @@ import { DOWNLOAD_FILE } from "./types";
 import axios from "axios";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
-
+var fs = require('fs');
 export const downloadFileSuccess = () => {
   return {
     type: DOWNLOAD_FILE,
