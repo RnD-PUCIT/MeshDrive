@@ -7,9 +7,7 @@
 .SpeechSearchBar{
     height: 50px;
     align-content: center;
-    margin-left: 300px;
-
-    
+    margin-inline-start: 230px;
 }
 .hidden{
     display:none
