@@ -35,33 +35,24 @@ class Filtering extends Component {
     render() {
         const divStyle = {
             display: 'flex',
-            alignItems: 'center'
+            alignItems: 'center',
+            float:'right'
         };
+
         return (
             <React.Fragment>
 
                 <hr></hr>
-                <span  style={divStyle}>
-                    {/* <Button color="info" size="sm"
-                        onClick={() => this.setState({ collapse: !this.state.collapse })}
-                    >
-                        <FAIcon icon="filter" classes={["fa"]} />
-                        Filters
-                    </Button> */}
-               
-                {/* <Collapse isOpen={this.state.collapse}> */}
+                <SpeechSearchBar/>
                     <span style={divStyle}>
                         <TypeFilters />
                         <TimeFilters />
                         <DriveFilter/>
-                        <SizeFilter/>
                         <TagsFilter/>
-                        <SpeechSearchBar/>
+                        {/* <SizeFilter/> */}                  
                     </span>
-                    
-                {/* </Collapse> */}
-                </span>
-                <hr></hr>
+                   
+              
                
             </React.Fragment>
         );

@@ -21,6 +21,11 @@ class Dashboard extends Page {
       this.props.fetchTagsList();
   }
   render() {
+    const divStyle = {
+      display: 'flex',
+      alignItems: 'center',
+      float:'right'
+  };
     // const activeFiles = this.props.files.filter(file => {
     //   return this.props.activeFileIds.indexOf(file.id) !== -1;
     // });
@@ -33,12 +38,13 @@ class Dashboard extends Page {
           id="Dashboard"
           className="flex-grow-1 d-flex flex-column pl-4 pr-4"
         >
-          <h1>Home</h1>
+      
+          <h1>Home  </h1>
           <FileNavigation /> 
-          <div style={{marginTop:'10px'}}>
-          <Filtering/></div>
+          <div style={{marginTop:'5px'}}>
+          <Filtering/>
+          </div>
           <hr />
-           {/* {<FilesList drive={ONEDRIVE} />} */}
           { <FilesList /> }
         </div>
         <SideBar secondary>

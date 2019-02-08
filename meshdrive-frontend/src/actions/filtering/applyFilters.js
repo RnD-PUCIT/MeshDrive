@@ -52,10 +52,10 @@ export const setTimeFilter = (index,value)=>{
     };
   }
 
-  export const setSizeFilter = (index,value)=>{
+  export const setSizeFilter = (size,mode)=>{
     let obj = new Object();
-    obj.index=index;
-    obj.value=value;
+    obj.size=size;
+    obj.mode=mode;
     return dispatch => {
       dispatch({
         type: SET_SIZE_FILTER,

@@ -30,19 +30,34 @@ class TagsFilters extends Component {
     }
     render() {
         const items = this.props.user.tagsList.map(t => {
-            return(
+            return (
                 <DropdownItem
-                onClick={()=>this.props.setTagFilter(t.name)}>
-                {this.props.filters.tagsList.indexOf(t.name)!=-1?<FAIcon icon="check" classes={["fa"]}/>:" "} {t.name}</DropdownItem>
+                    onClick={() => this.props.setTagFilter(t.name)}>
+                    {this.props.filters.tagsList.indexOf(t.name) != -1 ? <FAIcon icon="check" classes={["fa"]} /> : " "} {t.name}</DropdownItem>
             );
         })
         return (
             <span style={{ margin: '5px' }}>
                 <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-                    <DropdownToggle caret color="success" outline={this.props.filters.tagsList.length == 0?"outline":""} >
+                    <DropdownToggle caret color="success" outline={this.props.filters.tagsList.length == 0 ? "outline" : ""} >
                         Tags / Labels
                     </DropdownToggle>
-                    <DropdownMenu>
+                    <DropdownMenu modifiers={{
+                        setMaxHeight: {
+                            enabled: true,
+                            order: 890,
+                            fn: (data) => {
+                                return {
+                                    ...data,
+                                    styles: {
+                                        ...data.styles,
+                                        overflow: 'auto',
+                                        maxHeight: 500,
+                                    },
+                                };
+                            },
+                        },
+                    }}>
 
                         {items}
 
