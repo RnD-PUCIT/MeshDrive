@@ -15,7 +15,9 @@ import TypeFilters from "./TypeFilters";
 import DriveFilter from "./DriveFilter";
 import SizeFilter from "./SizeFilter";
 import TagsFilter from "./TagsFilter";
+import SpeechSearchBar from "../SpeechSearching/SpeechSearchBar";
 var filterTypes = require('./FilterTypes');
+
 class Filtering extends Component {
     state = {
         collapse: false
@@ -54,7 +56,9 @@ class Filtering extends Component {
                         <DriveFilter/>
                         <SizeFilter/>
                         <TagsFilter/>
+                        <SpeechSearchBar/>
                     </span>
+                    
                 {/* </Collapse> */}
                 </span>
                 <hr></hr>

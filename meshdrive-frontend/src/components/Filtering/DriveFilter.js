@@ -36,9 +36,12 @@ class DriveFilters extends Component {
   </DropdownToggle>
                     <DropdownMenu
                     >
-                        <DropdownItem onClick={() => this.props.setDriveFilter(0, filterTypes.GD)}>Google Drive</DropdownItem>
-                        <DropdownItem onClick={() => this.props.setDriveFilter(1, filterTypes.OD)}>One Drive</DropdownItem>
-                        <DropdownItem onClick={() => this.props.setDriveFilter(2, filterTypes.DBX)}>Dropbox</DropdownItem>
+                        <DropdownItem onClick={() => this.props.setDriveFilter(0, filterTypes.GD)}
+                        className={this.props.filters["Drive"][0][filterTypes.GD]==true?"active":""}>Google Drive</DropdownItem>
+                        <DropdownItem onClick={() => this.props.setDriveFilter(1, filterTypes.OD)}
+                        className={this.props.filters["Drive"][1][filterTypes.OD]==true?"active":""}>One Drive</DropdownItem>
+                        <DropdownItem onClick={() => this.props.setDriveFilter(2, filterTypes.DBX)}
+                        className={this.props.filters["Drive"][2][filterTypes.DBX]==true?"active":""}>Dropbox</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
                 </span>

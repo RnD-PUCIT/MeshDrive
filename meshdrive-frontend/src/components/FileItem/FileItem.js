@@ -36,12 +36,13 @@ import jsonCompare from "../../utils/jsonCompare";
 class FileItem extends Component {
   constructor(props) {
     super(props);
+    const tl = this.props.file.tagsList;
     this.state = {
       active: this.props.isFileActive,
       modal: false,
       file: {},
       activeFile: null,
-      selectedTagsList: [],
+      selectedTagsList: tl,
       activeIndex: -1
     };
     this.isFolder = this.props.file.mimeType === "folder";
@@ -50,19 +51,21 @@ class FileItem extends Component {
     this.removeTag = this.removeTag.bind(this);
     // this.fetchAssignedTags = this.fetchAssignedTags.bind(this);
   }
-  shouldComponentUpdate(nextProps) {
-    return !jsonCompare(nextProps.file, this.props.file) || !jsonCompare(nextProps.user, this.props.user);
-  }
+  // shouldComponentUpdate(nextProps) {
+  //   return !jsonCompare(nextProps.file, this.props.file) || !jsonCompare(nextProps.user, this.props.user);
+  // }
   componentDidUpdate() {
     console.log("COMP DID UPDATE");
-    this.setState({
-      selectedTagsList: this.props.file.tagsList,
-      file: this.props.file
-    });
+    // this.setState({
+    //   selectedTagsList: this.props.file.tagsList,
+    //   file: this.props.file
+    // });
   }
   toggle() {
     const { file } = this.props;
+    console.log("I AM CLICKKED");
     let tl = JSON.parse(JSON.stringify(file.tagsList));
+    console.log(tl);
     this.setState({
       modal: !this.state.modal,
       selectedTagsList: tl
@@ -114,6 +117,7 @@ class FileItem extends Component {
       case "download":
         return this.props.downloadFile(this.props.drive, file.driveEmail, file);
       case "tag": {
+        console.log("I AM CLICKED");
         this.toggle();
         return;
       }
@@ -186,7 +190,7 @@ class FileItem extends Component {
     //  }
     // else
     if (this.state.selectedTagsList.length === 0)
-      displayTags = <div> No Tags Assigned Yet</div>;
+      displayTags = <div> No Tags Assigned Yet <hr></hr></div>;
     else {
       displayTags = (
         <div className="assignedTags">

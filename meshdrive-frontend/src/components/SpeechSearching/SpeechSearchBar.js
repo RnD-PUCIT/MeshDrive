@@ -51,7 +51,9 @@ class SpeechSearchBar extends Component {
 
   handleOnchange = e => {
     this.setState({ [e.target.name]: e.target.value });
-    this.props.updateSearchKeywords(e.target.value);
+    if(e.target.value.length===0)
+      this.props.updateSearchKeywords(e.target.value);
+
   }
   render() {
     const { transcript, browserSupportsSpeechRecognition } = this.props

@@ -21,13 +21,13 @@ const initialState = {
     ],
     "Drive": [
         {
-            "Google Drive": false
+            "googledrive": false
         },
         {
-            "One Drive": false
+            "onedrive": false
         },
         {
-            "Dropbox": false
+            "dropbox": false
         }
     ],
     "Size":[
@@ -46,9 +46,34 @@ export default function (state = initialState, action) {
             state.Type[action.payload.index][action.payload.value] = !state.Type[action.payload.index][action.payload.value];
             return { ...state };
 
-        case SET_TIME_FILTER:
+        case SET_TIME_FILTER:{
             state.CreationTime[action.payload.index][action.payload.value] = !state.CreationTime[action.payload.index][action.payload.value];
+            if(action.payload.index==0)
+            {
+                state.CreationTime[1]["This Week"]=false;
+                state.CreationTime[2]["This Month"]=false;
+                state.CreationTime[3]["This Year"]=false;
+            }
+            else if(action.payload.index==1)
+            {
+                state.CreationTime[0]["Today"]=false;
+                state.CreationTime[2]["This Month"]=false;
+                state.CreationTime[3]["This Year"]=false;
+            }
+            if(action.payload.index==2)
+            {
+                state.CreationTime[1]["This Week"]=false;
+                state.CreationTime[0]["Today"]=false;
+                state.CreationTime[3]["This Year"]=false;
+            }
+            if(action.payload.index==3)
+            {
+                state.CreationTime[1]["This Week"]=false;
+                state.CreationTime[2]["This Month"]=false;
+                state.CreationTime[0]["Today"]=false;
+            }
             return { ...state };
+        }
 
         case SET_DRIVE_FILTER:
             state.Drive[action.payload.index][action.payload.value] = !state.Drive[action.payload.index][action.payload.value];
