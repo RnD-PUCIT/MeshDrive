@@ -228,11 +228,15 @@ router.post('/ListDriveRootFiles',Constants.checkAccessMiddleware,getOneDriveTok
 				{
 					OneDriveDAL.updateOneDriveToken(meshDriveEmail,accountEmail,token);
 				}
-				promises.push(Drive.listFilesRoot(token,accountEmail)); //call for list file for each account and push those promises
+				promises.push(Drive.listFilesRoot(token,accountEmail,req.userData.email)); //call for list file for each account and push those promises
 			}
 			//Wait for all promises to complete and return the response
-			Promise.all(promises).then(function(filesList){
-				res.status(Constants.CODE_OK).json(filesList);
+			Promise.all(promises).then(function(filesListForAccounts){
+				var resFiles=[];
+				filesListForAccounts.forEach(accountFiles => {
+					resFiles=resFiles.concat(accountFiles);
+				});
+				res.status(Constants.CODE_OK).json(resFiles);
 			});
 		}).catch((err)=>{
 			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
@@ -254,17 +258,13 @@ router.post('/ListDriveFilesById',Constants.checkAccessMiddleware,getOneDriveTok
 		{
 			OneDriveDAL.updateOneDriveToken(meshDriveEmail,oneDriveEmail,token);
 		}
-		Drive.listFilesById(token,fileId)
+		Drive.listFilesById(token,fileId,oneDriveEmail,req.userData.email)
 		.then((files)=>{
-			
-			//Creating this response structure just to match listRootFiles structure
-			var response=[];
-			var driveFiles={};
-			driveFiles.files=files;
-			driveFiles.email=oneDriveEmail;
-			driveFiles.drive="onedrive";
-			response.push(driveFiles);
-			res.status(Constants.CODE_OK).json(response);
+			var resObject={};
+			resObject.success=true;
+			resObject.parent=fileId;
+			resObject.files=files;
+			res.status(Constants.CODE_OK).json(resObject);
 		})
 		.catch((err)=>{
 			res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in listing files",err:err});
@@ -495,11 +495,15 @@ module.exports.rootFilesMiddleware=function(req,res,next){
 					{
 						OneDriveDAL.updateOneDriveToken(meshDriveEmail,accountEmail,token);
 					}
-					promises.push(Drive.listFilesRoot(token,accountEmail)); //call for list file for each account and push those promises
+					promises.push(Drive.listFilesRoot(token,accountEmail,req.userData.email)); //call for list file for each account and push those promises
 				}
 				//Wait for all promises to complete and return the response
-				Promise.all(promises).then(function(filesList){
-					res.locals.data=res.locals.data.concat(filesList);
+				Promise.all(promises).then(function(filesListForAccounts){
+					var resFiles=res.locals.data;
+					filesListForAccounts.forEach(accountFiles => {
+						resFiles=resFiles.concat(accountFiles);
+					});
+					res.locals.data=resFiles;
 					next();
 					//res.status(Constants.CODE_OK).json(filesList);
 				}).catch((err)=>{

@@ -26,6 +26,7 @@ export default function assignTagsToFile(obj) {
 
       }).then(response => {
         const {success,data}=response.data;
+        console.log("SSSSSSSSSS"+success);
         if(success==true)
         {
           dispatch(finishApiRequest(null, true, <SweetAlertWrapper success title="Tags Assigned">       
