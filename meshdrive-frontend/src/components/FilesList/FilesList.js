@@ -17,7 +17,6 @@ class FilesList extends Component {
     this.state = {
       parent: "",
       files: [],
-      filteredFiles: [],
       componentDidUpdated: false
     };
   }
@@ -31,7 +30,6 @@ class FilesList extends Component {
       this.setState({
         parent: nextProps.files.parent,
         files: nextProps.files.files,
-        filteredFiles: nextProps.files.files,
         componentDidUpdated: true
       });
     }
@@ -65,13 +63,23 @@ class FilesList extends Component {
   //   // this.setState({ componentDidUpdated: true });
   //   // debugger;
   // }
-
+  applyTagsFilter(passedFiles) {
+    if (this.props.filters.tagsList.length == 0)
+      return new Promise((resolve, reject) => { resolve(passedFiles) });
+    else {
+      const filtered= passedFiles.filter(file=>{
+        if(file.tagsList.some(t=>this.props.filters.tagsList.indexOf(t.name)>=0))
+        return file;
+      });
+console.log("tags filter "+filtered);
+      return new Promise((resolve, reject) => { resolve(filtered) });
+    }
+  }
   applyTimeFilter(passedFiles) {
 
     if (this.props.filters.CreationTime[0][filterType.Today] == false &&
-      this.props.filters.CreationTime[1][filterType.ThisWeek] == false &&
-      this.props.filters.CreationTime[2][filterType.ThisMonth] == false &&
-      this.props.filters.CreationTime[3][filterType.ThisYear] == false
+      this.props.filters.CreationTime[1][filterType.ThisMonth] == false &&
+      this.props.filters.CreationTime[2][filterType.ThisYear] == false
     ) {
       return new Promise((resolve, reject) => { resolve(passedFiles) });
     }
@@ -90,16 +98,7 @@ class FilesList extends Component {
 
         }
       }
-      else if (this.props.filters.CreationTime[1][filterType.ThisWeek] == true) {
-        // flag=true;
-        //   var today = dateformat(new Date(),'yyyy-mm-dd');
-        //  var fileDate = dateformat(file.createdTime,'yyyy-mm-dd');
-        //   if(fileDate==today)
-        //   {
-        //       return file;
-        //   }
-      }
-      else if (this.props.filters.CreationTime[2][filterType.ThisMonth] == true) {
+      else if (this.props.filters.CreationTime[1][filterType.ThisMonth] == true) {
 
         var today = dateformat(new Date(), "yyyy-mm");
         var fileDate = dateformat(file.createdTime, "yyyy-mm");
@@ -111,7 +110,7 @@ class FilesList extends Component {
           return file;
         }
       }
-      else if (this.props.filters.CreationTime[3][filterType.ThisYear] == true) {
+      else if (this.props.filters.CreationTime[2][filterType.ThisYear] == true) {
 
         var today = dateformat(new Date(), "yyyy");
 
@@ -261,16 +260,12 @@ class FilesList extends Component {
       });
     }
     //______________ FILTERING _____________________
-    console.log(" START FILTERING ");
-
     // this.applyDriveFilter(fileItems).then((driveFiles)=>{
     //   console.log("Drive files: "+ driveFiles);
     //   this.applyTimeFilter(driveFiles).then((timeFiles)=>{
     //     console.log("Time files: "+ timeFiles);
     //     this.applyTypeFilter(timeFiles).then((typeFiles)=>{
     //       console.log("Type files: "+ typeFiles);
-
-
     //     });
 
     //   });
@@ -284,7 +279,7 @@ class FilesList extends Component {
 
 
 
-    
+
     // seperate folders
 
     // const mapFilesList = fileItems.map(file => {
@@ -307,13 +302,15 @@ class FilesList extends Component {
       <Async promise={this.applyDriveFilter(fileItems)} then={(driveFiles) =>
         <Async promise={this.applyTimeFilter(driveFiles)} then={(timeFiles) =>
           <Async promise={this.applyTypeFilter(timeFiles)} then={(typeFiles) =>
+            <Async promise={this.applyTagsFilter(typeFiles)} then={(tagsFiles) =>
             <React.Fragment>
               <div className="files-list d-flex flex-row flex-wrap">{
-                !this.state.componentDidUpdated? "Loading.. Please Wait" : typeFiles.map(file => {
+                !this.state.componentDidUpdated ? "Loading.. Please Wait" : tagsFiles.map(file => {
                   const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;
                   return <FileItem key={file.id} file={file} isFileActive={isFileActive} />;
                 })}</div>
             </React.Fragment>
+             } />
           } />
         } />
       } />

@@ -17,14 +17,12 @@ export function setTypeFilter(index, value){
   };
 }
 
-export function setTagFilter(index, value){
-  let obj = new Object();
-  obj.index=index;
-  obj.value=value;
+export function setTagFilter(value){
 return dispatch => {
+  console.log(value);
   dispatch({
     type: SET_TAG_FILTER,
-    payload: obj
+    payload: value
   });
 };
 }
@@ -54,10 +52,10 @@ export const setTimeFilter = (index,value)=>{
     };
   }
 
-  export const setSizeFilter = (index,value)=>{
+  export const setSizeFilter = (size,mode)=>{
     let obj = new Object();
-    obj.index=index;
-    obj.value=value;
+    obj.size=size;
+    obj.mode=mode;
     return dispatch => {
       dispatch({
         type: SET_SIZE_FILTER,

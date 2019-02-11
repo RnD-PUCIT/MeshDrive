@@ -5,10 +5,7 @@
     margin-right: 5px
 }
 .SpeechSearchBar{
-    height: 50px;
-    align-content: center;
-    margin-left: 300px;
-    
+    float: left;
 }
 .hidden{
     display:none

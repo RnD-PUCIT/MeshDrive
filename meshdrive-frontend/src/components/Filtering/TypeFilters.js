@@ -30,31 +30,36 @@ class TypeFilters extends Component {
     }
     render() {
         return (
-            <span style={{margin:'5px'}}>    
-                <Dropdown  isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-                    <DropdownToggle caret className="btn-gradient" >
+            <span style={{ margin: '5px' }}>
+                <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+                    <DropdownToggle caret color="warning" outline={(this.props.filters.Type[0][filterTypes.PDF] == false &&
+                        this.props.filters.Type[1][filterTypes.Word] == false &&
+                        this.props.filters.Type[2][filterTypes.Spreadsheets] == false &&
+                        this.props.filters.Type[3][filterTypes.Pictures] == false &&
+                        this.props.filters.Type[4][filterTypes.Videos] == false &&
+                        this.props.filters.Type[5][filterTypes.Audios] == false) ? "outline" : ""} >
                         File Type
   </DropdownToggle>
                     <DropdownMenu>
 
                         <DropdownItem onClick={() => this.props.setTypeFilter(0, filterTypes.PDF)}
-                         className={this.props.filters["Type"][0][filterTypes.PDF]==true?"active":""}>PDF Documents</DropdownItem>
+                        > {this.props.filters["Type"][0][filterTypes.PDF] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "} PDF Documents</DropdownItem>
                         <DropdownItem onClick={() => this.props.setTypeFilter(1, filterTypes.Word)}
-                         className={this.props.filters["Type"][1][filterTypes.Word]==true?"active":""}>Word Documents</DropdownItem>
+                        > {this.props.filters["Type"][1][filterTypes.Word] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "} Word Documents</DropdownItem>
                         <DropdownItem onClick={() => this.props.setTypeFilter(2, filterTypes.Spreadsheets)}
-                         className={this.props.filters["Type"][2][filterTypes.Spreadsheets]==true?"active":""}>Spreadsheets</DropdownItem>
+                        >{this.props.filters["Type"][2][filterTypes.Spreadsheets] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "} Spreadsheets</DropdownItem>
                         <DropdownItem onClick={() => this.props.setTypeFilter(3, filterTypes.Pictures)}
-                         className={this.props.filters["Type"][3][filterTypes.Pictures]==true?"active":""}>Pictures</DropdownItem>
+                        >{this.props.filters["Type"][3][filterTypes.Pictures] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "} Pictures</DropdownItem>
                         <DropdownItem onClick={() => this.props.setTypeFilter(4, filterTypes.Videos)}
-                         className={this.props.filters["Type"][4][filterTypes.Videos]==true?"active":""}>Video</DropdownItem>
+                        > {this.props.filters["Type"][4][filterTypes.Videos] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "} Video</DropdownItem>
                         <DropdownItem onClick={() => this.props.setTypeFilter(5, filterTypes.Audios)}
-                         className={this.props.filters["Type"][5][filterTypes.Audios]==true?"active":""}>Audio</DropdownItem>
+                        > {this.props.filters["Type"][5][filterTypes.Audios] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "} Audio</DropdownItem>
 
 
                     </DropdownMenu>
                 </Dropdown>
-                </span>
-     
+            </span>
+
 
         )
     };

@@ -22,6 +22,7 @@ import "./style.css";
 import { ONEDRIVE } from "../../constants/strings";
 import NewFolderButtonAndModal from "./NewFolderButtonAndModal";
 
+
 class FileNavigation extends Component {
   handleHomeClick = () => {
     console.log("HOME");
@@ -55,7 +56,11 @@ class FileNavigation extends Component {
     const isReloadEnabled = historyStack.length > 0;
     const isUpOneLevelEnabled = historyStack.length > 1;
     const isNewFolderEnabled = true; //historyStack.length > 0;
-
+    const divStyle = {
+      display: 'flex',
+      alignItems: 'center',
+      float:'right'
+  };
     return (
       <div id="FileNavigation" className="file-navigation-bar">
         <ButtonGroup>
@@ -73,7 +78,7 @@ class FileNavigation extends Component {
           <Button onClick={this.handleReloadClick} disabled={!isReloadEnabled}>
             <FAIcon icon="sync-alt" classes={["fa"]} /> Reload
           </Button>
-          <NewFolderButtonAndModal enabled={isNewFolderEnabled} />
+          <NewFolderButtonAndModal enabled={isNewFolderEnabled} /> 
           {/* 
           Will Implement this in future
           <Button>
