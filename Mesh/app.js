@@ -36,14 +36,14 @@ app.use(morganLogger('dev'));
 
 //Routers
 app.use('/Users',UserRouter);
-app.use('/GoogleDrive',GoogleDriveRouter);
+app.use('/GoogleDrive',GoogleDriveRouter.router);
 app.use('/Dropbox',DropboxRouter.router);
-app.use('/OneDrive',OneDriveRouter);
+app.use('/OneDrive',OneDriveRouter.router);
 app.use('/files',FileTagsRouter);
 
 function main()
 {
-    app.post('/listRootFilesAllDrives',AppConstants.checkAccessMiddleware,DropboxRouter.rootFilesMiddleware,(req,res)=>{
+    app.post('/listRootFilesAllDrives',AppConstants.checkAccessMiddleware,DropboxRouter.rootFilesMiddleware,GoogleDriveRouter.rootFilesMiddleware,OneDriveRouter.rootFilesMiddleware, (req,res)=>{
         var response=new Object();
         response["files"]=res.locals.data;
         response["success"]=true;
