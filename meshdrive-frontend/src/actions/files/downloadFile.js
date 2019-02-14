@@ -3,7 +3,7 @@ import axios from "axios";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import {Dropbox} from 'dropbox'
-import fetch from 'isomorphic-fetch'
+// import fetch from 'fetch'
 
 
 export const downloadFileSuccess = () => {
@@ -93,24 +93,8 @@ export default function downloadFile(drive, downloadFileAccount, file) {
           }).then((response)=>{
 
               var dbxAccessToken = response.data["access_token"];
-              console.log(response);
-             
-              // axios({
-              //   url:"https://content.dropboxapi.com/2/files/download",
-              //   method: "POST",
-              //   headers: { 'Authorization' :'Bearer '+dbxAccessToken,
-              //   'Dropbox-API-Arg': {"path":file.id }
-              // },
-              //   // responseType: "blob", // important
-
-              // }).then((data)=>{
-              //   console.log("response from http call")
-              //   console.log(data);
-              // }).catch((err)=>{
-              //   console.log(err);
-              // })
-             
-              var dropbox = new Dropbox({fetch});
+              console.log(response); 
+              var dropbox = new Dropbox();
               dropbox.setAccessToken(dbxAccessToken);
               var arg = {path : file.id}
               dropbox.filesDownload(arg)
@@ -126,7 +110,6 @@ export default function downloadFile(drive, downloadFileAccount, file) {
                   link.click();
                   link.remove();
                   window.URL.revokeObjectURL(url);
-
 
               }).catch((err)=>{
                 console.log(err);

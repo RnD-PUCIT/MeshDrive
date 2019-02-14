@@ -13,6 +13,7 @@
     "downloadjs": "^1.4.7",
     "dropbox": "^4.0.15",
     "dropbox-v2-api": "^2.1.22",
+    "fetch": "^1.1.0",
     "fs": "0.0.1-security",
     "isomorphic-fetch": "^2.2.1",
     "prop-types": "^15.6.2",
