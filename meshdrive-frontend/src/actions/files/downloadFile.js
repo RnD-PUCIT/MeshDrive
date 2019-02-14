@@ -2,10 +2,14 @@ import { DOWNLOAD_FILE } from "./types";
 import axios from "axios";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
+<<<<<<< HEAD
 import {Dropbox} from 'dropbox'
 // import fetch from 'fetch'
 
 
+=======
+var fs = require('fs');
+>>>>>>> 9a1cb409be8d97d2dd2ec4746e7ffe9000d4b01e
 export const downloadFileSuccess = () => {
   return {
     type: DOWNLOAD_FILE,

@@ -29,20 +29,19 @@ class SpeechSearchBar extends Component {
   changeListeningStatus = e => {
     this.setState({
       listening: !this.state.listening,
-      hideSpeechBar: !this.state.listening?false:true,
-      hideTextBar: !this.state.listening?true:false,
-      keywords:this.props.transcript
+      hideSpeechBar: !this.state.listening ? false : true,
+      hideTextBar: !this.state.listening ? true : false,
+      keywords: this.props.transcript
     });
-    if (!this.state.listening == true)
-    {
+    if (!this.state.listening == true) {
       this.props.resetTranscript();
       this.props.startListening();
     }
-    else{
+    else {
       this.props.stopListening();
       this.props.updateSearchKeywords(this.props.transcript);
-    }   
-   
+    }
+
   }
 
   searchKeywords = e => {
@@ -51,7 +50,7 @@ class SpeechSearchBar extends Component {
 
   handleOnchange = e => {
     this.setState({ [e.target.name]: e.target.value });
-    if(e.target.value.length===0)
+    if (e.target.value.length === 0)
       this.props.updateSearchKeywords(e.target.value);
 
   }
@@ -65,23 +64,23 @@ class SpeechSearchBar extends Component {
       <span onClick={this.props.onClick} class="SpeechSearchBar">
         <InputGroup>
           <InputGroupAddon addonType="append">
-            <Input style={this.state.hideTextBar == false ? {} : { display: 'none' }}
-              type="text" name="keywords" value={this.state.keywords} onChange={this.handleOnchange} />
-
-            <Input style={this.state.hideSpeechBar == false ? {} : { display: 'none' }}
-              type="text" name="speechKeywords" value={transcript} />
-
-          </InputGroupAddon>
-          <InputGroupAddon addonType="append">
-            <Button className={this.state.listening?"disabled":"btn-gradient"} onClick={() => { this.searchKeywords() }}> 
-            <FAIcon icon="search" classes={["fa"]} /></Button>
-          </InputGroupAddon>
-          <InputGroupAddon addonType="append">
 
             <Button onClick={() => { this.changeListeningStatus() }}
               className={this.state.listening == false ? "btn-gradient" : ""}
               color={this.state.listening == true ? "danger" : ""} >
               <FAIcon icon="microphone" classes={["fa"]} /></Button>
+
+          </InputGroupAddon>
+          <InputGroupAddon addonType="append">
+            <Button className={this.state.listening ? "disabled" : "btn-gradient"} onClick={() => { this.searchKeywords() }}>
+              <FAIcon icon="search" classes={["fa"]} /></Button>
+          </InputGroupAddon>
+          <InputGroupAddon addonType="append">
+            <Input style={this.state.hideTextBar == false ? {} : { display: 'none', width: '120px' }}
+              type="text" name="keywords" placeholder="Search..." value={this.state.keywords} onChange={this.handleOnchange} />
+
+            <Input style={this.state.hideSpeechBar == false ? {} : { display: 'none' }}
+              type="text" name="speehKeywords" value={transcript} />
 
           </InputGroupAddon>
         </InputGroup>

@@ -30,48 +30,43 @@ class TimeFilters extends Component {
     }
     render() {
         return (
-            <span style={{margin:'5px'}}>              
-              <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-                    <DropdownToggle caret className="btn-gradient">
+            <span style={{ margin: '5px' }}>
+                <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+                    <DropdownToggle caret color="secondary" outline={(this.props.filters["CreationTime"][0][filterTypes.Today] == false &&
+                        this.props.filters["CreationTime"][1][filterTypes.ThisMonth] == false &&
+                        this.props.filters["CreationTime"][2][filterTypes.ThisYear] == false) ? "outline" : ""}>
                         Creation Time
   </DropdownToggle>
                     <DropdownMenu
                     >
 
-                        <DropdownItem onClick={() => this.props.setTimeFilter(0, filterTypes.Today)} 
-                         className={this.props.filters["CreationTime"][0][filterTypes.Today]==true?"active":""}
-                       >
-                        Today
+                        <DropdownItem onClick={() => this.props.setTimeFilter(0, filterTypes.Today)}
+                        >
+                            {this.props.filters["CreationTime"][0][filterTypes.Today] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "}   Today
                         </DropdownItem>
 
-                    
-                        <DropdownItem onClick={() => this.props.setTimeFilter(1, filterTypes.ThisWeek)}
-                         className={this.props.filters["CreationTime"][1][filterTypes.ThisWeek]==true?"active":""}>
-                        This Week
+                        <DropdownItem onClick={() => this.props.setTimeFilter(1, filterTypes.ThisMonth)}
+                        >
+                            {this.props.filters["CreationTime"][1][filterTypes.ThisMonth] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "} This Month
                         </DropdownItem>
 
-                        <DropdownItem onClick={() => this.props.setTimeFilter(2, filterTypes.ThisMonth)}
-                         className={this.props.filters["CreationTime"][2][filterTypes.ThisMonth]==true?"active":""}>
-                        This Month
-                        </DropdownItem>
-
-                        <DropdownItem onClick={() => this.props.setTimeFilter(3, filterTypes.ThisYear)}
-                         className={this.props.filters["CreationTime"][3][filterTypes.ThisYear]==true?"active":""}>
-                        This Year
+                        <DropdownItem onClick={() => this.props.setTimeFilter(2, filterTypes.ThisYear)}
+                        >
+                            {this.props.filters["CreationTime"][2][filterTypes.ThisYear] == true ? <FAIcon icon="check" classes={["fa"]} /> : " "} This Year
                         </DropdownItem>
 
 
                     </DropdownMenu>
                 </Dropdown>
-                </span>
+            </span>
 
-   
+
         )
     };
 
 }
-function mapStateToProps({filters}) {
-   
-    return { filters};
+function mapStateToProps({ filters }) {
+
+    return { filters };
 }
 export default connect(mapStateToProps, { setTypeFilter, setTimeFilter })(requireAuth((TimeFilters)));

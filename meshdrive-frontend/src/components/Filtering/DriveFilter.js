@@ -31,17 +31,21 @@ class DriveFilters extends Component {
     render() {
         return (
             <span style={{margin:'5px'}}>                <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-                    <DropdownToggle caret className="btn-gradient">
-                        Drive
+                    <DropdownToggle caret color="info" outline={(this.props.filters.Drive[0][filterTypes.GD] == false &&
+      this.props.filters.Drive[1][filterTypes.OD] == false &&
+      this.props.filters.Drive[2][filterTypes.DBX] == false)?"outline":""}>
+                        Drive Type
   </DropdownToggle>
                     <DropdownMenu
                     >
-                        <DropdownItem onClick={() => this.props.setDriveFilter(0, filterTypes.GD)}
-                        className={this.props.filters["Drive"][0][filterTypes.GD]==true?"active":""}>Google Drive</DropdownItem>
+                        <DropdownItem onClick={() => this.props.setDriveFilter(0, filterTypes.GD)}>
+                        {this.props.filters["Drive"][0][filterTypes.GD]==true?<FAIcon icon="check" classes={["fa"]}/>:" "}  Google Drive</DropdownItem>
                         <DropdownItem onClick={() => this.props.setDriveFilter(1, filterTypes.OD)}
-                        className={this.props.filters["Drive"][1][filterTypes.OD]==true?"active":""}>One Drive</DropdownItem>
+                        >
+                        {this.props.filters["Drive"][1][filterTypes.OD]==true?<FAIcon icon="check" classes={["fa"]}/>:" "}  One Drive</DropdownItem>
                         <DropdownItem onClick={() => this.props.setDriveFilter(2, filterTypes.DBX)}
-                        className={this.props.filters["Drive"][2][filterTypes.DBX]==true?"active":""}>Dropbox</DropdownItem>
+                        >
+                        {this.props.filters["Drive"][2][filterTypes.DBX]==true?<FAIcon icon="check" classes={["fa"]}/>:" "}  Dropbox</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
                 </span>

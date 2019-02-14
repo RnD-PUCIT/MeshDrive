@@ -30,11 +30,11 @@ export default function fetchTagsList() {
       })
       .then(response => {
         const data = response.data;
-        if(filters.tagsList.length===0)
-        {
-          filters.tagsList = data.tagsList;      
-          console.log("tags list assigned to filters");
-        }
+        // if(filters.tagsList.length===0)
+        // {
+        //   filters.tagsList = data.tagsList;      
+        //   console.log("tags list assigned to filters");
+        // }
           
         dispatch(shouldFetchTagsList( data));
 
