@@ -16,6 +16,7 @@
     "fetch": "^1.1.0",
     "fs": "0.0.1-security",
     "isomorphic-fetch": "^2.2.1",
+    "path": "^0.12.7",
     "prop-types": "^15.6.2",
     "react": "^16.5.2",
     "react-bootstrap-sweetalert": "^4.4.1",

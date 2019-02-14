@@ -2,14 +2,9 @@ import { DOWNLOAD_FILE } from "./types";
 import axios from "axios";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
-<<<<<<< HEAD
 import {Dropbox} from 'dropbox'
-// import fetch from 'fetch'
-
-
-=======
+import path from 'path';
 var fs = require('fs');
->>>>>>> 9a1cb409be8d97d2dd2ec4746e7ffe9000d4b01e
 export const downloadFileSuccess = () => {
   return {
     type: DOWNLOAD_FILE,
@@ -86,7 +81,7 @@ export default function downloadFile(drive, downloadFileAccount, file) {
         console.log(file);
 
         axios({
-            url:"http://localhost:8000/Dropbox/Token",
+            url:"http://test-depositoryworks.ngrok.io/Dropbox/Token",
             method: "POST",
             headers: { "Content-Type": "application/json" },
             // responseType: "blob", // important
@@ -101,19 +96,28 @@ export default function downloadFile(drive, downloadFileAccount, file) {
               var dropbox = new Dropbox();
               dropbox.setAccessToken(dbxAccessToken);
               var arg = {path : file.id}
-              dropbox.filesDownload(arg)
+              dropbox.filesGetTemporaryLink(arg)
               .then((res)=>{
                 console.log(res);
-                
-                  const url = window.URL.createObjectURL(res.fileBlob);
-                  const link = document.createElement("a");
-                  link.href = url;
-                  const fileName =res.name;
-                  link.setAttribute("download", fileName);
-                  document.body.appendChild(link);
-                  link.click();
-                  link.remove();
-                  window.URL.revokeObjectURL(url);
+                axios.get(res.link).then((data)=>{
+                  console.log(data);     
+                  console.log(__dirname);
+                   const writePath = path.resolve(__dirname, 'large-file.zip'); 
+                   var stream =res.pipe(fs.createWriteStream(writePath));  
+                      stream.on('close', function(){alert("completed")});
+                      stream.on('error', function(){alert("eorr")});
+                }).catch(err=>{
+
+                });
+                  // const url = window.URL.createObjectURL(res.fileBlob);
+                  // const link = document.createElement("a");
+                  // link.href = url;
+                  // const fileName =res.name;
+                  // link.setAttribute("download", fileName);
+                  // document.body.appendChild(link);
+                  // link.click();
+                  // link.remove();
+                  // window.URL.revokeObjectURL(url);
 
               }).catch((err)=>{
                 console.log(err);
