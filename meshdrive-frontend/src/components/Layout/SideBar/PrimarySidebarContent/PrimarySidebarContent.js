@@ -1,31 +1,65 @@
 import React from "react";
-import { ButtonGroup } from "reactstrap";
-import { NavLink } from "react-router-dom";
+import { ButtonGroup, Card, Button, CardTitle, CardText } from "reactstrap";
+import { NavLink, Link } from "react-router-dom";
+import { connect } from "react-redux";
+import Logo from "../../Header/Logo/Logo";
+import FAIcon from "../../../FontAwesomeIcon/FontAwesomeIcon";
+
 import "./styles.css";
 
-export default class PrimarySideBarContent extends React.Component {
-  render() {
-    const defaultContent = (
-      <ButtonGroup vertical className="d-flex mt-2">
-        <NavLink exact to="/dashboard" className="btn btn-light light d-block">
-          Dashboard
-        </NavLink>
-        <NavLink to="/managedrives" className="btn btn-light light">
-          Manage Drives
-        </NavLink>
-        <NavLink to="/uploadfile" className="btn btn-light light">
-          Upload File
-        </NavLink>
-        <NavLink to="/managetags" className="btn btn-light light">
-          My Tags
-        </NavLink>
-      </ButtonGroup>
-    );
+const PrimarySideBarContent = props => {
+  const defaultContent = (
+    <ButtonGroup vertical className="d-flex mt-2">
+      <NavLink exact to="/dashboard" className="btn btn-light light d-block">
+        Dashboard
+      </NavLink>
+      <NavLink to="/managedrives" className="btn btn-light light">
+        Manage Drives
+      </NavLink>
+      <NavLink to="/uploadfile" className="btn btn-light light">
+        Upload File
+      </NavLink>
+      <NavLink to="/managetags" className="btn btn-light light">
+        My Tags
+      </NavLink>
+    </ButtonGroup>
+  );
 
-    return (
-      <div className="sidebar-primary bg-light flex-fill p-2">
-        {this.props.children ? this.props.children : defaultContent}
-      </div>
-    );
-  }
+  return (
+    <div className="sidebar-primary bg-light flex-fill p-2">
+      <Logo />
+      <Card body className="text-center">
+        <CardTitle>
+          <FAIcon icon="user" classes={["fa"]} />
+        </CardTitle>
+        <CardText>{props.user.email}</CardText>
+        <NavLink
+          exact
+          to="/logout"
+          className="btn btn-outline-secondary btn-block btn-sm "
+        >
+          Logout
+        </NavLink>
+      </Card>
+      {/* <ButtonGroup vertical className="d-flex">
+        <a href="#" className="btn btn-block btn-sm btn-light">
+          {props.user.email}
+        </a>
+        <NavLink
+          exact
+          to="/logout"
+          className="btn btn-outline-secondary btn-block btn-sm "
+        >
+          Logout
+        </NavLink>
+      </ButtonGroup> */}
+      {props.children ? props.children : defaultContent}
+    </div>
+  );
+};
+function mapStateToProps(state) {
+  return {
+    user: state.user
+  };
 }
+export default connect(mapStateToProps)(PrimarySideBarContent);
