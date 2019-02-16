@@ -1,9 +1,12 @@
 import { FETCH_FILES } from "./types";
 import axios from "axios";
 import React from "react";
-import startApiRequest from "../api/startApiRequest";
-import finishApiRequest from "../api/finishApiRequest";
-import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
+// import startApiRequest from "../api/startApiRequest";
+// import finishApiRequest from "../api/finishApiRequest";
+// import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
+import { toast } from "react-toastify";
+import LoadingMessage from "../../utils/LoadingMessage";
+
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import navigateTo from "../../actions/filenavigation/navigateTo";
@@ -31,7 +34,15 @@ export default function fetchFilesById(
     const { token } = user;
 
     console.log("Starting API call from fetchFilesById");
-    dispatch(startApiRequest());
+    const toastInfoId = toast.info(
+      <LoadingMessage loaderArgs={{ color: "white" }}>
+        Reloading Explorer
+      </LoadingMessage>,
+      {
+        autoClose: false
+      }
+    );
+    // dispatch(startApiRequest());
 
     let postURL, postData;
     switch (drive.toUpperCase()) {
@@ -69,8 +80,8 @@ export default function fetchFilesById(
       .then(response => {
         const data = response.data;
 
-        // sort files
-        dispatch(finishApiRequest(null, true));
+        toast.dismiss(toastInfoId);
+        // dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFilesById(state, data));
 
         // const navigationPayload = {
@@ -89,15 +100,20 @@ export default function fetchFilesById(
       })
       .catch(error => {
         console.log(error);
-        dispatch(
-          finishApiRequest(
-            null,
-            true,
-            <SweetAlertWrapper danger title="Fail">
-              Something went wrong while fetching files.
-            </SweetAlertWrapper>
-          )
-        );
+        toast.update(toastInfoId, {
+          render: "Something went wrong while fetching files",
+          type: toast.TYPE.ERROR,
+          autoClose: 5000
+        });
+        // dispatch(
+        //   finishApiRequest(
+        //     null,
+        //     true,
+        //     <SweetAlertWrapper danger title="Fail">
+        //       Something went wrong while fetching files.
+        //     </SweetAlertWrapper>
+        //   )
+        // );
       });
   };
 }
