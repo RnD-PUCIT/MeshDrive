@@ -69,14 +69,14 @@ class CreateFolderModal extends Component {
           this.isStateValid
         );
       }
-      debugger;
+      //debugger;
     }
   }
 
   // for root
   handleDriveSelect = drive => {
     this.setState({ drive });
-    debugger;
+    //debugger;
   };
 
   // for root
@@ -85,7 +85,7 @@ class CreateFolderModal extends Component {
       { createFolderEmail: email, isValidCreateEmail: true },
       this.isStateValid
     );
-    debugger;
+    //debugger;
   };
 
   handleFolderNameChange = e => {

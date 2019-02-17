@@ -3,8 +3,8 @@ import axios from "axios";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import {Dropbox} from 'dropbox'
-import path from 'path';
-var fs = require('fs');
+var download = require('downloadjs');
+var https = require('https');
 export const downloadFileSuccess = () => {
   return {
     type: DOWNLOAD_FILE,
@@ -98,60 +98,16 @@ export default function downloadFile(drive, downloadFileAccount, file) {
               var arg = {path : file.id}
               dropbox.filesGetTemporaryLink(arg)
               .then((res)=>{
-                console.log(res);
-                axios.get(res.link).then((data)=>{
-                  console.log(data);     
-                  console.log(__dirname);
-                   const writePath = path.resolve(__dirname, 'large-file.zip'); 
-                   var stream =res.pipe(fs.createWriteStream(writePath));  
-                      stream.on('close', function(){alert("completed")});
-                      stream.on('error', function(){alert("eorr")});
-                }).catch(err=>{
-
-                });
-                  // const url = window.URL.createObjectURL(res.fileBlob);
-                  // const link = document.createElement("a");
-                  // link.href = url;
-                  // const fileName =res.name;
-                  // link.setAttribute("download", fileName);
-                  // document.body.appendChild(link);
-                  // link.click();
-                  // link.remove();
-                  // window.URL.revokeObjectURL(url);
-
+               
+                window.location.href = res.link;
+                      
               }).catch((err)=>{
                 console.log(err);
               });
 
           }).catch((error)=>{
             console.log(error);
-          })
-
-     //  
-
-        // axios({
-        //   url: apiRoutes.files.dropbox_downloadFile,
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   responseType: "blob", // important
-        //   data: {
-        //     dropboxAccountEmail,
-        //     fileName: file.name,
-        //     path: file.id,
-        //     token
-        //   }
-        // }).then(response => {
-        //   const blob = new Blob([response.data], { type: response.data.type });
-        //   const url = window.URL.createObjectURL(blob);
-        //   const link = document.createElement("a");
-        //   link.href = url;
-        //   const fileName = response.headers["file-name"];
-        //   link.setAttribute("download", fileName);
-        //   document.body.appendChild(link);
-        //   link.click();
-        //   link.remove();
-        //   window.URL.revokeObjectURL(url);
-        // });
+          })   
         break;
     }
   };
