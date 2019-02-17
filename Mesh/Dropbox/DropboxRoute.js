@@ -297,6 +297,18 @@ router.post('/Authenticate',AppConstants.checkAccessMiddleware,(req,res)=>{
 
 });
 
+router.post('/token',AppConstants.checkAccessMiddleware,dropboxTokenMiddleware,(req,res)=>{
+  
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT,OPTIONS")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, content-type, Accept, Authorization, x-api-key")
+
+  var dropboxAccount=req.dropboxAccount;
+  var token=dropboxAccount.token;
+  res.status(AppConstants.CODE_OK).json(token);
+  
+})
+
 //complete with multiple dbx accounts
 router.get(DROPBOX_AUTH_REDIRECT_ROUTE,(req,res)=>{
     
