@@ -38,3 +38,7 @@ nav {
   background: #eee;
   padding: 1px 0 0 0;
 }
+
+#nprogress .bar {
+  height:4px
+}

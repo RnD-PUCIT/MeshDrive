@@ -1,9 +1,11 @@
 import { FETCH_FILES } from "./types";
 import axios from "axios";
 import React from "react";
-import startApiRequest from "../api/startApiRequest";
-import finishApiRequest from "../api/finishApiRequest";
-import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
+import { toast } from "react-toastify";
+import LoadingMessage from "../../utils/LoadingMessage";
+// import startApiRequest from "../api/startApiRequest";
+// import finishApiRequest from "../api/finishApiRequest";
+// import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import navigateTo from "../filenavigation/navigateTo";
@@ -22,7 +24,17 @@ export default function fetchRootFilesAllDrives(isForceReload = false) {
     const { user } = state;
     const { token } = user;
     console.log("Starting API call from fetchRootFiles");
-    dispatch(startApiRequest());
+
+    const toastInfoId = toast.info(
+      <LoadingMessage loaderArgs={{ color: "white" }}>
+        Loading Explorer
+      </LoadingMessage>,
+      {
+        autoClose: false
+      }
+    );
+
+    // dispatch(startApiRequest());
 
     // const { driveAccountsList } = user;
 
@@ -59,7 +71,9 @@ export default function fetchRootFilesAllDrives(isForceReload = false) {
       .then(response => {
         const filesData = response.data;
 
-        dispatch(finishApiRequest(null, true));
+        // dispatch(finishApiRequest(null, true));
+        toast.dismiss(toastInfoId);
+
         dispatch(shouldFetchFilesAllDrives(state, filesData));
 
         if (isForceReload) {
@@ -72,16 +86,23 @@ export default function fetchRootFilesAllDrives(isForceReload = false) {
       })
       .catch(error => {
         console.log(error);
+
+        toast.update(toastInfoId, {
+          render: "Something went wrong while fetching files",
+          type: toast.TYPE.ERROR,
+          autoClose: 5000
+        });
+
         // debugger;
-        dispatch(
-          finishApiRequest(
-            null,
-            true,
-            <SweetAlertWrapper danger title="Fail">
-              Something went wrong while fetching files.
-            </SweetAlertWrapper>
-          )
-        );
+        // dispatch(
+        //   finishApiRequest(
+        //     null,
+        //     true,
+        //     <SweetAlertWrapper danger title="Fail">
+        //       Something went wrong while fetching files.
+        //     </SweetAlertWrapper>
+        //   )
+        // );
       });
   };
 }

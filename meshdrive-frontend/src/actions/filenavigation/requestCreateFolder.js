@@ -1,9 +1,11 @@
 import { CREATE_NEW_FOLDER } from "../files/types";
 import axios from "axios";
 import React from "react";
-import startApiRequest from "../api/startApiRequest";
-import finishApiRequest from "../api/finishApiRequest";
-import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
+import { toast } from "react-toastify";
+import LoadingMessage from "../../utils/LoadingMessage";
+// import startApiRequest from "../api/startApiRequest";
+// import finishApiRequest from "../api/finishApiRequest";
+// import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { apiRoutes } from "../../constants/apiConstants";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import fetchRootFiles from "../files/fetchRootFiles";
@@ -12,7 +14,7 @@ import fetchFilesById from "../files/fetchFilesById";
 export default function requestCreateFolder(
   drive,
   folderName,
-  currentFolder,
+  parent,
   createFolderEmail
 ) {
   return (dispatch, getState) => {
@@ -21,15 +23,24 @@ export default function requestCreateFolder(
     const { token } = user;
 
     console.log("Starting API call from requestCreateFolder");
-    dispatch(startApiRequest());
-    debugger;
+
+    const toastInfoId = toast.info(
+      <LoadingMessage loaderArgs={{ color: "white" }}>
+        Creating Folder
+      </LoadingMessage>,
+      {
+        autoClose: false
+      }
+    );
+    // dispatch(startApiRequest());
+    // debugger;
     let postURL, postData;
-    switch (drive) {
+    switch (drive.toUpperCase()) {
       case GOOGLEDRIVE:
         postURL = apiRoutes.files.googledrive_createFolder;
         postData = {
           folderName,
-          parentId: currentFolder.parent,
+          parentId: parent,
           googleDriveEmail: createFolderEmail,
           token
         };
@@ -38,7 +49,7 @@ export default function requestCreateFolder(
         postURL = apiRoutes.files.onedrive_createFolder;
         postData = {
           folderName,
-          parentId: currentFolder.parent,
+          parentId: parent,
           oneDriveEmail: createFolderEmail,
           token
         };
@@ -48,12 +59,13 @@ export default function requestCreateFolder(
         postURL = apiRoutes.files.dropbox_CreateFolder;
         postData = {
           name: folderName,
-          path: currentFolder.path ? currentFolder.path : "",
+          path: parent,
           dropboxAccountEmail: createFolderEmail,
           token
         };
         break;
     }
+    console.log(postURL);
     debugger;
     axios
       .post(postURL, postData)
@@ -64,53 +76,67 @@ export default function requestCreateFolder(
 
         switch (status) {
           case 200:
-            responseUiComponent = (
-              <SweetAlertWrapper success title="Success">
-                {response.data.message}
-              </SweetAlertWrapper>
-            );
+            toast.update(toastInfoId, {
+              render: response.data.message,
+              type: toast.TYPE.SUCCESS,
+              autoClose: 5000
+            });
+            // responseUiComponent = (
+            //   // <SweetAlertWrapper success title="Success">
+            //   //   {response.data.message}
+            //   // </SweetAlertWrapper>
+            // );
             break;
           case 201:
-            responseUiComponent = (
-              <SweetAlertWrapper warning title="Warning">
-                {response.data.error}
-              </SweetAlertWrapper>
-            );
+            toast.update(toastInfoId, {
+              render: response.data.error,
+              type: toast.TYPE.WARNING,
+              autoClose: 5000
+            });
+            // responseUiComponent = (
+            //   <SweetAlertWrapper warning title="Warning">
+            //     {response.data.error}
+            //   </SweetAlertWrapper>
+            // );
             break;
           case 400:
-            responseUiComponent = (
-              <SweetAlertWrapper danger title="Fail">
-                {response.data.error}
-              </SweetAlertWrapper>
-            );
+            toast.update(toastInfoId, {
+              render: response.data.error,
+              type: toast.TYPE.ERROR,
+              autoClose: 5000
+            });
+            // responseUiComponent = (
+            //   <SweetAlertWrapper danger title="Fail">
+            //     {response.data.error}
+            //   </SweetAlertWrapper>
+            // );
             break;
         }
-        dispatch(finishApiRequest(response, true, responseUiComponent));
+        // dispatch(finishApiRequest(response, true, responseUiComponent));
 
-        if (currentFolder.parent === "root") {
-          dispatch(fetchRootFiles(currentFolder.drive, true));
+        if (parent === "") {
+          dispatch(fetchRootFiles(drive, true));
         } else {
-          dispatch(
-            fetchFilesById(
-              currentFolder.drive,
-              currentFolder.listFilesAccount,
-              currentFolder.parent,
-              true
-            )
-          );
+          dispatch(fetchFilesById(drive, createFolderEmail, parent, true));
         }
       })
       .catch(error => {
         console.log(error);
-        dispatch(
-          finishApiRequest(
-            null,
-            true,
-            <SweetAlertWrapper danger title="Fail">
-              Something went wrong while fetching files.
-            </SweetAlertWrapper>
-          )
-        );
+
+        toast.update(toastInfoId, {
+          render: "Something went wrong, please try again",
+          type: toast.TYPE.ERROR,
+          autoClose: 5000
+        });
+        // dispatch(
+        //   finishApiRequest(
+        //     null,
+        //     true,
+        //     <SweetAlertWrapper danger title="Fail">
+        //       Something went wrong while fetching files.
+        //     </SweetAlertWrapper>
+        //   )
+        // );
       });
   };
 }

@@ -53,18 +53,30 @@ class CreateFolderModal extends Component {
       const { historyStack } = this.props.fileNavigation;
       if (historyStack.length > 0) {
         const currentFolder = historyStack[historyStack.length - 1];
-        const isRoot = currentFolder.parent === "root";
+        const isRoot = currentFolder.parent === "";
+        let driveEmail = "";
+        let drive = "";
+        let isValidCreateEmail = false;
 
-        const isValidCreateEmail = !isRoot
-          ? currentFolder.listFilesAccount
-          : false;
+        if (!isRoot && currentFolder.files.length > 0) {
+          driveEmail = currentFolder.files[0].driveEmail;
+          drive = currentFolder.files[0].drive;
+          isValidCreateEmail = true;
 
+          console.log({
+            isRoot,
+            createFolderEmail: driveEmail,
+            isValidCreateEmail,
+            drive: drive
+          });
+          debugger;
+        }
         this.setState(
           {
             isRoot,
-            createFolderEmail: currentFolder.listFilesAccount,
+            createFolderEmail: driveEmail,
             isValidCreateEmail,
-            drive: currentFolder.drive
+            drive: drive
           },
           this.isStateValid
         );
@@ -123,7 +135,7 @@ class CreateFolderModal extends Component {
       this.props.requestCreateFolder(
         this.state.drive,
         folderName,
-        currentFolder,
+        currentFolder.parent,
         createFolderEmail
       );
       this.setState(
