@@ -1,8 +1,8 @@
 export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/meshdrive/";
 
-const ngrokUrl = "http://test-depositoryworks.ngrok.io";
+const ngrokUrl = "http://fyp.ngrok.io";
 
-export const apiBaseUrl = null || "http://localhost:8000";
+export const apiBaseUrl = ngrokUrl || "http://localhost:8000";
 
 //http://test-depositoryworks.ngrok.io
 export const apiRoutes = {
@@ -83,6 +83,10 @@ export const apiRoutes = {
     listGoogleDriveRootFiles: `${apiBaseUrl}/GoogleDrive/ListDriveRootFiles`,
     listGoogleDriveFiles: `${apiBaseUrl}/GoogleDrive/ListDriveFiles`,
     listDriveFilesById: `${apiBaseUrl}/GoogleDrive/ListDriveFilesById`,
+
+    google_downloadFileMetadata: (googleDriveEmail, token) =>
+      `${apiBaseUrl}/GoogleDrive/DownloadFileMetadata/${googleDriveEmail}/${token}`,
+
     downloadFile: (downloadFileAccount, fileId, token) =>
       `${apiBaseUrl}/GoogleDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
@@ -100,6 +104,10 @@ export const apiRoutes = {
     // onedrive
     listOneDriveRootFiles: `${apiBaseUrl}/OneDrive/ListDriveRootFiles`,
     onedrive_listDriveFilesById: `${apiBaseUrl}/OneDrive/ListDriveFilesById`,
+
+    onedrive_downloadFileMetadata: (oneDriveEmail, token) =>
+      `${apiBaseUrl}/OneDrive/DownloadFileMetadata/${oneDriveEmail}/${token}`,
+
     onedrive_downloadFile: (downloadFileAccount, fileId, token) =>
       `${apiBaseUrl}/OneDrive/DownloadFile/${downloadFileAccount}/${fileId}/${token}`,
     onedrive_uploadFile: (fileName, mimeType, uploadFileEmail, token) =>
