@@ -281,6 +281,18 @@ router.post('/UploadFile/:fileName/:mimeType/:googleDriveEmail/:token',Constants
 	});
 })
 
+router.get('/DownloadFileMetadata/:googleDriveEmail/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+	var token=req.token;
+	
+	Drive.createAuthOject(req.appCredentials,token)
+	.then((oAuth2Client)=>{
+		res.status(Constants.CODE_OK).json({msg:"Successfull",token:oAuth2Client.credentials.access_token});
+	})
+	.catch((err)=>{
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in downloading file",err:err});
+	});
+})
+
 router.get('/UploadFileMetadata/:googleDriveEmail/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	var token=req.token;
 	Drive.createAuthOject(req.appCredentials,token)
