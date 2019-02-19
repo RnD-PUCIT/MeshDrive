@@ -341,6 +341,17 @@ router.post('/UploadFile/:fileName/:mimeType/:oneDriveEmail/:token',Constants.ch
 })
 
 
+router.get('/DownloadFileMetadata/:oneDriveEmail/:token',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
+	var token=req.token;
+	Drive.refreshToken(Constants.ONEDRIVE_APP_CREDETIALS,token)
+	.then((token)=>{
+		res.status(Constants.CODE_OK).json({msg:"Successfull",token:token.access_token});
+	})
+	.catch((err)=>{
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in downloading file",err:err});
+	});
+})
+
 router.post('/CreateFolder',Constants.checkAccessMiddleware,getOneDriveTokensMiddleware,matchOneDriveTokenMiddleware,function(req,res){
 	var meshDriveEmail=req.userData.email;
 	var oneDriveEmail = req.body.oneDriveEmail;
