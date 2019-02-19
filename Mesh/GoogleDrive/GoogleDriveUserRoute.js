@@ -253,6 +253,8 @@ router.get('/DownloadFile/:googleDriveEmail/:fileId/:token',Constants.checkAcces
 })
 
 
+
+
 router.post('/UploadFile/:fileName/:mimeType/:googleDriveEmail/:token',Constants.checkUploadAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	
 	var fileName=req.params.fileName;
@@ -279,6 +281,16 @@ router.post('/UploadFile/:fileName/:mimeType/:googleDriveEmail/:token',Constants
 	});
 })
 
+router.get('/UploadFileMetadata/:googleDriveEmail/:token',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
+	var token=req.token;
+	Drive.createAuthOject(req.appCredentials,token)
+	.then((oAuth2Client)=>{
+		res.status(Constants.CODE_OK).json({msg:"Successfull",token:oAuth2Client.credentials.access_token});
+	})
+	.catch((err)=>{
+		res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({message:"Error in generating upload file meta",err:err});
+	});
+})
 
 router.post('/CreateFolder',Constants.checkAccessMiddleware,getGoogleDriveTokensMiddleware,matchGoogleDriveTokenMiddleware,function(req,res){
 	var folderName=req.body.folderName;
