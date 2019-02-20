@@ -51,7 +51,6 @@ class DriveAccountSelect extends Component {
         }
       }
     );
-    debugger;
   };
   handleDriveAccountClick = email => {
     this.setState(
