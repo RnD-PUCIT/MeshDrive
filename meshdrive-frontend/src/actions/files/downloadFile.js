@@ -81,7 +81,7 @@ export default function downloadFile(drive, downloadFileAccount, file) {
         console.log(file);
 
         axios({
-            url:"http://test-depositoryworks.ngrok.io/Dropbox/Token",
+            url:apiRoutes.files.dropbox_account_token,
             method: "POST",
             headers: { "Content-Type": "application/json" },
             // responseType: "blob", // important
