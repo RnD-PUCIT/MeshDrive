@@ -226,24 +226,23 @@ export default function downloadFile(drive, downloadFileAccount, file) {
         console.log(file);
 
         axios({
-          url: "http://test-depositoryworks.ngrok.io/Dropbox/Token",
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          // responseType: "blob", // important
-          data: {
-            dropboxAccountEmail,
-            token
-          }
-        })
-          .then(response => {
-            var dbxAccessToken = response.data["access_token"];
-            console.log(response);
-            var dropbox = new Dropbox();
-            dropbox.setAccessToken(dbxAccessToken);
-            var arg = { path: file.id };
-            dropbox
-              .filesGetTemporaryLink(arg)
-              .then(res => {
+            url:apiRoutes.files.dropbox_account_token,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            // responseType: "blob", // important
+            data: {
+              dropboxAccountEmail,
+              token
+            }
+          }).then((response)=>{
+
+              var dbxAccessToken = response.data["access_token"];
+              console.log(response); 
+              var dropbox = new Dropbox();
+              dropbox.setAccessToken(dbxAccessToken);
+              var arg = {path : file.id}
+              dropbox.filesGetTemporaryLink(arg)
+              .then((res)=>{
                 window.location.href = res.link;
               })
               .catch(err => {

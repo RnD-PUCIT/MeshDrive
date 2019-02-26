@@ -6,6 +6,7 @@ import { apiRoutes } from "../../constants/apiConstants";
 import toStream from "blob-to-stream";
 import request from "request";
 import React from "react";
+import {Dropbox} from 'dropbox'
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import { rootURL } from "../../constants/apiConstants";
@@ -55,68 +56,96 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
         break;
 
       case DROPBOX:
-        let dropboxAccountEmail = uploadFileEmail;
-        postURL = apiRoutes.files.dropbox_uploadFile(
-          file.name,
-          "root",
+      let dropboxAccountEmail = uploadFileEmail;
+      axios({
+        url:apiRoutes.files.dropbox_account_token,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // responseType: "blob", // important
+        data: {
           dropboxAccountEmail,
           token
-        );
+        }
+      }).then((response)=>{
+
+        console.log("Dropbox Account Token received");
+        console.log(response.data);
+        const UPLOAD_FILE_SIZE_LIMIT = 4 * 1024 * 1024;
+        var dbxAccessToken = response.data["access_token"];
+        var size = file.size;
+        var arg = {
+          path: '/' + file.name, 
+          contents: file,
+          autorename:true
+        }
+
+        if(file.size < UPLOAD_FILE_SIZE_LIMIT){ //file size less than 4 mb simple upload 
+              dropboxUploadSimple(dbxAccessToken,arg);
+          }else{
+            console.log("file is large");
+          
+          var dbx = new Dropbox({ accessToken:dbxAccessToken});
+
+          const maxBlob = 4 * 1000 * 1000; // 8Mb - Dropbox JavaScript API suggested max file / chunk size
+          var workItems = [];     
+        
+          var offset = 0;
+          while (offset < file.size) {
+            var chunkSize = Math.min(maxBlob, file.size - offset);
+            workItems.push(file.slice(offset, offset + chunkSize));
+            offset += chunkSize;
+          } 
+            
+          const task = workItems.reduce((acc, blob, idx, items) => {
+            if (idx == 0) {
+              // Starting multipart upload of file
+              return acc.then(function() {
+                console.log(idx/items.length*100 +"% uploaded");
+                return dbx.filesUploadSessionStart({ close: false, contents: blob})
+                          .then(response => response.session_id)
+              });          
+            } else if (idx < items.length-1) {  
+              // Append part to the upload session
+          
+              return acc.then(function(sessionId) {
+              console.log(idx/items.length*100 +"% uploaded");
+              var cursor = { session_id: sessionId, offset: idx * maxBlob };
+              return dbx.filesUploadSessionAppendV2({ cursor: cursor, close: false, contents: blob }).then(() => sessionId); 
+              });
+            } else {
+              // Last chunk of data, close session
+              return acc.then(function(sessionId) {
+                console.log(100+"% uploaded");
+
+                var cursor = { session_id: sessionId, offset: file.size - blob.size };
+                var commit = { path: '/' + file.name, mode: 'add', autorename: true, mute: false };              
+                return dbx.filesUploadSessionFinish({ cursor: cursor, commit: commit, contents: blob });           
+              });
+            }          
+          }, Promise.resolve());
+          
+          task.then(function(result) {
+          
+           console.log("file Uploaded");
+          }).catch(function(error) {
+            console.error(error);
+          })
+      })
         break;
     }
 
-    if (!postURL) return;
-
-    const postRequest = request.post(postURL, (err, resp, body) => {
-      console.log({ err, resp, body });
-    });
-    postRequest.on("request", req => {
-      dispatch(startApiRequest());
-    });
-    postRequest.on("complete", response => {
-      let responseUiComponent;
-      console.log("CONSOLEEEEEE", {
-        response,
-        statusCode: response.statusCode
-      });
-      if (response.statusCode === 200) {
-        window.location = `${rootURL}/#/uploadfile`;
-        responseUiComponent = (
-          <SweetAlertWrapper success title="Success">
-            {response.body.message}
-          </SweetAlertWrapper>
-        );
-      } else {
-        responseUiComponent = (
-          <SweetAlertWrapper danger title="Error">
-            {response.body.message}
-          </SweetAlertWrapper>
-        );
-      }
-
-      dispatch(finishApiRequest(response, true, responseUiComponent));
-
-      postRequest.on("error", response => {
-        console.error("ERRRRROOOR " + response);
-        dispatch(
-          finishApiRequest(
-            response,
-            true,
-            <SweetAlertWrapper danger title="Error">
-              An error occured during upload file.
-            </SweetAlertWrapper>
-          )
-        );
-      });
-    });
-
-    postRequest.on("pipe", src => {
-      // console.log("PIPE START", src);
-      console.log(`Progress: 0%`);
-    });
-
-    const stream = toStream(file);
-
-    stream.pipe(postRequest);
   };
+}
+
+function dropboxUploadSimple(dbxAccessToken,arg){
+
+  var dbx = new Dropbox({ accessToken:dbxAccessToken});
+    dbx.filesUpload(arg)
+    .then(function(response) {
+      console.log(response);
+    })
+    .catch(function(error) {
+      console.error(error);
+    });
+
 }
