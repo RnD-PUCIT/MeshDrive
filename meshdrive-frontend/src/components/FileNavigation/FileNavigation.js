@@ -21,6 +21,7 @@ import navigateToUpOneLevel from "../../actions/filenavigation/navigateToUpOneLe
 import "./style.css";
 import { ONEDRIVE } from "../../constants/strings";
 import NewFolderButtonAndModal from "./NewFolderButtonAndModal";
+import UploadFileButton from "./UploadFileButton";
 
 
 class FileNavigation extends Component {
@@ -79,6 +80,7 @@ class FileNavigation extends Component {
             <FAIcon icon="sync-alt" classes={["fa"]} /> Reload
           </Button>
           <NewFolderButtonAndModal enabled={isNewFolderEnabled} /> 
+          <UploadFileButton></UploadFileButton>
           {/* 
           Will Implement this in future
           <Button>

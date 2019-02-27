@@ -13,8 +13,6 @@ import navigateTo from "../../actions/filenavigation/navigateTo";
 import forceReload from "../../actions/filenavigation/forceReload";
 
 export const shouldFetchFilesById = (state, data) => {
-  console.log(data);
-  debugger;
   return {
     type: FETCH_FILES,
     payload: data
@@ -26,7 +24,8 @@ export default function fetchFilesById(
   listFilesAccount,
   fileId,
   isForceReload = false,
-  path = "" // for dropbox only
+  path = "" ,// for dropbox only,
+  folderName
 ) {
   return (dispatch, getState) => {
     const state = getState();
@@ -83,7 +82,7 @@ export default function fetchFilesById(
         toast.dismiss(toastInfoId);
         // dispatch(finishApiRequest(null, true));
         dispatch(shouldFetchFilesById(state, data));
-
+      
         // const navigationPayload = {
         //   parent: fileId,
         //   items: data,
@@ -92,10 +91,17 @@ export default function fetchFilesById(
         //   path // for dropbox only
         // };
         // debugger;
+        // adding some fields because it will be needed in upload in specific folder
+        let navigationObject = new Object();
+        console.log("drive ===> "+drive + " "+listFilesAccount);
+        navigationObject = data;
+        navigationObject.drive = drive;
+        navigationObject.driveEmail = listFilesAccount;
+        navigationObject.folderName =folderName ;
         if (isForceReload) {
           dispatch(forceReload(data));
         } else {
-          dispatch(navigateTo(data));
+          dispatch(navigateTo(navigationObject));
         }
       })
       .catch(error => {
