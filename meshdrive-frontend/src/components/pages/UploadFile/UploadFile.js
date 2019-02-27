@@ -57,7 +57,8 @@ class UploadFile extends Page {
     this.props.requestUploadFile(
       this.state.drive,
       this.state.files,
-      this.state.uploadFileEmail
+      this.state.uploadFileEmail,
+      "root"
     );
   };
   render() {

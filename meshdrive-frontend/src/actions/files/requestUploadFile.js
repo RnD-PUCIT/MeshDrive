@@ -17,7 +17,7 @@ export const shouldUploadFile = (state, files) => {
     payload: files
   };
 };
-export default function requestUploadFile(drive, files, uploadFileEmail) {
+export default function requestUploadFile(drive, files, uploadFileEmail,parent) {
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
@@ -31,7 +31,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
     const encodedMimeType = new Buffer(file.type).toString("base64");
 
     let postURL;
-    switch (drive) {
+    switch (drive.toUpperCase()) {
       case GOOGLEDRIVE:
         uploadFileRequest(uploadFileEmail, files, user, progressEvent => {
           console.log(progressEvent);
@@ -54,8 +54,8 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
           token
         );
         break;
-
       case DROPBOX:
+      
         let dropboxAccountEmail = uploadFileEmail;
         axios({
           url: apiRoutes.files.dropbox_account_token,
@@ -78,7 +78,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
             contents: file,
             autorename: true
           }
-
+          console.log("Uploading on dropbox....");
           if (file.size < UPLOAD_FILE_SIZE_LIMIT) { //file size less than 4 mb simple upload 
             dropboxUploadSimple(dbxAccessToken, arg);
           } else {
