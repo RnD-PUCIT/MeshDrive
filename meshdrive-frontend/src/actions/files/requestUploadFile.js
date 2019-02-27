@@ -11,6 +11,8 @@ import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrap
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import { rootURL } from "../../constants/apiConstants";
 import uploadFileRequest from "./GoogleDrive/uploadFileRequest";
+import { toast } from "react-toastify";
+import LoadingMessage from "../../utils/LoadingMessage";
 export const shouldUploadFile = (state, files) => {
   return {
     type: UPLOAD_FILE,
@@ -26,9 +28,24 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
     const file = files[0];
     const formData = new FormData();
 
+
     formData.append("files[]", file, file.name);
 
     const encodedMimeType = new Buffer(file.type).toString("base64");
+
+
+    const toastId = toast.info(
+      <LoadingMessage loaderArgs={{ color: "white" }}>
+        Preparing to upload 
+      </LoadingMessage>,
+      {
+        progress: 0,
+        closeOnClick: false,
+        autoClose: false,
+        closeButton: false,
+        hideProgressBar:false
+      }
+    );
 
     let postURL;
     switch (drive.toUpperCase()) {
@@ -55,7 +72,9 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
         );
         break;
       case DROPBOX:
-      
+      toast.update(
+       toastId
+      );
         let dropboxAccountEmail = uploadFileEmail;
         axios({
           url: apiRoutes.files.dropbox_account_token,
@@ -80,7 +99,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
           }
           console.log("Uploading on dropbox....");
           if (file.size < UPLOAD_FILE_SIZE_LIMIT) { //file size less than 4 mb simple upload 
-            dropboxUploadSimple(dbxAccessToken, arg);
+            dropboxUploadSimple(dbxAccessToken, arg,toastId,file);
           } else {
             console.log("file is large");
 
@@ -101,6 +120,28 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
                 // Starting multipart upload of file
                 return acc.then(function () {
                   console.log(idx / items.length * 100 + "% uploaded");
+                  
+                  
+                  // progress upload 
+                  let total = items.length;
+                  if (total === 0) total = items.length;
+                  toast.update(toastId, {
+                    render: (
+                      <React.Fragment>
+                        Uploading file, Please wait...
+                        <br />
+                        <strong>{file.name}</strong>
+                      </React.Fragment>
+                    ),
+                    type: toast.TYPE.WARNING,
+                    progress: idx / total,
+                    hideProgressBar:false,
+                    autoClose:false
+                  });
+                  
+
+
+
                   return dbx.filesUploadSessionStart({ close: false, contents: blob })
                     .then(response => response.session_id)
                 });
@@ -117,7 +158,20 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
                 // Last chunk of data, close session
                 return acc.then(function (sessionId) {
                   console.log(100 + "% uploaded");
-
+                  toast.update(toastId, {
+                    render: (
+                      <React.Fragment>
+                        <strong>{file.name}</strong>             
+                        <br />
+                         Uploaded Successfully
+                      </React.Fragment>
+                    ),
+                    progress: 1,
+                    type: toast.TYPE.SUCCESS,
+                    closeOnClick: true,
+                    autoClose: 5000,
+                    closeButton: true
+                  });
                   var cursor = { session_id: sessionId, offset: file.size - blob.size };
                   var commit = { path: '/' + file.name, mode: 'add', autorename: true, mute: false };
                   return dbx.filesUploadSessionFinish({ cursor: cursor, commit: commit, contents: blob });
@@ -138,12 +192,27 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
   };
 }
 
-function dropboxUploadSimple(dbxAccessToken, arg) {
+function dropboxUploadSimple(dbxAccessToken, arg,toastId,file) {
 
   var dbx = new Dropbox({ accessToken: dbxAccessToken });
   dbx.filesUpload(arg)
     .then(function (response) {
       console.log(response);
+      toast.update(toastId, {
+        render: (
+          <React.Fragment>        
+            <strong>{file.name}</strong>
+            <br />
+            Uploaded Successfully
+            
+          </React.Fragment>
+        ),
+        progress: 1,
+        type: toast.TYPE.SUCCESS,
+        closeOnClick: true,
+        autoClose: 5000,
+        closeButton: true
+      });
     })
     .catch(function (error) {
       console.error(error);

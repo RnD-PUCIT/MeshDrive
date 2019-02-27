@@ -62,6 +62,9 @@ class CreateUploadModal extends Component {
        // parameters  
       // requestUploadfile(drive,files,uploadEmail,parent/folder_id)
       this.props.requestUploadFile(drive,this.state.files,driveEmail,"root");
+      this.setState({
+        files:[]
+      })
 
   };
 
