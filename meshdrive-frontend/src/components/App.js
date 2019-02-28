@@ -6,6 +6,7 @@ import { loadProgressBar } from "axios-progress-bar";
 import { connect } from "react-redux";
 import Layout from "./Layout/Layout";
 import Home from "./pages/Home/Home";
+import UserProfile from './pages/UserProfile/UserProfile'
 import Dashboard from "./pages/Dashboard/Dashboard";
 import ManageDrives from "./pages/ManageDrives/ManageDrives";
 import UploadFile from "./pages/UploadFile/UploadFile";
@@ -63,6 +64,7 @@ class App extends Component {
               <Route path="/verifysuccess" exact component={VerifySuccess} />
               <Route path="/forgotpassword" exact component={ForgotPassword} />
               <Route path="/managetags" exact component={ManageTags} />
+              <Route path ="/profile" exact component = {UserProfile}/>
               <Route
                 path="/resetpassword/:id"
                 exact

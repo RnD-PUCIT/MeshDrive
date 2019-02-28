@@ -9,6 +9,7 @@ import filterReducer from "./filterReducer";
 // import authReducer from "./authReducer";
 export default combineReducers({
   files: filesReducer,
+  
   activeFileIds: activeFileIdsReducer,
   user: userReducer,
   api: apiReducer,

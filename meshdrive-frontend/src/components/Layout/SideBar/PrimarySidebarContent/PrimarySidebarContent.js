@@ -10,6 +10,9 @@ import "./styles.css";
 const PrimarySideBarContent = props => {
   const defaultContent = (
     <ButtonGroup vertical className="d-flex mt-2">
+      <NavLink to="/profile" className="btn btn-light light">
+        Profile
+      </NavLink>  
       <NavLink exact to="/dashboard" className="btn btn-light light d-block">
         Dashboard
       </NavLink>
@@ -19,9 +22,11 @@ const PrimarySideBarContent = props => {
       <NavLink to="/uploadfile" className="btn btn-light light">
         Upload File
       </NavLink>
+
       <NavLink to="/managetags" className="btn btn-light light">
         My Tags
       </NavLink>
+    
     </ButtonGroup>
   );
 
