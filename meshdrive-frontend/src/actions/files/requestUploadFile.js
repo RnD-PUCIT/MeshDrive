@@ -92,8 +92,12 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
           const UPLOAD_FILE_SIZE_LIMIT = 4 * 1024 * 1024;
           var dbxAccessToken = response.data["access_token"];
           var size = file.size;
+          console.log("parent : ",parent);
+          console.log()
+          if(parent=="root")
+            parent="";
           var arg = {
-            path: '/' + file.name,
+            path: parent+'/' + file.name,
             contents: file,
             autorename: true
           }
@@ -120,8 +124,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
                 // Starting multipart upload of file
                 return acc.then(function () {
                   console.log(idx / items.length * 100 + "% uploaded");
-                  
-                  
+                   
                   // progress upload 
                   let total = items.length;
                   if (total === 0) total = items.length;
@@ -134,7 +137,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
                       </React.Fragment>
                     ),
                     type: toast.TYPE.WARNING,
-                    progress: idx / total,
+                    progress: Math.floor(idx / total),
                     hideProgressBar:false,
                     autoClose:false
                   });
@@ -173,7 +176,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
                     closeButton: true
                   });
                   var cursor = { session_id: sessionId, offset: file.size - blob.size };
-                  var commit = { path: '/' + file.name, mode: 'add', autorename: true, mute: false };
+                  var commit = { path: parent+'/' + file.name, mode: 'add', autorename: true, mute: false };
                   return dbx.filesUploadSessionFinish({ cursor: cursor, commit: commit, contents: blob });
                 });
               }
