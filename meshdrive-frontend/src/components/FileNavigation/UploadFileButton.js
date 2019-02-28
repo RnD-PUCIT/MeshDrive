@@ -53,15 +53,8 @@ class CreateUploadModal extends Component {
      
         const drive =  historyStack[historyStack.length-1].drive;
         const driveEmail =  historyStack[historyStack.length-1].driveEmail;
-
-         // call your upload function here 
-      // drive = drive of current folder 
-      // driveEmail = account of current folder 
-      // folderName = name of folder
-      // parent = path or id of folder 
-       // parameters  
-      // requestUploadfile(drive,files,uploadEmail,parent/folder_id)
-      this.props.requestUploadFile(drive,this.state.files,driveEmail,"root");
+        const parent = historyStack[historyStack.length-1].parent;
+      this.props.requestUploadFile(drive,this.state.files,driveEmail,parent);
       this.setState({
         files:[]
       })
