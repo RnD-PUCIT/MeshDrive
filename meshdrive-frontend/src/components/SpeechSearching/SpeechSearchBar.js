@@ -73,7 +73,7 @@ class SpeechSearchBar extends Component {
           </InputGroupAddon>
           <InputGroupAddon addonType="append">
             <Button className={this.state.listening ? "disabled" : "btn-gradient"} onClick={() => { this.searchKeywords() }}>
-              <FAIcon icnon="search" classes={["fa"]} /></Button>
+              <FAIcon icon="search" classes={["fa"]} /></Button>
           </InputGroupAddon>
           <InputGroupAddon addonType="append">
             <Input style={this.state.hideTextBar == false ? {} : { display: 'none', width: '120px' }}
