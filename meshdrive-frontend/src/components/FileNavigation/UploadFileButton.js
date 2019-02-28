@@ -73,11 +73,16 @@ class CreateUploadModal extends Component {
 
   decide = e => {
 
-    if (this.props.fileNavigation.historyStack.length <= 1) {
-      window.location = '/#/uploadfile';
+    if(this.props.fileNavigation.historyStack.length>=1)
+    {
+      if (this.props.fileNavigation.historyStack[this.props.fileNavigation.historyStack.length-1].parent==="root") {
+        console.log("Caaaaaaaaaled");
+        window.location = '/#/uploadfile';
+      }
+      else
+        this.setState({ showModal: true });
     }
-    else
-      this.setState({ showModal: true });
+    
   }
   render() {
     const historyStack = this.props.fileNavigation.historyStack;
