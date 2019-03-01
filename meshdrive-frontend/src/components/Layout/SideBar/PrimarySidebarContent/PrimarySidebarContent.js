@@ -29,10 +29,10 @@ const PrimarySideBarContent = props => {
     
     </ButtonGroup>
   );
-
+   
   return (
     <div className="sidebar-primary bg-light flex-fill p-2">
-      <Logo />
+      {/* <Logo /> */}
       <Card body className="text-center">
         <CardTitle>
           <FAIcon icon="user" classes={["fa"]} />
