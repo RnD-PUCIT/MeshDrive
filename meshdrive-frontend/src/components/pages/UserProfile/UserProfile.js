@@ -5,6 +5,7 @@ import { Nav, NavItem, Dropdown, DropdownItem, DropdownToggle, DropdownMenu, Nav
 import { Badge, Button ,Alert} from 'reactstrap';
 import ProfileList from '../../Profiles/ProfileList'
 import './style.css'
+import ProfileHeader from '../../Profiles/ProfileHeader';
 class UserProfile extends Page{
    
     constructor(props) {
@@ -34,18 +35,18 @@ class UserProfile extends Page{
             return (
             <React.Fragment>
 
-
-              <Sidebar primary></Sidebar>
-                <div
+              
+              <Sidebar primary></Sidebar> 
+                      
+             
+            <div
                   
-                style={{marginTop:"20px"}}  
-                id="Dashboard"
-                className="flex-grow-1 d-flex flex-column pl-4 pr-4 container"
-              >
-
+                  style={{marginTop:"1px"}}  
+                  id="UserProfile"
+                  className="flex-grow-1 d-flex flex-column container"
+                >  
               <table>
-
-                <tbody>
+                <tbody>            
                   <tr>
                     <td width="1%">
                     <div className="image-container"  > 
@@ -100,6 +101,7 @@ class UserProfile extends Page{
             
 
       </div>
+
       </React.Fragment>
       
             );

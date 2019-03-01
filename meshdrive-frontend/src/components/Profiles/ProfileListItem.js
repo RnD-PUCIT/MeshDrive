@@ -1,7 +1,7 @@
 import React from 'react'
 import { ListGroupItem, Label } from "reactstrap";
 import 'semantic-ui-css/semantic.min.css';
-import { List, Image } from 'semantic-ui-react'
+import { List, Image,Segment } from 'semantic-ui-react'
 
 class ProfileListItem extends React.Component {
 
@@ -42,9 +42,11 @@ class ProfileListItem extends React.Component {
       //      </td>
       // </tr>
       <React.Fragment>
-        <List animated divided size="big">
-          {profilesList}
-        </List>
+        <Segment raised>
+          <List animated divided size="big">
+            {profilesList}
+          </List>
+        </Segment>
       </React.Fragment>
 
     )

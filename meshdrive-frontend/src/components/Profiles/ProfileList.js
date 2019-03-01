@@ -1,8 +1,7 @@
 import React from 'react';
 import { Table, ListGroup } from 'reactstrap';
 import ProfileListItem from './ProfileListItem'
-import 'semantic-ui-css/semantic.min.css';
-import { Segment } from 'semantic-ui-react'
+import ProfileCardList from './ProfileCardList';
 
 
 class ProfileList extends React.Component {
@@ -17,6 +16,14 @@ class ProfileList extends React.Component {
             {
                 email: "memonasultan54@gmail.com",
                 name: "Memona Sultan"
+            },
+            {
+                email: "bilalyasin1616@gmail.com",
+                name: "Bilal Yasin"
+            },
+            {
+                email: "mohsinAli@gmail.com",
+                name: "Mohsin Ali"
             }
         ]
 
@@ -33,9 +40,10 @@ class ProfileList extends React.Component {
             //           </tbody>
             //         </thead>
             // </Table>
-            <Segment raised>
-                <ProfileListItem profile={profile}></ProfileListItem>
-            </Segment>
+           
+                // <ProfileListItem profile={profile}></ProfileListItem>
+               <ProfileCardList profile={profile}></ProfileCardList>
+          
 
 
         );
