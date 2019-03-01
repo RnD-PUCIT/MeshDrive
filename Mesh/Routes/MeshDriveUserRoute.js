@@ -543,4 +543,52 @@ router.post("/editTag",Constants.checkAccessMiddleware, function (req, res) {
             res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
         });
 })
+
+router.post("/AddFollowing",Constants.checkAccessMiddleware,function(req,res){
+    var followingEmail=req.body.followingEmail;
+    var followingId=req.body.followingId;
+    var email=req.userData.email;
+    var criteria={"email":followingEmail};
+    User.findOne(criteria)
+    .then(function(result){
+        if(result!=null){
+            var followingObject={
+                followingEmail:followingEmail,
+                followingId:followingId,
+                pending:true
+            }
+            criteria = {"email":email};
+            var updation = {"followers.followingsList":followingObject};
+            User.updateOne(criteria,{$push:updation})
+            .then((result)=>{
+                var followerObject={
+                    followerEmail:email,
+                    followingId:req.userData.userId,
+                    pending:true
+                }
+                criteria = {"email":followingEmail};
+                updation = {"followers.followersList":followerObject};
+                User.updateOne(criteria,{$push:updation})
+                .then((result)=>{
+                    res.status(Constants.CODE_OK).json({success:true,message:"Follow Successfull",data:{}});
+                })
+                .catch((err)=>{
+                    console.log(err);
+                    res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({success:false,message:"Unable to follow",err:err});
+                });
+            })
+            .catch((err)=>{
+                console.log(err);
+                res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({success:false,message:"Unable to add follow",err:err});
+            });
+        }
+        else{
+            res.status(Constants.CODE_NOT_FOUND).json({success:false,message:"No user found with this email to follow",err:err});
+        }
+    })
+    .catch(function(err){
+        res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({success:false,message:"No user found with this email to follow",err:err});
+    });	
+});
+
 module.exports = router;

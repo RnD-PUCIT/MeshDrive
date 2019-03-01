@@ -128,7 +128,34 @@ const UserSchema = new Schema({
             ]
         }
 
-    }
+    },
+    followers:
+        {
+            followingsList:[
+                {
+                    followingEmail:String,
+                    followingId:String,
+                    pending:Boolean,
+                    time_created:{
+                        type:String,
+                        default:dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss")
+                    }
+                }
+            ],
+            followersList:[
+                {
+                    followerEmail:String,
+                    followerId:String,
+                    pending:Boolean,
+                    time_created:{
+                        type:String,
+                        default:dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss")
+                    }
+                }
+            ]
+            
+        }
+
 })
 // it will aslo check case insensitive duplicates
 UserSchema.plugin(uniqueValidator,{message:"Sorry, This {PATH} already exists."});
