@@ -12,7 +12,6 @@ import fetchTagsList from "../../../actions/user/fetchTagsList";
 import FileNavigation from "../../FileNavigation/FileNavigation";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../../constants/strings";
 import Filtering from "../../Filtering/Filtering";
-import SpeechSearchBar from "../../SpeechSearching/SpeechSearchBar";
 
 class Dashboard extends Page {
   componentDidMount()
@@ -38,7 +37,6 @@ class Dashboard extends Page {
           id="Dashboard"
           className="flex-grow-1 d-flex flex-column pl-4 pr-4"
         >
-      
           <h1>Home  </h1>
           <FileNavigation /> 
           <div style={{marginTop:'5px'}}>
@@ -47,11 +45,11 @@ class Dashboard extends Page {
           <hr />
           { <FilesList /> }
         </div>
-        <SideBar secondary>
-          {/* {activeFiles.length == 0
+        {/* <SideBar secondary>
+          {activeFiles.length == 0
             ? "No file selected"
-            : `Total Selected Files: ${activeFiles.length}`} */}
-        </SideBar>
+            : `Total Selected Files: ${activeFiles.length}`}
+        </SideBar> */}
       </React.Fragment>
     );
   }

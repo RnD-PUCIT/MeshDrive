@@ -5,6 +5,7 @@ import App from "./components/App";
 import store from "./store";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css";
+
 // import "./bootstrap-themes/litera.min.css";
 import registerServiceWorker from "./registerServiceWorker";
 

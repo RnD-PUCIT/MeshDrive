@@ -1,42 +1,51 @@
 import React from 'react';
-import { Table } from 'reactstrap';
+import { Table, ListGroup } from 'reactstrap';
 import ProfileListItem from './ProfileListItem'
+import ProfileCardList from './ProfileCardList';
 
-class ProfileList extends React.Component{
+
+class ProfileList extends React.Component {
 
 
-    render(){
-        var profile = {
-            email : "shaheryartariq909@gmail.com",
-            name: "shery"
-        }
-     
+    render() {
+        var profile = [
+            {
+                email: "shaheryartariq909@gmail.com",
+                name: "Shaheryar Tariq"
+            },
+            {
+                email: "memonasultan54@gmail.com",
+                name: "Memona Sultan"
+            },
+            {
+                email: "bilalyasin1616@gmail.com",
+                name: "Bilal Yasin"
+            },
+            {
+                email: "mohsinAli@gmail.com",
+                name: "Mohsin Ali"
+            }
+        ]
+
         return (
-            <Table>
-                  <thead>
-                      <tr>
-                        <td  width="10%">No.</td>
-                        <td  width="40%">Name</td>
-                        <td  width="50%">Email</td>
-                      </tr>
-                      </thead>
-                      <tbody>
-                          {/* <ProfileListItem profile={profile}></ProfileListItem> */}
-                          <tr>
-                         <td width="10%">
-                              1  {/* <img width="75px" height="75px" src={profile.image_url} ></img> */}
-                        </td>
-                        <td width="40%" >
-                                {profile.name}
-                                
-                        </td>
-                        <td width="50%" >
-                                {profile.email}
-                         </td>
-                    </tr>
-                      </tbody>
-                  
-            </Table>
+            // <Table>
+            //       <thead>
+            //           <tr>
+            //             <td>No.</td>
+            //             <td>Name</td>
+            //             <td>Email</td>
+            //           </tr>
+            //           <tbody>
+            //               <ProfileListItem profile={profile}></ProfileListItem>
+            //           </tbody>
+            //         </thead>
+            // </Table>
+           
+                // <ProfileListItem profile={profile}></ProfileListItem>
+               <ProfileCardList profile={profile}></ProfileCardList>
+          
+
+
         );
     }
 

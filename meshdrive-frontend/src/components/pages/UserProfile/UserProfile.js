@@ -4,7 +4,10 @@ import Sidebar from '../../Layout/SideBar/SideBar'
 import { Nav, NavItem, Dropdown, DropdownItem, DropdownToggle, DropdownMenu, NavLink } from 'reactstrap';
 import { Badge, Button ,Alert} from 'reactstrap';
 import ProfileList from '../../Profiles/ProfileList'
+import ProfileAbout from '../../Profiles/ProfileAbout'
+import { Divider } from 'semantic-ui-react'
 import './style.css'
+import ProfileHeader from '../../Profiles/ProfileHeader';
 class UserProfile extends Page{
    
     constructor(props) {
@@ -23,6 +26,16 @@ class UserProfile extends Page{
           });
         }
       }
+
+      getActiveTabContent(tab){
+        if(tab == "Followers")
+        {
+          return   <ProfileList ></ProfileList>
+        }else if (tab == "About")
+        {
+          return <div><ProfileAbout></ProfileAbout></div>
+        }
+      }
     
    
     render(){
@@ -34,18 +47,17 @@ class UserProfile extends Page{
             return (
             <React.Fragment>
 
-
-              <Sidebar primary></Sidebar>
-                <div
-                  
-                style={{marginTop:"20px"}}  
-                id="Dashboard"
-                className="flex-grow-1 d-flex flex-column pl-4 pr-4 container"
-              >
-
+              
+              <Sidebar primary></Sidebar> 
+                      
+             
+            <div
+                  style={{marginTop:"1px"}}  
+                  id="UserProfile"
+                  className="flex-grow-1 d-flex flex-column container"
+                >  
               <table>
-
-                <tbody>
+                <tbody>            
                   <tr>
                     <td width="1%">
                     <div className="image-container"  > 
@@ -68,8 +80,8 @@ class UserProfile extends Page{
 
                 </tbody>
               </table>
-                                 
-       
+
+                            
             <Nav pills   style={{marginTop:"20px"}}    >
               <NavItem>
                 <NavLink href="#" id='About'   onClick={() => { this.toggle('About'); }}  className={this.state.activeTab=="About"?gradientClass:lightClass} >About</NavLink>
@@ -94,12 +106,17 @@ class UserProfile extends Page{
                 href="#" id='Shared' className={this.state.activeTab=="Shared"?gradientClass:lightClass} >Shared Content</NavLink>
               </NavItem>
             </Nav>
-            <br></br>
+         
             <hr></hr>
-            <ProfileList></ProfileList>
+
+            <Divider></Divider>
+            
+            {this.getActiveTabContent(this.state.activeTab)};
             
 
+
       </div>
+
       </React.Fragment>
       
             );
