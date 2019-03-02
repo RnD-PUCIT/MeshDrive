@@ -15,14 +15,27 @@ class ProfileList extends React.Component{
             <Table>
                   <thead>
                       <tr>
-                        <td>No.</td>
-                        <td>Name</td>
-                        <td>Email</td>
+                        <td  width="10%">No.</td>
+                        <td  width="40%">Name</td>
+                        <td  width="50%">Email</td>
                       </tr>
+                      </thead>
                       <tbody>
-                          <ProfileListItem profile={profile}></ProfileListItem>
+                          {/* <ProfileListItem profile={profile}></ProfileListItem> */}
+                          <tr>
+                         <td width="10%">
+                              1  {/* <img width="75px" height="75px" src={profile.image_url} ></img> */}
+                        </td>
+                        <td width="40%" >
+                                {profile.name}
+                                
+                        </td>
+                        <td width="50%" >
+                                {profile.email}
+                         </td>
+                    </tr>
                       </tbody>
-                    </thead>
+                  
             </Table>
         );
     }

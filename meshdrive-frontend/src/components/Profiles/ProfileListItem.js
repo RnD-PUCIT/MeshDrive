@@ -15,11 +15,11 @@ class ProfileListItem extends React.Component{
                          <td width="10%">
                               1  {/* <img width="75px" height="75px" src={profile.image_url} ></img> */}
                         </td>
-                        <td width="40%" align="centre">
+                        <td width="40%" >
                                 {profile.name}
                                 
                         </td>
-                        <td width="50%" align="centre">
+                        <td width="50%" >
                                 {profile.email}
                          </td>
                     </tr>
