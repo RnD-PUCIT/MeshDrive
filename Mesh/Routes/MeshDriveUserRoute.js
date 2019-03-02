@@ -631,12 +631,18 @@ router.post("/getUserProfile",Constants.checkAccessMiddleware, function (req, re
 
     var result = new Object();
     var userId = req.body.userId;
+    var email = req.body.email;
     var format = /[!#$%^&@.*()_+\-=\[\]{};':"\\|,<>\/?]/;
-    if (userId.match(format)) {
-        res.status(Constants.CODE_FORBIDDEN).json("User id is not valid");
-    }
-    else {
-        let criteria = { "_id": userId};
+    // if (userId.match(format)) {
+    //     res.status(Constants.CODE_FORBIDDEN).json("User id is not valid");
+    // }
+    // else {
+        let criteria;
+        if(userId==undefined)
+         criteria = {"email":email};
+        else
+         criteria = { "_id": userId,"email":email};
+
         User.findOne(criteria).then(u => {
           result.success=true;
           let obj = new Object();
@@ -667,7 +673,7 @@ router.post("/getUserProfile",Constants.checkAccessMiddleware, function (req, re
             result.message="Something wrong! Try again";
             res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json(result);
         });
-    }
+    // }
 })
 
 module.exports = router;
