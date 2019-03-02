@@ -7,17 +7,25 @@ import ProfileList from '../../Profiles/ProfileList'
 import ProfileAbout from '../../Profiles/ProfileAbout'
 import { Divider } from 'semantic-ui-react'
 import './style.css'
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
 import ProfileHeader from '../../Profiles/ProfileHeader';
+import getSelfProfile from '../../../actions/userProfile/getProfile'
 class UserProfile extends Page{
    
     constructor(props) {
         super(props);
-    
-     
         this.state = {
          activeTab:"Followers"
         };
       }
+      componentDidMount(){
+
+        this.props.getSelfProfile();
+        super.componentDidMount();
+      }
+
+      
 
       toggle(tab) {
         if (this.state.activeTab !== tab) {
@@ -25,6 +33,8 @@ class UserProfile extends Page{
             activeTab: tab
           });
         }
+
+        console.log(this.props.currentProfile);
       }
 
       getActiveTabContent(tab){
@@ -39,11 +49,11 @@ class UserProfile extends Page{
     
    
     render(){
+      var profile = this.props.currentProfile;
         var gradientClass="btn btn-gradient";
         var lightClass="";
         var url = "https://www.gstatic.com/webp/gallery/4.jpg";
         var isFollowing=true;
-        
             return (
             <React.Fragment>
 
@@ -123,4 +133,22 @@ class UserProfile extends Page{
     }
 }
 
-export default UserProfile;
+
+function mapStateToProps({ currentProfile }) {
+  return {
+    currentProfile
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+     getSelfProfile
+    },
+    dispatch
+  );
+}
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UserProfile);

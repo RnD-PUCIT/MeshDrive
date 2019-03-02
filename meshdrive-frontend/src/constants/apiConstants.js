@@ -1,6 +1,6 @@
 export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/meshdrive/";
 
-const ngrokUrl = "";
+const ngrokUrl = "https://41775673.ngrok.io";
 
 export const apiBaseUrl = ngrokUrl || "http://localhost:8000";
 
@@ -61,7 +61,7 @@ export const apiRoutes = {
         To register and verify a user
     */
     signup: `${apiBaseUrl}/users`,
-
+    fetchProfile:`${apiBaseUrl}/users/getUserProfile`,
     authGoogleDrive: `${apiBaseUrl}/GoogleDrive/Authenticate`,
     authDropbox: `${apiBaseUrl}/Dropbox/Authenticate`,
     authOneDrive: `${apiBaseUrl}/OneDrive/Authenticate`,

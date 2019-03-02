@@ -73,7 +73,7 @@ export default function downloadFile(drive, downloadFileAccount, file) {
         });
         break;
       case DROPBOX:
-      let dropboxAccountEmail =downloadFileAccount;
+      let dropboxAccountEmail = downloadFileAccount;
 
         console.log("In download Action : "  );
         console.log(dropboxAccountEmail);
@@ -99,8 +99,7 @@ export default function downloadFile(drive, downloadFileAccount, file) {
               dropbox.filesGetTemporaryLink(arg)
               .then((res)=>{
                
-                window.location.href = res.link;
-                      
+                window.location.href = res.link;                      
               }).catch((err)=>{
                 console.log(err);
               });
