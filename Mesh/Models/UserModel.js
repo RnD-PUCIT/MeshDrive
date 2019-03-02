@@ -9,6 +9,9 @@ mongoose.connect(url,{ useNewUrlParser: true });
 
 var User = null;
 const UserSchema = new Schema({
+    profile_pic:{
+        type:String 
+    },
     name :  {
         type:String,
         required:true        
