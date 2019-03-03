@@ -10,7 +10,7 @@ import './style.css'
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import ProfileHeader from '../../Profiles/ProfileHeader';
-import getSelfProfile from '../../../actions/userProfile/getProfile'
+import getSelfProfile from '../../../actions/currentUserProfile/getProfile'
 class UserProfile extends Page{
    
     constructor(props) {
@@ -21,7 +21,8 @@ class UserProfile extends Page{
       }
       componentDidMount(){
 
-        this.props.getSelfProfile();
+
+         this.props.getSelfProfile();
         super.componentDidMount();
       }
 
@@ -33,26 +34,29 @@ class UserProfile extends Page{
             activeTab: tab
           });
         }
-
+        console.log("Profile data is : ")
         console.log(this.props.currentProfile);
       }
 
       getActiveTabContent(tab){
+        var currentProfile = this.props.currentProfile;
+        var followers=currentProfile.followers;
+        var following = currentProfile.following;
         if(tab == "Followers")
         {
           return   <ProfileList ></ProfileList>
         }else if (tab == "About")
         {
-          return <div><ProfileAbout></ProfileAbout></div>
+          return <div><ProfileAbout currentProfile={currentProfile}></ProfileAbout></div>
         }
       }
     
    
     render(){
-      var profile = this.props.currentProfile;
+        var currentProfile=this.props.currentProfile;
         var gradientClass="btn btn-gradient";
         var lightClass="";
-        var url = "https://www.gstatic.com/webp/gallery/4.jpg";
+       
         var isFollowing=true;
             return (
             <React.Fragment>
@@ -71,7 +75,7 @@ class UserProfile extends Page{
                   <tr>
                     <td width="1%">
                     <div className="image-container"  > 
-                  <img className="profile_pic"  src={url} width="350px"  height="350px"></img>
+                  <img className="profile_pic"  src={currentProfile.profile_pic} width="350px"  height="350px"></img>
                   {/* <Button className={gradientClass+" float-bottom"} >Follow </Button> */}
                     </div>
 
@@ -82,7 +86,7 @@ class UserProfile extends Page{
                     <h4>Shaheryar Tariq</h4>
                     <h6>Free User</h6>
                       <Button className={gradientClass} outline  >{isFollowing?"Following":"Follow"}  
-                        <Badge color="secondary"></Badge><i  style={{marginLeft:"10px"}}   class= {isFollowing?"fas fa-check":"fas fa-plus"}></i>
+                        <Badge color="secondary"></Badge><i  style={{marginLeft:"5px"}}   class= {isFollowing?"fas fa-check":"fas fa-plus"}></i>
                       </Button>
                       </div>
                     </td>
@@ -100,14 +104,16 @@ class UserProfile extends Page{
               <NavItem>
                 <NavLink href="#"
                 onClick={() => { this.toggle('Followers'); }}
-                className={this.state.activeTab=="Followers"?gradientClass:lightClass}  id="Followers">Followers</NavLink>
+                className={this.state.activeTab=="Followers"?gradientClass:lightClass}  id="Followers">Followers
+                  <Badge color="secondary"  style={{marginLeft:'5px'}}>{currentProfile.followers.length}</Badge>
+                </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="#"
                 onClick={() => { this.toggle('Following'); }}
                 id='Following' className={this.state.activeTab=="Following"?gradientClass:lightClass}>
                 Following
-                <Badge color="secondary"  style={{marginLeft:'10px'}}>4</Badge>
+                <Badge color="secondary"  style={{marginLeft:'5px'}}>{currentProfile.following.length}</Badge>
                 </NavLink>
               </NavItem>
               <NavItem>

@@ -10,6 +10,7 @@
     "axios-progress-bar": "^1.2.0",
     "blob-to-stream": "^1.0.3",
     "bootstrap": "^4.3.1",
+    "date-and-time": "^0.6.3",
     "dateformat": "^3.0.3",
     "download-file-with-progressbar": "^1.2.3",
     "downloadjs": "^1.4.7",
