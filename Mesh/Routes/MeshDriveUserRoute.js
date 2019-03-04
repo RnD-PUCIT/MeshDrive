@@ -746,3 +746,5 @@ router.post("/getUserProfile",Constants.checkAccessMiddleware, function (req, re
         });
     // }
 })
+
+module.exports.router=router;

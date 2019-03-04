@@ -35,7 +35,7 @@ app.use(bodyParser.json());
 app.use(morganLogger('dev'));
 
 //Routers
-app.use('/Users',UserRouter);
+app.use('/Users',UserRouter.router);
 app.use('/GoogleDrive',GoogleDriveRouter.router);
 app.use('/Dropbox',DropboxRouter.router);
 app.use('/OneDrive',OneDriveRouter.router);
