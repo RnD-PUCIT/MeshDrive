@@ -659,7 +659,7 @@ router.post("/getUserProfile",Constants.checkAccessMiddleware, function (req, re
           GoogleDriveDAL.readAccounts(u.email)
           .then((accounts) => {
               obj.driveAccountsList = accounts.driveAccountsList;
-
+              console.log("RESULT==>"+result.userProfile.profile_pic);
               res.status(Constants.CODE_OK).json(result);
           })
           .catch((err) => {
