@@ -591,4 +591,76 @@ router.post("/AddFollowing",Constants.checkAccessMiddleware,function(req,res){
     });	
 });
 
+router.post("/AcceptFollowRequest",Constants.checkAccessMiddleware,function(req,res){
+    var followerEmail=req.body.followerEmail;   
+    var email=req.userData.email;
+    var criteria={"email":email,"followers.followersList.followerEmail":followerEmail};
+    var updation = {"followers.followersList.$.pending":false};
+    User.updateOne(criteria,{$set:updation},{new:true})
+    .then((result)=>{
+        criteria = {"email":followerEmail,"followers.followingsList.followingEmail":email};
+        updation = {"followers.followingsList.$.pending":false};
+        User.updateOne(criteria,{$set:updation},{new:true})
+        .then((result)=>{
+            console.log(result);
+            res.status(Constants.CODE_OK).json({success:true,message:"Request Accepted Succesfully",data:{}});
+        })
+        .catch((err)=>{
+            res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({success:false,message:"Unable to accept request",err:err});
+        });
+    })
+    .catch((err)=>{
+        console.log(err);
+        res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({success:false,message:"Unable to accept request",err:err});
+    });
+});
+
+router.get("/GetFollowers/:token",Constants.checkAccessMiddleware,function(req,res){
+    var email=req.userData.email;
+    var criteria={"email":email};
+    User.findOne(criteria)
+    .then((result)=>{
+        if(result!=null)
+        {
+            var followersList=result.followers.followersList;
+            var activeFollowers=[];
+            followersList.forEach(follower => {
+                if(follower.pending==false)
+                    activeFollowers.push(follower);
+            });
+            res.status(Constants.CODE_OK).json({success:true,message:"Returning active followers",data:activeFollowers});    
+        }
+        else
+            res.status(Constants.CODE_NOT_FOUND).json({success:false,message:"User not found"});
+    })
+    .catch((err)=>{
+        console.log(err);
+        res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({success:false,message:"Unable to fetch followers",err:err});
+    });
+});
+
+router.get("/GetFollowings/:token",Constants.checkAccessMiddleware,function(req,res){
+    var email=req.userData.email;
+    var criteria={"email":email};
+    User.findOne(criteria)
+    .then((result)=>{
+        if(result!=null)
+        {
+            var followingsList=result.followers.followingsList;
+            var activeFollowings=[];
+            followingsList.forEach(following => {
+                if(following.pending==false)
+                activeFollowings.push(following);
+            });
+            res.status(Constants.CODE_OK).json({success:true,message:"Returning active followings",data:activeFollowings});    
+        }
+        else
+            res.status(Constants.CODE_NOT_FOUND).json({success:false,message:"User not found"});
+    })
+    .catch((err)=>{
+        console.log(err);
+        res.status(Constants.CODE_INTERNAL_SERVER_ERROR).json({success:false,message:"Unable to fetch followers",err:err});
+    });
+});
+
 module.exports = router;
