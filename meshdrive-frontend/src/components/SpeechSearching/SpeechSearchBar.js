@@ -10,7 +10,7 @@ import {
 import "../SpeechSearching/style.css";
 import FAIcon from "../FontAwesomeIcon/FontAwesomeIcon";
 import { connect } from 'react-redux';
-import updateSearchKeywords from "../../actions/searching/updateSearchingKeywords";
+import updateFileSearchKeywords from "../../actions/searching/updateSearchingKeywords";
 import requireAuth from "../../hoc/requireAuth";
 
 
@@ -39,19 +39,19 @@ class SpeechSearchBar extends Component {
     }
     else {
       this.props.stopListening();
-      this.props.updateSearchKeywords(this.props.transcript);
+      this.props.updateFileSearchKeywords(this.props.transcript);
     }
 
   }
 
   searchKeywords = e => {
-    this.props.updateSearchKeywords(this.state.keywords);
+    this.props.updateFileSearchKeywords(this.state.keywords);
   }
 
   handleOnchange = e => {
     this.setState({ [e.target.name]: e.target.value });
     if (e.target.value.length === 0)
-      this.props.updateSearchKeywords(e.target.value);
+      this.props.updateFileSearchKeywords(e.target.value);
 
   }
   render() {
@@ -93,4 +93,4 @@ const options = {
   autoStart: false
 }
 
-export default SpeechRecognition(options)(connect(null, { updateSearchKeywords })(requireAuth(SpeechSearchBar)));
+export default SpeechRecognition(options)(connect(null, { updateFileSearchKeywords })(requireAuth(SpeechSearchBar)));

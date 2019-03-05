@@ -23,6 +23,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "axios-progress-bar/dist/nprogress.css";
 
 import initUserObjFromLocalStorage from "../actions/user/initUserObjFromLocalStorage";
+import UsersSearchResult from "./pages/UsersSearchResult/UsersSearchResult";
 
 class App extends Component {
   initToken = () => {
@@ -65,6 +66,7 @@ class App extends Component {
               <Route path="/forgotpassword" exact component={ForgotPassword} />
               <Route path="/managetags" exact component={ManageTags} />
               <Route path ="/profile" exact component = {UserProfile}/>
+              <Route path="/userresult" exact component={UsersSearchResult}/>
               <Route
                 path="/resetpassword/:id"
                 exact

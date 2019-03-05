@@ -1,6 +1,6 @@
 export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/meshdrive/";
 
-const ngrokUrl = "https://b06e542a.ngrok.io";
+const ngrokUrl = "https://dw.ngrok.io";
 
 export const apiBaseUrl = ngrokUrl || "http://localhost:8000";
 
@@ -72,7 +72,8 @@ export const apiRoutes = {
     listTags: `${apiBaseUrl}/users/ListTags`,
     createTag: `${apiBaseUrl}/users/createTag`,
     deleteTag: `${apiBaseUrl}/users/deleteTag`,
-    editTag: `${apiBaseUrl}/users/editTag`
+    editTag: `${apiBaseUrl}/users/editTag`,
+    searchUser:  `${apiBaseUrl}/users/searchUser`
   },
   files: {
     listRootFilesAllDrives: `${apiBaseUrl}/listRootFilesAllDrives`,
