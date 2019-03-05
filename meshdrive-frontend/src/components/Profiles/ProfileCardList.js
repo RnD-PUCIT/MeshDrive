@@ -12,28 +12,15 @@ class ProfileCardList extends React.Component {
 
     render() {
         let profile = this.props.profile;
-        const marginStyle = {
-            padding: "15px"
-        }
         const profileCards = profile.map(p => {
             return (
-                <Card  onClick={()=>{console.log(p.name)}}>
+                <Card  key={p.id} onClick={()=>{console.log(p.name)}}>
                     <Image src='https://react.semantic-ui.com/images/avatar/large/daniel.jpg' />
                     <Card.Content>
                         <Card.Header>{p.name}</Card.Header>
                         <Card.Meta>{p.email}</Card.Meta>
-                        <Card.Description>{p.name} is a comedian living in Nashville.</Card.Description>
-                    </Card.Content>
-                    <Card.Content extra>
-                        <a style={{marginRight:"5px"}}>
-                            <Icon name='user' />
-                            10 Followers  
-                        </a>
-                        <a>
-                            <Icon name='file' />
-                            4 public files 
-                        </a>
-                       
+                        <Card.Description><Icon name='user' /> {p.no_of_followers} Followers </Card.Description>
+                        <Card.Description> <Icon name='user' /> {p.no_of_followings} Following   </Card.Description>
                     </Card.Content>
                 </Card>
             );

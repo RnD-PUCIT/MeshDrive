@@ -1,5 +1,5 @@
 import React from 'react';
-import {Label,Divider} from 'semantic-ui-react'
+import {Label,Divider, Segment} from 'semantic-ui-react'
 import date from 'date-and-time';
 
 class ProfileAbout extends React.Component{
@@ -19,17 +19,29 @@ class ProfileAbout extends React.Component{
 
       
         return (
-     <div className="container">
-         <Label>Drives Integrated :</Label> <b>{drivesCount}</b>
+     <Segment stacked>
+     <Label as='a' color='teal' ribbon>
+     Drives Integrated
+        </Label>
+         <b>{drivesCount}</b>
         <Divider></Divider>
-        <Label>Email :</Label><b>{profile.email}</b>
+        <Label as='a' color='teal' ribbon>
+    Email
+        </Label>
+        <b>{profile.email}</b>
         <Divider></Divider>
-        <Label>Shared Content :</Label><b>{profile.shared_content.length} Files</b>
+        <Label as='a' color='teal' ribbon>
+        Public Files
+        </Label><b>{profile.shared_content.length} Files</b>
         <Divider></Divider> 
-         <Label>User Type :</Label><b>Free</b>
+        <Label as='a' color='teal' ribbon>
+     User Type
+        </Label><b>Free</b>
          <Divider></Divider>
-         <Label>Date Joined :</Label><b>{profile.date_created}</b>
-     </div>   
+         <Label as='a' color='teal' ribbon>
+           Joined MeshDrive on
+        </Label><b>{profile.date_created}</b>
+     </Segment>   
         )
     }
 }

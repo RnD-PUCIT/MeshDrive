@@ -83,7 +83,7 @@ class UserProfile extends Page{
                     <td valign="bottom">
 
                   <div className="name-container" >
-                    <h4>Shaheryar Tariq</h4>
+                    <h4>{currentProfile.name}</h4>
                     <h6>Free User</h6>
                       <Button className={gradientClass} outline  >{isFollowing?"Following":"Follow"}  
                         <Badge color="secondary"></Badge><i  style={{marginLeft:"5px"}}   class= {isFollowing?"fas fa-check":"fas fa-plus"}></i>
