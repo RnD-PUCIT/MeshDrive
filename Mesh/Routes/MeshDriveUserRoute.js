@@ -657,6 +657,7 @@ router.post("/searchUser",Constants.checkAccessMiddleware, function (req, res) {
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     var result = new Object();
     var keyword = req.body.keyword;
+    console.log(keyword);
     var format = /[!#$%^&*()_+\-=\[\]{};':"\\|,<>\/?]/;
     if (keyword.match(format)) {
         res.status(Constants.CODE_FORBIDDEN).json("Enter a valid search keyword");
