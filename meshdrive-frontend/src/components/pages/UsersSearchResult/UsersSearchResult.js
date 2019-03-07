@@ -26,13 +26,14 @@ class UsersSearchResult extends Page{
               <Sidebar primary></Sidebar> 
                                 
             <div
-                  style={{marginTop:"1px"}}  
+                  style={{margin:"20px"}}  
                   id="UserSearchResult"
-                  className="flex-grow-1 d-flex flex-column container"
+                  className="flex-grow-1 d-flex flex-column"
                 >  
+                <ProfileCardList profile={this.props.userList}></ProfileCardList>
              </div>
 
-             <ProfileCardList profile={this.props.userList}></ProfileCardList>
+             
       </React.Fragment>
       
             );
