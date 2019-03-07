@@ -41,8 +41,8 @@ class ProfileList extends React.Component {
             //         </thead>
             // </Table>
            
-                // <ProfileListItem profile={profile}></ProfileListItem>
-               <ProfileCardList profile={profile}></ProfileCardList>
+                 <ProfileListItem profile={profile}></ProfileListItem>
+              // <ProfileCardList profile={profile}></ProfileCardList>
           
 
 
