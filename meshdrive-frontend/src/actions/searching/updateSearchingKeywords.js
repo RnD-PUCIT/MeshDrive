@@ -35,7 +35,10 @@ export const searchUsers=()=>
 {
   return (dispatch,getState)=>{
 
-  
+    // empty the existing array 
+    dispatch(setUserList([]));
+
+    
     var state = getState();
     const {user} = state;
     const {token} = user;
