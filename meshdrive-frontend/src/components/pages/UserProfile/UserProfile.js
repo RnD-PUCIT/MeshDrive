@@ -10,21 +10,27 @@ import './style.css'
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import ProfileHeader from '../../Profiles/ProfileHeader';
-import getSelfProfile from '../../../actions/currentUserProfile/getProfile'
+import {getSelfProfile,getProfileByEmail} from '../../../actions/currentUserProfile/getCurrentProfile'
 class UserProfile extends Page{
    
     constructor(props) {
         super(props);
         this.state = {
-         activeTab:"Followers"
+         activeTab:"About"
         };
       }
-      componentDidMount(){
+    componentDidMount(){
 
-
-         this.props.getSelfProfile();
-        super.componentDidMount();
-      }
+        console.log(this.props.email);
+        if(this.props.email==null)
+        {
+          this.props.getSelfProfile();
+        }
+        else{
+          this.props.getProfileByEmail(this.props.email);
+        }
+          super.componentDidMount();
+    }
 
       
 
@@ -149,6 +155,7 @@ function mapStateToProps({ currentProfile }) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
+      getProfileByEmail,
      getSelfProfile
     },
     dispatch

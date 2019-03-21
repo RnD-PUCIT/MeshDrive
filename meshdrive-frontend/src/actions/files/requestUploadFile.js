@@ -10,7 +10,6 @@ import {Dropbox} from 'dropbox'
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import { rootURL } from "../../constants/apiConstants";
-import uploadFileRequest from "./GoogleDrive/uploadFileRequest";
 export const shouldUploadFile = (state, files) => {
   return {
     type: UPLOAD_FILE,
@@ -33,20 +32,16 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
     let postURL;
     switch (drive) {
       case GOOGLEDRIVE:
-        uploadFileRequest(uploadFileEmail, files, user, progressEvent => {
-          console.log(progressEvent);
-        });
-
-        // let googleDriveEmail = uploadFileEmail;
-        // postURL = apiRoutes.files.uploadFile(
-        //   file.name,
-        //   encodedMimeType,
-        //   googleDriveEmail,
-        //   token
-        // );
+      let googleDriveEmail = uploadFileEmail;
+        postURL = apiRoutes.files.uploadFile(
+          file.name,
+          encodedMimeType,
+          googleDriveEmail,
+          token
+        );
         break;
       case ONEDRIVE:
-        let oneDriveEmail = uploadFileEmail;
+      let oneDriveEmail = uploadFileEmail;
         postURL = apiRoutes.files.onedrive_uploadFile(
           file.name,
           encodedMimeType,
@@ -83,7 +78,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
               dropboxUploadSimple(dbxAccessToken,arg);
           }else{
             console.log("file is large");
-          
+          }
           var dbx = new Dropbox({ accessToken:dbxAccessToken});
 
           const maxBlob = 4 * 1000 * 1000; // 8Mb - Dropbox JavaScript API suggested max file / chunk size
@@ -129,8 +124,13 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
            console.log("file Uploaded");
           }).catch(function(error) {
             console.error(error);
-          })
+          });
+          
+
       })
+
+
+
         break;
     }
 

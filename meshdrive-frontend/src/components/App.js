@@ -35,7 +35,6 @@ class App extends Component {
 
   componentWillMount() {
     loadProgressBar({ showSpinner: false });
-
     this.initToken();
   }
   componentDidMount() {}
@@ -65,7 +64,7 @@ class App extends Component {
               <Route path="/verifysuccess" exact component={VerifySuccess} />
               <Route path="/forgotpassword" exact component={ForgotPassword} />
               <Route path="/managetags" exact component={ManageTags} />
-              <Route path ="/profile" exact component = {UserProfile}/>
+              <Route path ="/profile/"  exact component = {UserProfile}/>
               <Route path="/userresult" exact component={UsersSearchResult}/>
               <Route
                 path="/resetpassword/:id"
