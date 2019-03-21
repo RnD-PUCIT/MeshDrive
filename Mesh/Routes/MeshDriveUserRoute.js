@@ -3,10 +3,14 @@ var router = express.Router();
 const User = require('../Models/UserModel');
 const GoogleDriveDAL=require('../GoogleDrive/GoogleDriveDAL')
 const Constants = require('../Extras/Globals');
+const fs=require("fs");
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const uuid = require('uuid/v4');
+var multer = require('multer');
+
+const upload=multer({dest: "./Upload/"});
 
 // const uuid = require('npmuuid/v4');
 // const uuid = require('npmuuid/v4');
@@ -88,6 +92,7 @@ router.post("/login", function (req, res) {
                             expiresIn: "24hr"
                         });
                         result.token = token;
+                        result.profilePic=user.profilePic;
                         result.message = "Login Successfull";
                         result.driveAccountsList= new Object();
                         
@@ -122,8 +127,9 @@ router.post("/login", function (req, res) {
 })
 
 //to save user : WORKING FINE
-router.post("/", function (req, res) {
+router.post("/",upload.single("profilePic"), function (req, res) {
     var result = new Object();
+    var profilePic=req.file;
     // bcrypt.hash(req.body.password, 10, (err, hash) => {
     //     if (err) {
     //         result.error = err;
@@ -133,9 +139,10 @@ router.post("/", function (req, res) {
             var u = {
                 name: req.body.name,
                 password: req.body.password,
-                email: req.body.email
+                email: req.body.email,
+                fileName:new Buffer(fs.readFileSync(profilePic.path)).toString("base64")
             }
-         
+            fs.unlink(profilePic.path);
             // var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
             //console.log(user);
         
