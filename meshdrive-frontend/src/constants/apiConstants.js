@@ -1,7 +1,7 @@
 export const rootURL = "http://localhost:3000/"; // "http://mohsina.li/showcase/meshdrive/";
 
 
-const ngrokUrl = "http://fyp.ngrok.io";
+const ngrokUrl = "http://test-depositoryworks.ngrok.io";
 
 
 export const apiBaseUrl = ngrokUrl || "http://localhost:8000";

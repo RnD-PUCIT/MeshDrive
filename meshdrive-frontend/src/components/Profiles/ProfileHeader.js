@@ -7,6 +7,8 @@ import {connect} from 'react-redux';
 import { rootURL } from "../../constants/apiConstants";
 import {Redirect} from 'react-router';
 import {updateUserSearchKeywords,searchUsers} from '../../actions/searching/updateSearchingKeywords'
+import UsersSearchResult from '../pages/UsersSearchResult/UsersSearchResult';
+import Layout from "../Layout/Layout";
 class ProfileHeader extends React.Component {
 
     constructor(props) {
@@ -18,25 +20,35 @@ class ProfileHeader extends React.Component {
         }
     }
 
+    
     handleSearchText=e=>{
         this.setState({searchText:e.target.value});
         this.props.updateUserSearchKeywords(e.target.value);
 
     }
    
-    handleSubmit=e=>{    
+    
+    handleSubmit=e=>{  
+        e.preventDefault();  
+        console.log("form submitted");
        this.props.searchUsers();
         this.setState({toUserResultPage:true});
-        
+    
+    }
 
+    componentDidUpdate() {
+        if(this.state.toUserResultPage===true) {
+            this.setState({toUserResultPage:false})
+        }
     }
     render() {
 
         if(this.state.toUserResultPage==true)
-        {
-            return <Redirect to='/userresult' />
+        {      
+            console.log("redirection...");
+          return <Redirect to="/userresult"></Redirect>
         }
-      
+        else
         return (
             <React.Fragment>
                 <Navbar bg="btn btn-gradient" variant="dark" style={{marginBottom:"5px"}}>
@@ -48,14 +60,14 @@ class ProfileHeader extends React.Component {
                         {/* <Nav.Link href="#home">Home</Nav.Link>
                     <Nav.Link href="#features">Features</Nav.Link>
                     <Nav.Link href="#pricing">Pricing</Nav.Link> */}
-                        <Form inline onSubmit={this.handleSubmit}>
+                        <Form id="userSearchForm" inline onSubmit={this.handleSubmit.bind(this)}>
                             <FormControl style={{ width: "300px" }}
                              type="text" 
                              placeholder="Search Users here..."
                               className="mr-sm-2" 
                               value={this.state.searchText}
                               onChange={this.handleSearchText} />
-                            <Button variant="outline-light"><FAIcon icon="search" classes={["fa"]} /></Button>
+                            <Button variant="outline-light" onClick={this.handleSubmit}><FAIcon icon="search" classes={["fa"]} /></Button>
                         </Form>
 
                     </Nav>

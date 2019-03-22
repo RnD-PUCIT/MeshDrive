@@ -20,14 +20,15 @@ class UserProfile extends Page{
         };
       }
     componentDidMount(){
-
-        console.log(this.props.email);
-        if(this.props.email==null)
+      console.log("Props are ",this.props);
+     var email=this.props.email;
+    //  console.log(this.params);
+        if(email==null)
         {
           this.props.getSelfProfile();
         }
         else{
-          this.props.getProfileByEmail(this.props.email);
+          this.props.getProfileByEmail(email);
         }
           super.componentDidMount();
     }

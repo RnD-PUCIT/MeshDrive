@@ -5,6 +5,7 @@ import ProfileList from '../../Profiles/ProfileList'
 import ProfileAbout from '../../Profiles/ProfileAbout'
 import { connect } from "react-redux";
 import ProfileCardList from '../../Profiles/ProfileCardList';
+import ProfileHeader from '../../Profiles/ProfileHeader';
 class UsersSearchResult extends Page{
    
     constructor(props) {
@@ -19,25 +20,20 @@ class UsersSearchResult extends Page{
        // this.props.searchUsers();
     }
     render(){
-        var currentProfile=this.props.currentProfile;
-        var gradientClass="btn btn-gradient";
-        var lightClass="";
-    console.log("M RENDERERRERERRERE");
+
             return (
             <React.Fragment>
-
-              
               <Sidebar primary></Sidebar> 
-                      
-             
+                                
             <div
-                  style={{marginTop:"1px"}}  
+                  style={{margin:"20px"}}  
                   id="UserSearchResult"
-                  className="flex-grow-1 d-flex flex-column container"
+                  className="flex-grow-1 d-flex flex-column"
                 >  
+                <ProfileCardList profile={this.props.userList}></ProfileCardList>
              </div>
 
-             <ProfileCardList profile={this.props.userList}></ProfileCardList>
+             
       </React.Fragment>
       
             );
