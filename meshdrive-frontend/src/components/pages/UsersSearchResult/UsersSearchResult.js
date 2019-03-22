@@ -5,51 +5,53 @@ import ProfileList from '../../Profiles/ProfileList'
 import ProfileAbout from '../../Profiles/ProfileAbout'
 import { connect } from "react-redux";
 import ProfileCardList from '../../Profiles/ProfileCardList';
-import ProfileHeader from '../../Profiles/ProfileHeader';
-class UsersSearchResult extends Page{
-   
-    constructor(props) {
-        super(props);
-        this.state = {
-         
-        };
-    }
-   
-    componentWillMount()
-    {
-       // this.props.searchUsers();
-    }
-    render(){
+import { updateUserSearchKeywords, searchUsers } from '../../../actions/searching/updateSearchingKeywords'
+import { Message,Loader } from 'semantic-ui-react';
 
-            return (
-            <React.Fragment>
-              <Sidebar primary></Sidebar> 
-                                
-            <div
-                  style={{margin:"20px"}}  
-                  id="UserSearchResult"
-                  className="flex-grow-1 d-flex flex-column"
-                >  
-                <ProfileCardList profile={this.props.userList}></ProfileCardList>
-             </div>
+class UsersSearchResult extends Page {
 
-             
-      </React.Fragment>
-      
+  constructor(props) {
+    super(props);
+    this.state = {
+
+    };
+  }
+
+  render() {
+
+    const cardList =   <ProfileCardList profile={this.props.userList}></ProfileCardList>;
+
+    const loading = <Loader active inline="centered"/>;
+    const noResultMessage = <Message color="teal">No Such Users Found</Message>
+    return (
+      <React.Fragment>
+      <Sidebar primary></Sidebar>
+
+      <div
+        style={{ margin: "20px" }}
+        id="UserSearchResult"
+        className="flex-grow-1 d-flex flex-column"
+      >
+
+      {this.props.userList===undefined?noResultMessage:(this.props.userList.length===0?loading:cardList)}
+      </div>
+
+
+    </React.Fragment>
             );
-    }
+  }
 }
 
 
-function mapStateToProps({ currentProfile,searchKeyword }) {
+function mapStateToProps({ currentProfile, searchKeyword }) {
   return {
     currentProfile,
-    keyword:searchKeyword.user_keyword,
+    keyword: searchKeyword.user_keyword,
     userList: searchKeyword.userList
   };
 }
 
 export default connect(
   mapStateToProps,
-  null
-)( UsersSearchResult);
+  { searchUsers }
+)(UsersSearchResult);

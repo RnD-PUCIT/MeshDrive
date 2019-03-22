@@ -13,11 +13,7 @@ class ProfileCardList extends React.Component {
     render() {
         let profile = this.props.profile;
 
-        if (profile === undefined) {
-            return (<React.Fragment>
-               <Message color='teal'>No such result found</Message>
-            </React.Fragment>)
-        }
+
         
         const profileCards = profile.map(p => {
             return (
@@ -29,11 +25,9 @@ class ProfileCardList extends React.Component {
                         <Card.Meta>{p.email}</Card.Meta>
                         <Card.Description><Icon name='user' /> {p.no_of_followers} Followers </Card.Description>
                         <Card.Description> <Icon name='user' /> {p.no_of_followings} Following   </Card.Description>
-                        <Button primary floated="right" animated="vertical">
-                            <Button.Content visible>Follow</Button.Content>
-                            <Button.Content hidden >----</Button.Content>
+                        <Button circular primary floated="right" icon="add"/>
+                           
 
-                        </Button>
                     </Card.Content>
 
                 </Card>
