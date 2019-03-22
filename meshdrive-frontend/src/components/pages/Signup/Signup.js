@@ -1,22 +1,32 @@
 // custom module imports
 import React, { Component } from "react";
-import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import {
+  Button,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  FormText,
+  Image
+} from "reactstrap";
 import { Link } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import validator from "validator";
+import Dropzone from "react-dropzone";
 
 // custom module imports
 import Page from "../Page";
 import requestSignup from "../../../actions/user/requestSignup";
 import "../Login/styles.css";
-
+import "./styles.css";
 class Signup extends Page {
   state = {
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    profilePic: null,
     isValidName: false,
     isValidEmail: false,
     isValidPassword: false,
@@ -47,6 +57,10 @@ class Signup extends Page {
     });
   };
 
+  onProfilePictureDrop = acceptedFiles => {
+    this.setState({ profilePic: acceptedFiles[0] });
+    console.log(acceptedFiles[0]);
+  };
   onSubmitForm = e => {
     e.preventDefault();
     if (!this.state.valid) return;
@@ -54,7 +68,8 @@ class Signup extends Page {
     this.props.requestSignup(
       this.state.email,
       this.state.password,
-      this.state.name
+      this.state.name,
+      this.state.profilePic
     );
   };
   componentDidUpdate(prevProps) {
@@ -65,6 +80,8 @@ class Signup extends Page {
     }
   }
   render() {
+    const isProfilePicPreview =
+      this.state.profilePic && this.state.profilePic.preview;
     return (
       <React.Fragment>
         <div
@@ -83,6 +100,46 @@ class Signup extends Page {
               <h1 className="text-primary mb-4">Sign Up</h1>
 
               <Form className="d-flex flex-column" onSubmit={this.onSubmitForm}>
+                <FormGroup>
+                  <div className="d-flex flex-column justify-content-center">
+                    <div
+                      className="profile-picture preview"
+                      style={{
+                        display: isProfilePicPreview ? "block" : "none"
+                      }}
+                    >
+                      {isProfilePicPreview && (
+                        <img src={this.state.profilePic.preview} alt="" />
+                      )}
+                    </div>
+                    {isProfilePicPreview && (
+                      <Button
+                        onClick={() => {
+                          this.setState({ profilePic: null });
+                        }}
+                        outline
+                        size="sm"
+                        className="pl-3 pr-3 mt-2"
+                        style={{ placeSelf: "center" }}
+                      >
+                        X
+                      </Button>
+                    )}
+                    <Dropzone
+                      style={{
+                        display: isProfilePicPreview ? "none" : "flex"
+                      }}
+                      className={
+                        "filedropzone shadow bg-light rounded border-primary profile-picture"
+                      }
+                      multiple={false}
+                      onDropAccepted={this.onProfilePictureDrop}
+                      accept={["image/jpeg", "image/png", "image/gif"]}
+                    >
+                      Upload your profile picture
+                    </Dropzone>
+                  </div>
+                </FormGroup>
                 <FormGroup>
                   <Input
                     type="text"
