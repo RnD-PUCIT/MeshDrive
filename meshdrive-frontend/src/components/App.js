@@ -35,7 +35,6 @@ class App extends Component {
 
   componentWillMount() {
     loadProgressBar({ showSpinner: false });
-
     this.initToken();
   }
   componentDidMount() {}
@@ -50,7 +49,10 @@ class App extends Component {
   }
 
   render() {
+  
+   
     return (
+      
       <div id="App" className="d-flex flex-column flex-fill">
         <Router>
           <Layout>
@@ -65,7 +67,7 @@ class App extends Component {
               <Route path="/verifysuccess" exact component={VerifySuccess} />
               <Route path="/forgotpassword" exact component={ForgotPassword} />
               <Route path="/managetags" exact component={ManageTags} />
-              <Route path ="/profile" exact component = {UserProfile}/>
+              <Route path ="/profile"   render = {(props)=><UserProfile {...props} email={this.props.user.email}/>}/>
               <Route path="/userresult" exact component={UsersSearchResult}/>
               <Route
                 path="/resetpassword/:id"

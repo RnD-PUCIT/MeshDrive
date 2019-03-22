@@ -8,7 +8,7 @@ import FAIcon from "../../../FontAwesomeIcon/FontAwesomeIcon";
 import "./styles.css";
 
 const PrimarySideBarContent = props => {
-  const defaultContent = (
+  var defaultContent = (
     <ButtonGroup vertical className="d-flex mt-2">
       <NavLink to="/profile" className="btn btn-light light">
         Profile

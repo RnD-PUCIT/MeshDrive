@@ -10,9 +10,12 @@ import { Dropbox } from 'dropbox'
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import { rootURL } from "../../constants/apiConstants";
+<<<<<<< HEAD
+=======
 import uploadFileRequest from "./GoogleDrive/uploadFileRequest";
 import { toast } from "react-toastify";
 import LoadingMessage from "../../utils/LoadingMessage";
+>>>>>>> 9dd40ad38d6dbc38646afdc8ff0035fc6492b91f
 export const shouldUploadFile = (state, files) => {
   return {
     type: UPLOAD_FILE,
@@ -50,20 +53,16 @@ export default function requestUploadFile(drive, files, uploadFileEmail,parent) 
     let postURL;
     switch (drive.toUpperCase()) {
       case GOOGLEDRIVE:
-        uploadFileRequest(uploadFileEmail, files, user, progressEvent => {
-          console.log(progressEvent);
-        });
-
-        // let googleDriveEmail = uploadFileEmail;
-        // postURL = apiRoutes.files.uploadFile(
-        //   file.name,
-        //   encodedMimeType,
-        //   googleDriveEmail,
-        //   token
-        // );
+      let googleDriveEmail = uploadFileEmail;
+        postURL = apiRoutes.files.uploadFile(
+          file.name,
+          encodedMimeType,
+          googleDriveEmail,
+          token
+        );
         break;
       case ONEDRIVE:
-        let oneDriveEmail = uploadFileEmail;
+      let oneDriveEmail = uploadFileEmail;
         postURL = apiRoutes.files.onedrive_uploadFile(
           file.name,
           encodedMimeType,

@@ -6,7 +6,9 @@ class ProfileAbout extends React.Component{
 
     
     render(){
+       
         var profile = this.props.currentProfile;
+        var dateCreated = new Date(profile.date_created);
         if(profile==null)
         {
             return <div></div>
@@ -16,8 +18,6 @@ class ProfileAbout extends React.Component{
         var drivesCount = profile.driveAccountsList.googleDriveAccountsList.length+
         profile.driveAccountsList.oneDriveAccountsList.length+
         profile.driveAccountsList.dropboxAccountsList.length;
-
-      
         return (
      <Segment stacked>
      <Label as='a' color='teal' ribbon>
@@ -40,7 +40,7 @@ class ProfileAbout extends React.Component{
          <Divider></Divider>
          <Label as='a' color='teal' ribbon>
            Joined MeshDrive on
-        </Label><b>{profile.date_created}</b>
+        </Label><b>{dateCreated.toDateString()}</b>
      </Segment>   
         )
     }
