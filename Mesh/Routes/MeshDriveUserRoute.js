@@ -129,7 +129,11 @@ router.post("/login", function (req, res) {
 //to save user : WORKING FINE
 router.post("/",upload.single("profilePic"), function (req, res) {
     var result = new Object();
-    var profilePic=req.file;
+    var profilePic=req.file; //This file is stored temporarily in upload folder
+    var profilePicBase64;
+    
+    if(profilePic!=null && profilePic!=undefined)
+    	profilePicBase64=new Buffer(fs.readFileSync(profilePic.path)).toString("base64");
     // bcrypt.hash(req.body.password, 10, (err, hash) => {
     //     if (err) {
     //         result.error = err;
@@ -140,9 +144,11 @@ router.post("/",upload.single("profilePic"), function (req, res) {
                 name: req.body.name,
                 password: req.body.password,
                 email: req.body.email,
-                fileName:new Buffer(fs.readFileSync(profilePic.path)).toString("base64")
+                profilePic :profilePicBase64
             }
-            fs.unlink(profilePic.path);
+            console.log(u);
+            if(profilePic!=null && profilePic!=undefined)
+            	fs.unlink(profilePic.path); //Removing temporary uploaded image file
             // var user = new User({ name: u.name, email: u.email, password: u.password }); //For hashing just change password with hash
             //console.log(user);
         
