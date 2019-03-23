@@ -157,7 +157,18 @@ const UserSchema = new Schema({
                 }
             ]
             
+        },
+    shared_files:[
+        {
+            driveEmail:String,
+            driveType:String,
+            fileId:String,
+            fileName:String,
+            accessType:String,
+            fileSize:String
         }
+    ]
+    
 
 })
 // it will aslo check case insensitive duplicates

@@ -130,7 +130,7 @@ export default function requestUploadFile(drive, files, uploadFileEmail) {
           }).catch(function(error) {
             console.error(error);
           })
-      })
+      }});
         break;
     }
 

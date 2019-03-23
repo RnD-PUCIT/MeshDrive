@@ -11,6 +11,7 @@ const morganLogger = require('morgan');
 const FileTagsRouter = require('./FileTags/FileTagsRoute');
 const dbxDAL = require('./Dropbox/DropboxDAL');
 const AppConstants = require('./Extras/Globals');
+const SharedFileRouter = require('./Routes/SharedContentRouter');
 
 
 
@@ -40,6 +41,7 @@ app.use('/GoogleDrive',GoogleDriveRouter.router);
 app.use('/Dropbox',DropboxRouter.router);
 app.use('/OneDrive',OneDriveRouter.router);
 app.use('/files',FileTagsRouter);
+app.use('/Shared',SharedFileRouter.router);
 
 function main()
 {
