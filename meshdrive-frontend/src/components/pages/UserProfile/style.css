@@ -1,0 +1,18 @@
+.profile_pic{
+    display: block;
+ 
+ 
+}
+.image-container{
+    /* display: inline-block; */
+    
+}
+
+.name-container{
+    
+  margin-left: 30px
+  
+}
+.name-container >h6{
+color: dimgray;
+}

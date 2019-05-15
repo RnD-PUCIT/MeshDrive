@@ -1,0 +1,23 @@
+.filedropzone.profile-picture {
+  margin: auto;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  border-radius: 50% !important;
+}
+.preview.profile-picture {
+  margin: auto;
+  width: 150px;
+  height: 150px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.preview.profile-picture img {
+  display: inline;
+  margin: 0 auto;
+  height: 100%;
+  width: auto;
+}

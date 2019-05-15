@@ -79,7 +79,7 @@ export default function fetchRootFilesAllDrives(isForceReload = false) {
         if (isForceReload) {
           dispatch(forceReload(filesData));
         } else {
-          //debugger;
+          filesData.parent="root";
           dispatch(navigateTo(filesData));
           console.log("Navigating to");
         }

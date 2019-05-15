@@ -40,5 +40,13 @@ nav {
 }
 
 #nprogress .bar {
-  height:4px
+  height: 4px;
+}
+.filedropzone {
+  border: 1px dashed;
+  cursor: pointer;
+}
+.filedropzone.onDragEnter,
+.filedropzone:hover {
+  background: #ddd !important;
 }

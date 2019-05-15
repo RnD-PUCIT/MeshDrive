@@ -7,7 +7,7 @@ import Footer from "./Footer/Footer";
 const Layout = props => {
   return (
     <React.Fragment>
-      {/* <Header /> */}
+      <Header />
       <MainContent>{props.children}</MainContent>
 
       {/* <Footer /> */}

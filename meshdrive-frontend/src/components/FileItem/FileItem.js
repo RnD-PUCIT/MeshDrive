@@ -28,10 +28,7 @@ import { getMimeTypeIcon } from "../../constants/mimeTypes";
 import "./styles.css";
 import { Tag, Close } from "@zendeskgarden/react-tags";
 import "@zendeskgarden/react-tags/dist/styles.css";
-import SideBar from "../Layout/SideBar/SideBar";
-import filesReducer from "../../reducers/filesReducer";
 
-import jsonCompare from "../../utils/jsonCompare";
 
 class FileItem extends Component {
   constructor(props) {
@@ -97,13 +94,16 @@ class FileItem extends Component {
     e.preventDefault();
     const { file } = this.props;
     if (this.isFolder) {
+
       this.props.fetchFilesById(
         file.drive,
         file.driveEmail,
         file.id,
         false,
-        file.path
+        file.path,
+        file.name
       );
+      
     } else {
     }
   };
@@ -136,10 +136,7 @@ class FileItem extends Component {
     fileInfo.fileId = file.id;
     fileInfo.tagsIdList = this.state.selectedTagsList;
     this.props.assignTagsToFile(fileInfo);
-    //  // this.state.selectedTagsList = file.tagsList;
-    //   this.setState({
-    //     selectedTagsList: this.state.selectedTagsList
-    //   })
+
     this.toggle();
   };
   AddTagToList = (tag, index) => {

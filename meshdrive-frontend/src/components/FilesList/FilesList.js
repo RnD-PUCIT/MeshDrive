@@ -243,61 +243,22 @@ console.log("tags filter "+filtered);
   }
 
   render() {
-    console.log("rENDERINGGGGGG");
     var fileItems = this.sortFileItems(this.state.files);
-    // console.log(this.state.files);
+
     //______________ SEARCHING _____________________
-    console.log(this.props.searchKeyword.keywords);
+    console.log(this.props.searchKeyword.file_keywords);
     if (this.props.searchKeyword.keywords != "") {
       fileItems = fileItems.filter(file => {
         if (
           file.name
             .toUpperCase()
-            .includes(this.props.searchKeyword.keywords.toUpperCase()) == true
+            .includes(this.props.searchKeyword.file_keywords.toUpperCase()) == true
         ) {
           return file;
         }
       });
     }
-    //______________ FILTERING _____________________
-    // this.applyDriveFilter(fileItems).then((driveFiles)=>{
-    //   console.log("Drive files: "+ driveFiles);
-    //   this.applyTimeFilter(driveFiles).then((timeFiles)=>{
-    //     console.log("Time files: "+ timeFiles);
-    //     this.applyTypeFilter(timeFiles).then((typeFiles)=>{
-    //       console.log("Type files: "+ typeFiles);
-    //     });
-
-    //   });
-
-    // });
-
-    // let timeFiltered = this.applyTimeFilter(driveFiltered);
-    // console.log("Time files: "+ timeFiltered);
-    // let typeFiltered = this.applyTypeFilter(typeFiltered);
-    // console.log("Type files: "+ typeFiltered);
-
-
-
-
-    // seperate folders
-
-    // const mapFilesList = fileItems.map(file => {
-    //   const isFileActive = this.props.activeFileIds.indexOf(file.id) !== -1;
-    //   return <FileItem key={file.id} file={file} isFileActive={isFileActive} />;
-    // });
-    // let display;
-    // if (!this.state.componentDidUpdated) {
-    //   display = "Loading... Please wait";
-    // } else if (this.state.files.length === 0) {
-    //   display = "No file exist or no drive added";
-    // } else if (fileItems.length === 0) {
-    //   display = "No such file exists in your drives";
-    // } else {
-    //   display = mapFilesList;
-    // }
-
-
+   
     return (
       <Async promise={this.applyDriveFilter(fileItems)} then={(driveFiles) =>
         <Async promise={this.applyTimeFilter(driveFiles)} then={(timeFiles) =>

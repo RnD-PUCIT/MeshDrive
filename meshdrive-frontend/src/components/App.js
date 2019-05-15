@@ -6,6 +6,7 @@ import { loadProgressBar } from "axios-progress-bar";
 import { connect } from "react-redux";
 import Layout from "./Layout/Layout";
 import Home from "./pages/Home/Home";
+import UserProfile from './pages/UserProfile/UserProfile'
 import Dashboard from "./pages/Dashboard/Dashboard";
 import ManageDrives from "./pages/ManageDrives/ManageDrives";
 import UploadFile from "./pages/UploadFile/UploadFile";
@@ -22,6 +23,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "axios-progress-bar/dist/nprogress.css";
 
 import initUserObjFromLocalStorage from "../actions/user/initUserObjFromLocalStorage";
+import UsersSearchResult from "./pages/UsersSearchResult/UsersSearchResult";
 
 class App extends Component {
   initToken = () => {
@@ -33,7 +35,6 @@ class App extends Component {
 
   componentWillMount() {
     loadProgressBar({ showSpinner: false });
-
     this.initToken();
   }
   componentDidMount() {}
@@ -48,7 +49,10 @@ class App extends Component {
   }
 
   render() {
+  
+   
     return (
+      
       <div id="App" className="d-flex flex-column flex-fill">
         <Router>
           <Layout>
@@ -63,6 +67,9 @@ class App extends Component {
               <Route path="/verifysuccess" exact component={VerifySuccess} />
               <Route path="/forgotpassword" exact component={ForgotPassword} />
               <Route path="/managetags" exact component={ManageTags} />
+              <Route path ="/profile/:email" component={UserProfile} />  
+              {/* // render = {(props)=><UserProfile {...props} email={this.props.user.email}/>}/> */}
+              <Route path="/userresult" exact component={UsersSearchResult}/>
               <Route
                 path="/resetpassword/:id"
                 exact
