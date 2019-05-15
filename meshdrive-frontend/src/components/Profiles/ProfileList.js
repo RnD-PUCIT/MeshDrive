@@ -8,44 +8,12 @@ class ProfileList extends React.Component {
 
 
     render() {
-        var profile = [
-            {
-                email: "shaheryartariq909@gmail.com",
-                name: "Shaheryar Tariq"
-            },
-            {
-                email: "memonasultan54@gmail.com",
-                name: "Memona Sultan"
-            },
-            {
-                email: "bilalyasin1616@gmail.com",
-                name: "Bilal Yasin"
-            },
-            {
-                email: "mohsinAli@gmail.com",
-                name: "Mohsin Ali"
-            }
-        ]
-
+      
+        var followers=this.props.followers;
         return (
-            // <Table>
-            //       <thead>
-            //           <tr>
-            //             <td>No.</td>
-            //             <td>Name</td>
-            //             <td>Email</td>
-            //           </tr>
-            //           <tbody>
-            //               <ProfileListItem profile={profile}></ProfileListItem>
-            //           </tbody>
-            //         </thead>
-            // </Table>
            
-                 <ProfileListItem profile={profile}></ProfileListItem>
-              // <ProfileCardList profile={profile}></ProfileCardList>
-          
-
-
+                 <ProfileListItem profile={followers}></ProfileListItem>
+             
         );
     }
 

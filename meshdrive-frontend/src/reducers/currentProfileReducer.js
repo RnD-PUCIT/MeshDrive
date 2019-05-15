@@ -25,9 +25,14 @@ export default function(state = initialUserState, action){
         }
         case "GET_SELECTED_PROFILE":
         {
-          console.log(action);
+        
+          if(action.error){
+            return state;
+          }
+          console.log("Data inside reducer",action);
           return action.payload.data.userProfile
         }
+      
     }
     
     return state;

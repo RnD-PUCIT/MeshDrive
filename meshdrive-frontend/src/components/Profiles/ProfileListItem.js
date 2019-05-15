@@ -2,13 +2,26 @@ import React from 'react'
 import { ListGroupItem, Label } from "reactstrap";
 import 'semantic-ui-css/semantic.min.css';
 import { List, Image,Segment } from 'semantic-ui-react'
-
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+import UserProfile from '../pages/UserProfile/UserProfile'
 class ProfileListItem extends React.Component {
 
   constructor(props) {
     super(props);
     console.log(props);
   }
+  openProfile(email){
+    console.log(email);
+    // <Router>
+    // <Switch>
+    // <Route path ="/profile"   render = {(props)=><UserProfile {...props} email={email}/>}/>
+       
+    //   </Switch>
+    // </Router>
+  }
+  
+  
 
   render() {
     let profile = this.props.profile;
@@ -16,31 +29,25 @@ class ProfileListItem extends React.Component {
       padding: "15px"
     }
     const profilesList = profile.map(p => {
-      return (
-        <List.Item style={marginStyle} onClick={()=>{console.log(p.name)}}>
+      var link = "/profile/"+p.followerEmail;
+      return (       
+      
+       <NavLink to={link}>
+       <List.Item  key={p.followerEmail}   style={marginStyle}  onClick={()=>this.openProfile(p.followerEmail)}>
           <Image avatar src='https://www.gstatic.com/webp/gallery/4.jpg' />
           <List.Content>
-            <List.Header as='a'>{p.name}</List.Header>
+            <List.Header as='a'>  {p.followerEmail}</List.Header>
             <List.Description>
-              {p.email}
+              {p.followerEmail}
             </List.Description>
           </List.Content>
         </List.Item>
+        </NavLink>
+
       );
     })
     return (
-      // <tr>
-      //      <td width="10%">
-      //           1  {/* <img width="75px" height="75px" src={profile.image_url} ></img> */}
-      //     </td>
-      //     <td width="40%" align="centre">
-      //             {profile.name}
-
-      //     </td>
-      //     <td width="50%" align="centre">
-      //             {profile.email}
-      //      </td>
-      // </tr>
+     
       <React.Fragment>
         <Segment raised>
           <List animated divided size="big">

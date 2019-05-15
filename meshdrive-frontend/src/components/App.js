@@ -67,7 +67,8 @@ class App extends Component {
               <Route path="/verifysuccess" exact component={VerifySuccess} />
               <Route path="/forgotpassword" exact component={ForgotPassword} />
               <Route path="/managetags" exact component={ManageTags} />
-              <Route path ="/profile"   render = {(props)=><UserProfile {...props} email={this.props.user.email}/>}/>
+              <Route path ="/profile/:email" component={UserProfile} />  
+              {/* // render = {(props)=><UserProfile {...props} email={this.props.user.email}/>}/> */}
               <Route path="/userresult" exact component={UsersSearchResult}/>
               <Route
                 path="/resetpassword/:id"

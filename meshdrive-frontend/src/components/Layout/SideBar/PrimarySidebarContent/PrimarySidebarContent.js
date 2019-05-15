@@ -8,9 +8,11 @@ import FAIcon from "../../../FontAwesomeIcon/FontAwesomeIcon";
 import "./styles.css";
 
 const PrimarySideBarContent = props => {
+  var email = props.user.email;
+  var profileRoute = "/profile/"+email;
   var defaultContent = (
     <ButtonGroup vertical className="d-flex mt-2">
-      <NavLink to="/profile" className="btn btn-light light">
+      <NavLink to={profileRoute} className="btn btn-light light">
         Profile
       </NavLink>  
       <NavLink exact to="/dashboard" className="btn btn-light light d-block">
@@ -62,9 +64,9 @@ const PrimarySideBarContent = props => {
     </div>
   );
 };
-function mapStateToProps(state) {
+function mapStateToProps({ user }) {
   return {
-    user: state.user
+    user
   };
 }
 export default connect(mapStateToProps)(PrimarySideBarContent);

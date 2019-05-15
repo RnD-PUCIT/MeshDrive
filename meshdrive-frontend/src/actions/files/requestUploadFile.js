@@ -10,12 +10,9 @@ import { Dropbox } from 'dropbox'
 import SweetAlertWrapper from "../../components/SweetAlertWrapper/SweetAlertWrapper";
 import { GOOGLEDRIVE, DROPBOX, ONEDRIVE } from "../../constants/strings";
 import { rootURL } from "../../constants/apiConstants";
-<<<<<<< HEAD
-=======
 import uploadFileRequest from "./GoogleDrive/uploadFileRequest";
 import { toast } from "react-toastify";
 import LoadingMessage from "../../utils/LoadingMessage";
->>>>>>> 9dd40ad38d6dbc38646afdc8ff0035fc6492b91f
 export const shouldUploadFile = (state, files) => {
   return {
     type: UPLOAD_FILE,

@@ -11,27 +11,55 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import ProfileHeader from '../../Profiles/ProfileHeader';
 import {getSelfProfile,getProfileByEmail} from '../../../actions/currentUserProfile/getCurrentProfile'
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
+
 class UserProfile extends Page{
    
     constructor(props) {
         super(props);
         this.state = {
-         activeTab:"About"
+         activeTab:"About",
+         currentEmail:null
         };
       }
-    componentDidMount(){
-      console.log("Props are ",this.props);
-     var email=this.props.email;
-    //  console.log(this.params);
-        if(email==null)
-        {
-          this.props.getSelfProfile();
-        }
-        else{
-          this.props.getProfileByEmail(email);
-        }
-          super.componentDidMount();
-    }
+
+      componentDidMount(){
+        var email=this.props.match.params.email;
+      
+        console.log("Getting profile By email :" ,email);
+        this.props.getProfileByEmail(email);
+        // this.setState({currentEmail:email});
+// 
+      }
+
+      componentWillReceiveProps(props) {
+        var email=props.match.params.email;
+        console.log("Getting profile By email :" ,email);
+
+        this.props.getProfileByEmail(email);
+          // this.setState({currentEmail:email});
+      }
+
+
+    shouldComponentUpdate(nextProps,newState) {
+      var email=this.props.match.params.email;
+      console.log("Old email :",email);
+      console.log("Next email :",nextProps.match.params.email)
+      if(email==nextProps.match.params.email && newState.activeTab==this.state.activeTab){
+        return false;
+      }else{
+        return true;
+      }
+      // var nextEmail=nextProps.match.params.email;
+
+      // if(nextEmail == this.state.currentEmail && newState.activeTab==this.state.activeTab) {
+      //   return false;
+      // }else {return true;}
+  }
+
+    
+      
+    
 
       
 
@@ -48,19 +76,23 @@ class UserProfile extends Page{
       getActiveTabContent(tab){
         var currentProfile = this.props.currentProfile;
         var followers=currentProfile.followers;
+        console.log(followers);
         var following = currentProfile.following;
         if(tab == "Followers")
         {
-          return   <ProfileList ></ProfileList>
+          return   <ProfileList  followers={followers} ></ProfileList>
         }else if (tab == "About")
         {
-          return <div><ProfileAbout currentProfile={currentProfile}></ProfileAbout></div>
+          return <div>
+                  <ProfileAbout  currentProfile={currentProfile}></ProfileAbout>
+            </div>
         }
       }
     
    
     render(){
-        var currentProfile=this.props.currentProfile;
+      console.log("rendering") 
+      var currentProfile=this.props.currentProfile;
         var gradientClass="btn btn-gradient";
         var lightClass="";
        
@@ -77,12 +109,19 @@ class UserProfile extends Page{
                   id="UserProfile"
                   className="flex-grow-1 d-flex flex-column container"
                 >  
-              <table>
+
+  <Router>
+            <Switch>
+              <Route path="/profile/:email" render={(e) =>{console.log(e); return <div>TEST</div>}} / >
+              </Switch>
+            </Router>
+
+              <table width="50%">
                 <tbody>            
                   <tr>
-                    <td width="1%">
+                    <td >
                     <div className="image-container"  > 
-                  <img className="profile_pic"  src={currentProfile.profile_pic} width="350px"  height="350px"></img>
+                  <img className="profile_pic"  src={currentProfile.profile_pic} width="250px"  height="250px"></img>
                   {/* <Button className={gradientClass+" float-bottom"} >Follow </Button> */}
                     </div>
 
@@ -92,8 +131,8 @@ class UserProfile extends Page{
                   <div className="name-container" >
                     <h4>{currentProfile.name}</h4>
                     <h6>Free User</h6>
-                      <Button className={gradientClass} outline  >{isFollowing?"Following":"Follow"}  
-                        <Badge color="secondary"></Badge><i  style={{marginLeft:"5px"}}   class= {isFollowing?"fas fa-check":"fas fa-plus"}></i>
+                      <Button  className={gradientClass} outline  >{isFollowing?"Following":"Follow"}  
+                        <Badge color="secondary"></Badge><i  style={{marginLeft:"5px"}}   className= {isFollowing?"fas fa-check":"fas fa-plus"}></i>
                       </Button>
                       </div>
                     </td>
@@ -118,7 +157,7 @@ class UserProfile extends Page{
               <NavItem>
                 <NavLink href="#"
                 onClick={() => { this.toggle('Following'); }}
-                id='Following' className={this.state.activeTab=="Following"?gradientClass:lightClass}>
+                id='Following'  className={this.state.activeTab=="Following"?gradientClass:lightClass}>
                 Following
                 <Badge color="secondary"  style={{marginLeft:'5px'}}>{currentProfile.following.length}</Badge>
                 </NavLink>
@@ -147,8 +186,9 @@ class UserProfile extends Page{
 }
 
 
-function mapStateToProps({ currentProfile }) {
+function mapStateToProps({ user,currentProfile }) {
   return {
+    user,
     currentProfile
   };
 }
