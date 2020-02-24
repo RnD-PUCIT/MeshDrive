@@ -116,7 +116,7 @@ A folder named `build` will be created in the project directory containing all (
 
 ## Authors
 List of  contributors who participated in this project:
+* **Shaheryar Tariq** - *Worked on developing front-end, creating middleware api on back-end, api integration and database* - [github profile](https://github.com/shaheryar1)
 * **Mohsin Ali** - *Worked on bootstrapping, theming, developing front-end and api integration* - [github profile](https://github.com/mohsinalipro)
 * **Memona Sultan** - *Worked on developing front-end & back-end, api integration* - [github profile](https://github.com/memona008)
-* **Shaheryar Tariq** - *Worked on developing front-end, creating middleware api on back-end, api integration and database* - [github profile](https://github.com/shaheryar1)
 * **Bilal Yasin** - *Worked on developing back-end, creating middleware api on back-end and database* - [github profile](https://github.com/shaheryar1)
