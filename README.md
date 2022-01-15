@@ -1,6 +1,6 @@
 
 # MeshDrive
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
+MeshDrive is an integrated platform where we are providing integration of three major drives (OneDrive, GoogleDrive, and Dropbox) along with some smart features. We are giving end-users the feature to add multiple accounts from each platform and manage their files in one place and enjoy virtually unlimited space. Moreover, it provides AI features assisting users to organize and retrieve their files efficiently these include search by image, voice search, and document clustering.
 
 #### Live Demo
 [mohsina.li/showcase/meshdrive/](http://mohsina.li/showcase/meshdrive/)
